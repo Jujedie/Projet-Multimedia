@@ -1,4 +1,4 @@
-package application.multimedia.iut.Vue.image;
+package application.multimedia.iut.Metier;
 
 import java.awt.Dimension;
 import java.awt.Point;

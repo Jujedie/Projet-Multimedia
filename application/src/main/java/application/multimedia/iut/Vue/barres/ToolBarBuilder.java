@@ -1,5 +1,7 @@
-package application.multimedia.iut.Vue;
+package application.multimedia.iut.Vue.barres;
 
+import application.multimedia.iut.Vue.LucideIconLoader;
+import application.multimedia.iut.Vue.PaintPanel;
 import javax.swing.*;
 import java.awt.*;
 

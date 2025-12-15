@@ -1,4 +1,4 @@
-package application.multimedia.iut.Vue.image;
+package application.multimedia.iut.Metier;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -56,11 +56,20 @@ public class RenduToile {
 	public BufferedImage construireComposite(PileCouches pile) {
 		if (pile.estVide()) return null;
 		Rectangle base = pile.limitesBase();
-		int minX = base != null ? base.x : 0;
-		int minY = base != null ? base.y : 0;
-		int maxX = base != null ? base.x + base.width : 0;
-		int maxY = base != null ? base.y + base.height : 0;
-		if (base == null) {
+		int minX;
+		int minY;
+		int largeurImg;
+		int hauteurImg;
+		if (base != null) {
+			minX = base.x;
+			minY = base.y;
+			largeurImg = base.width;
+			hauteurImg = base.height;
+		} else {
+			minX = 0;
+			minY = 0;
+			int maxX = 0;
+			int maxY = 0;
 			for (CoucheImage couche : pile.couches()) {
 				int largeur = couche.largeurRedimensionnee(pile.niveauZoom());
 				int hauteur = couche.hauteurRedimensionnee(pile.niveauZoom());
@@ -69,13 +78,13 @@ public class RenduToile {
 				maxX = Math.max(maxX, couche.x + largeur);
 				maxY = Math.max(maxY, couche.y + hauteur);
 			}
+			largeurImg = Math.max(1, maxX - minX);
+			hauteurImg = Math.max(1, maxY - minY);
 		}
-		int largeurImg = Math.max(1, maxX - minX);
-		int hauteurImg = Math.max(1, maxY - minY);
 		BufferedImage composite = new BufferedImage(largeurImg, hauteurImg, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2d = composite.createGraphics();
-		g2d.setColor(Color.WHITE);
-		g2d.fillRect(0, 0, largeurImg, hauteurImg);
+		g2d.setComposite(AlphaComposite.Src);
+		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 		List<CoucheImage> couches = pile.couches();
 		double zoom = pile.niveauZoom();

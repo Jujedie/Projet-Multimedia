@@ -1,9 +1,9 @@
 package application.multimedia.iut.Vue;
 
-import application.multimedia.iut.Vue.image.CoucheImage;
-import application.multimedia.iut.Vue.image.PileCouches;
-import application.multimedia.iut.Vue.image.RenduToile;
-import application.multimedia.iut.Vue.image.SessionPlacement;
+import application.multimedia.iut.Metier.CoucheImage;
+import application.multimedia.iut.Metier.PileCouches;
+import application.multimedia.iut.Metier.RenduToile;
+import application.multimedia.iut.Metier.SessionPlacement;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -22,6 +22,7 @@ public class ImageManager {
 
 	private Point dernierePositionSouris;
 	private boolean glisserEnCours = false;
+	private CoucheImage coucheGlissee;
 
 	public ImageManager(JLabel toile, JComponent parent) {
 		this.toile = toile;
@@ -111,16 +112,15 @@ public class ImageManager {
 		}
 
 		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setDialogTitle("Enregistrer l'image");
+		fileChooser.setDialogTitle("Enregistrer l'image (PNG)");
 		fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
 			public boolean accept(File f) {
 				if (f.isDirectory()) return true;
 				String name = f.getName().toLowerCase();
-				return name.endsWith(".jpg") || name.endsWith(".jpeg") ||
-				   name.endsWith(".png");
+				return name.endsWith(".png");
 			}
 			public String getDescription() {
-				return "Images (*.jpg, *.png)";
+				return "Images (*.png)";
 			}
 		});
 
@@ -128,15 +128,13 @@ public class ImageManager {
 		if (result == JFileChooser.APPROVE_OPTION) {
 			File fichierChoisi = fileChooser.getSelectedFile();
 			String nomFichier = fichierChoisi.getName();
-			if (!nomFichier.toLowerCase().endsWith(".png") && !nomFichier.toLowerCase().endsWith(".jpg")) {
+			if (!nomFichier.toLowerCase().endsWith(".png")) {
 				fichierChoisi = new File(fichierChoisi.getAbsolutePath() + ".png");
-				nomFichier = fichierChoisi.getName();
 			}
 
 			try {
-				String format = nomFichier.toLowerCase().endsWith(".jpg") ? "jpg" : "png";
 				BufferedImage composite = renduToile.construireComposite(pileCouches);
-				ImageIO.write(composite, format, fichierChoisi);
+				ImageIO.write(composite, "png", fichierChoisi);
 				JOptionPane.showMessageDialog(parent,
 					"Image enregistrée avec succès !",
 					"Succès", JOptionPane.INFORMATION_MESSAGE);
@@ -218,10 +216,25 @@ public class ImageManager {
 		pileCouches.vider();
 		sessionPlacement.annuler();
 		glisserEnCours = false;
+		coucheGlissee = null;
 		if (image != null) {
 			pileCouches.ajouterCouche(image, obtenirTailleToile(), true);
 		}
 		afficherImage();
+	}
+
+	private CoucheImage coucheAuPoint(Point p) {
+		java.util.List<CoucheImage> couches = pileCouches.couches();
+		double zoom = pileCouches.niveauZoom();
+		for (int i = couches.size() - 1; i >= 0; i--) {
+			CoucheImage couche = couches.get(i);
+			int largeur = couche.largeurRedimensionnee(zoom);
+			int hauteur = couche.hauteurRedimensionnee(zoom);
+			if (p.x >= couche.x && p.x <= couche.x + largeur && p.y >= couche.y && p.y <= couche.y + hauteur) {
+				return couche;
+			}
+		}
+		return null;
 	}
 
 	public void activerDeplacementImage() {
@@ -235,6 +248,14 @@ public class ImageManager {
 					dernierePositionSouris = e.getPoint();
 					glisserEnCours = true;
 					toile.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+					return;
+				}
+				CoucheImage cible = coucheAuPoint(e.getPoint());
+				if (cible != null) {
+					coucheGlissee = cible;
+					dernierePositionSouris = e.getPoint();
+					glisserEnCours = true;
+					toile.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 				}
 			}
 
@@ -242,20 +263,25 @@ public class ImageManager {
 			public void mouseReleased(MouseEvent e) {
 				if (SwingUtilities.isLeftMouseButton(e)) {
 					glisserEnCours = false;
+					coucheGlissee = null;
 					toile.setCursor(Cursor.getDefaultCursor());
 				}
 			}
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				if (glisserEnCours && sessionPlacement.estActive()) {
-					Point positionActuelle = e.getPoint();
-					int dx = positionActuelle.x - dernierePositionSouris.x;
-					int dy = positionActuelle.y - dernierePositionSouris.y;
+				if (!glisserEnCours) return;
+				Point positionActuelle = e.getPoint();
+				int dx = positionActuelle.x - dernierePositionSouris.x;
+				int dy = positionActuelle.y - dernierePositionSouris.y;
+				if (sessionPlacement.estActive()) {
 					sessionPlacement.translater(dx, dy);
-					dernierePositionSouris = positionActuelle;
-					toile.repaint();
+				} else if (coucheGlissee != null) {
+					coucheGlissee.x += dx;
+					coucheGlissee.y += dy;
 				}
+				dernierePositionSouris = positionActuelle;
+				toile.repaint();
 			}
 		};
 

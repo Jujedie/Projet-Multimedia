@@ -1,5 +1,7 @@
 package application.multimedia.iut.Vue;
 
+import application.multimedia.iut.Vue.barres.MenuBarBuilder;
+import application.multimedia.iut.Vue.barres.ToolBarBuilder;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
