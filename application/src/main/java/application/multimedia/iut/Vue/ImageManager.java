@@ -1,9 +1,9 @@
 package application.multimedia.iut.Vue;
 
-import application.multimedia.iut.Metier.CoucheImage;
-import application.multimedia.iut.Metier.PileCouches;
-import application.multimedia.iut.Metier.RenduToile;
-import application.multimedia.iut.Metier.SessionPlacement;
+import application.multimedia.iut.Metier.image.CoucheImage;
+import application.multimedia.iut.Metier.image.PileCouches;
+import application.multimedia.iut.Metier.image.RenduToile;
+import application.multimedia.iut.Metier.image.SessionPlacement;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;

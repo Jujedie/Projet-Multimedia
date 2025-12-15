@@ -1,4 +1,4 @@
-package application.multimedia.iut.Metier;
+package application.multimedia.iut.Metier.image;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;

@@ -1,4 +1,4 @@
-package application.multimedia.iut.Metier;
+package application.multimedia.iut.Metier.image;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
