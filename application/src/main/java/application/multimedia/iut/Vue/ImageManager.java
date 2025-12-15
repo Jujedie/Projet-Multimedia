@@ -6,9 +6,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-/**
- * Classe responsable de la gestion des images (ouverture, enregistrement, affichage)
- */
 public class ImageManager {
     
     private BufferedImage currentImage;

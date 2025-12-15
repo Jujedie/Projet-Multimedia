@@ -31,7 +31,6 @@ public class MenuBarBuilder {
         JMenuItem enregistrerSousItem = new JMenuItem("Enregistrer sous...");
         JMenuItem quitterItem = new JMenuItem("Quitter");
         
-        // Ajouter les actions
         ouvrirItem.addActionListener(e -> panel.ouvrirFichier());
         enregistrerItem.addActionListener(e -> panel.enregistrerFichier(false));
         enregistrerSousItem.addActionListener(e -> panel.enregistrerFichier(true));

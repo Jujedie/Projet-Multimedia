@@ -25,11 +25,9 @@ public class PaintPanel extends JPanel {
 	private JPanel creerPanneauSuperieur() {
 		JPanel panneauHaut = new JPanel(new BorderLayout());
 		
-		// Créer la barre de menu
 		MenuBarBuilder menuBuilder = new MenuBarBuilder(this);
 		JMenuBar menuBar = menuBuilder.creerMenuBar();
 		
-		// Créer la barre d'outils
 		ToolBarBuilder toolBarBuilder = new ToolBarBuilder(this);
 		JToolBar barreOutils = toolBarBuilder.creerToolBar();
 		
