@@ -81,28 +81,48 @@ public class Colorisation {
 		}
 	}
 
-	private void potDePeinture (BufferedImage image, int coulDest, Boolean estContinue, int x, int y)
-	{
+	private void potDePeinture (BufferedImage image, int coulDest, int distance, Boolean estContinue, int xOrig, int yOrig) {
 		if (estContinue) {
-			potDePeintureRec (image, x, y, image.getRGB( x, y ) & 0xFFFFFF, coulDest );
+			potDePeintureRec (image, xOrig, yOrig, image.getRGB( xOrig, yOrig ) & 0xFFFFFF, coulDest, distance);
 		}
 		else {
-
+			int coulOrig = image.getRGB( xOrig, yOrig ) & 0xFFFFFF;
+			for(int x = 0; x < image.getWidth(); x++){
+				for (int y = 0; y < image.getHeight(); y++){
+					if (distance(image.getRGB( x, y ),coulOrig) < distance)
+						image.setRGB(x,y, coulDest);
+				}
+			}
 		}
 	}
 
-	private void potDePeintureRec  (BufferedImage image, int x, int y, int coulOrig, int coul)
-	{
+	private void potDePeintureRec  (BufferedImage image, int x, int y, int coulOrig, int coul, int distance) {
 		if ( x < 0 || x >= image.getWidth() ) return;
 		if ( y < 0 || y >= image.getHeight()) return;
 
-		if ( ( image.getRGB( x, y ) & 0xFFFFFF ) != coulOrig ) return; // Mettre distance
+		if ( !(distance(image.getRGB( x, y ),coulOrig) < distance) ){ return;}
 
 		image.setRGB(x, y, coul);
 
-		potDePeintureRec(image, x+1, y, coulOrig, coul);
-		potDePeintureRec(image, x-1, y, coulOrig, coul);
-		potDePeintureRec(image, x, y+1, coulOrig, coul);
-		potDePeintureRec(image, x, y-1, coulOrig, coul);
+		potDePeintureRec(image, x+1, y, coulOrig, coul, distance);
+		potDePeintureRec(image, x-1, y, coulOrig, coul, distance);
+		potDePeintureRec(image, x, y+1, coulOrig, coul, distance);
+		potDePeintureRec(image, x, y-1, coulOrig, coul, distance);
+	}
+
+	public static double distance(int c1, int c2) {
+		int r1 = c1 / (256*256);
+		int g1 = c1 / 256 % 256;
+		int b1 = c1 % 256;
+
+		int r2 = c2 / (256*256);
+		int g2 = c2 / 256 % 256;
+		int b2 = c2 % 256;
+
+		int dr = r1 - r2;
+		int dg = g1 - g2;
+		int db = b1 - b2;
+
+		return Math.sqrt((double)(dr * dr + dg * dg + db * db));
 	}
 }
