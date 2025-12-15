@@ -72,6 +72,34 @@ public class ColorisationTest {
 
 
 		// Test Teinter
-		Colorisation.teinter(image, 100, 0, 0);
+		Colorisation.teinter(image, 100, 0, 0, 75);
+
+		try {
+			ImageIO.write(image, "png", new File("./application/src/test/resources/chat_teinter.png"));
+		}
+		catch (Exception e) {
+			System.err.println("Erreur d'écriture de l'image : " + e.getMessage());
+			return;
+		}
+
+		try {
+			 image = ImageIO.read(new File("./application/src/main/resources/chat.png"));
+		}
+		catch (Exception e) {
+			System.err.println("Erreur de lecture de l'image : " + e.getMessage());
+			return;
+		}
+
+
+		// Test Pot de peinture
+		Colorisation.potDePeinture(image, (new java.awt.Color(255, 255, 255)).getRGB(), 50, false, 150, 5);
+
+		try {
+			ImageIO.write(image, "png", new File("./application/src/test/resources/chat_potDePeinture.png"));
+		}
+		catch (Exception e) {
+			System.err.println("Erreur d'écriture de l'image : " + e.getMessage());
+			return;
+		}
 	}
 }
