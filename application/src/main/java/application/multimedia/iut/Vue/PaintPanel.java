@@ -5,10 +5,10 @@ import javax.swing.*;
 import java.awt.image.BufferedImage;
 
 public class PaintPanel extends JPanel {
-	
-	private JLabel canvas;
-	private JScrollPane scrollPane;
-	private ImageManager imageManager;
+
+	private JLabel toile;
+	private JScrollPane panneauDeroulement;
+	private ImageManager gestionnaireImages;
 	
 	public PaintPanel() {
 		setLayout(new BorderLayout());
@@ -16,10 +16,10 @@ public class PaintPanel extends JPanel {
 		new Thread(() -> LucideIconLoader.preloadCommonIcons()).start();
 		JPanel panneauHaut = creerPanneauSuperieur();
 		
-		creerCanvas();
+		creerToile();
 		
 		add(panneauHaut, BorderLayout.NORTH);
-		add(scrollPane, BorderLayout.CENTER);
+		add(panneauDeroulement, BorderLayout.CENTER);
 	}
 	
 	private JPanel creerPanneauSuperieur() {
@@ -37,42 +37,51 @@ public class PaintPanel extends JPanel {
 		return panneauHaut;
 	}
 	
-	private void creerCanvas() {
-		canvas = new JLabel();
-		canvas.setHorizontalAlignment(JLabel.CENTER);
-		canvas.setVerticalAlignment(JLabel.CENTER);
-		canvas.setBackground(Color.WHITE);
-		canvas.setOpaque(true);
-		canvas.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+	private void creerToile() {
+		toile = new JLabel() {
+			@Override
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				if (gestionnaireImages != null) {
+					gestionnaireImages.dessinerImage(g);
+				}
+			}
+		};
+		toile.setHorizontalAlignment(JLabel.CENTER);
+		toile.setVerticalAlignment(JLabel.CENTER);
+		toile.setBackground(Color.WHITE);
+		toile.setOpaque(true);
+		toile.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 		
-		scrollPane = new JScrollPane(canvas);
-		scrollPane.setBackground(Color.DARK_GRAY);
+		panneauDeroulement = new JScrollPane(toile);
+		panneauDeroulement.setBackground(Color.DARK_GRAY);
 		
-		imageManager = new ImageManager(canvas, this);
+		gestionnaireImages = new ImageManager(toile, this);
+		gestionnaireImages.activerDeplacementImage();
 	}
 	
 	
 	public void ouvrirFichier() {
-		imageManager.ouvrirFichier();
+		gestionnaireImages.ouvrirFichier();
 	}
 	
 	public void enregistrerFichier(boolean nouveauFichier) {
-		imageManager.enregistrerFichier(nouveauFichier);
+		gestionnaireImages.enregistrerFichier(nouveauFichier);
 	}
 	
-	public void zoom(double factor) {
-		imageManager.zoom(factor);
+	public void zoomer(double facteur) {
+		gestionnaireImages.zoomer(facteur);
 	}
 	
-	public void resetZoom() {
-		imageManager.resetZoom();
+	public void reinitialiserZoom() {
+		gestionnaireImages.reinitialiserZoom();
 	}
 	
-	public BufferedImage getCurrentImage() {
-		return imageManager.getCurrentImage();
+	public BufferedImage obtenirImageCourante() {
+		return gestionnaireImages.obtenirImageCourante();
 	}
 	
-	public void setCurrentImage(BufferedImage image) {
-		imageManager.setCurrentImage(image);
+	public void definirImageCourante(BufferedImage image) {
+		gestionnaireImages.definirImageCourante(image);
 	}
 }

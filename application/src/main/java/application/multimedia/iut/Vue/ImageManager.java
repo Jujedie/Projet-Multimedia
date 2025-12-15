@@ -1,145 +1,265 @@
 package application.multimedia.iut.Vue;
 
+import application.multimedia.iut.Vue.image.CoucheImage;
+import application.multimedia.iut.Vue.image.PileCouches;
+import application.multimedia.iut.Vue.image.RenduToile;
+import application.multimedia.iut.Vue.image.SessionPlacement;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class ImageManager {
-	
-	private BufferedImage currentImage;
-	private double zoomLevel = 1.0;
-	private JLabel canvas;
-	private JComponent parent;
-	
-	public ImageManager(JLabel canvas, JComponent parent) {
-		this.canvas = canvas;
+	private final PileCouches pileCouches = new PileCouches();
+	private final SessionPlacement sessionPlacement = new SessionPlacement();
+	private final RenduToile renduToile = new RenduToile();
+	private final JLabel toile;
+	private final JComponent parent;
+
+	private Point dernierePositionSouris;
+	private boolean glisserEnCours = false;
+
+	public ImageManager(JLabel toile, JComponent parent) {
+		this.toile = toile;
 		this.parent = parent;
+		installerRaccourcisClavier();
 	}
-	
+
 	public void ouvrirFichier() {
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setDialogTitle("Ouvrir une image");
+		fileChooser.setMultiSelectionEnabled(true);
 		fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
 			public boolean accept(File f) {
 				if (f.isDirectory()) return true;
 				String name = f.getName().toLowerCase();
-				return name.endsWith(".jpg") || name.endsWith(".jpeg") || 
-					   name.endsWith(".png") || name.endsWith(".gif") || 
-					   name.endsWith(".bmp");
+				return name.endsWith(".jpg") || name.endsWith(".jpeg") ||
+				   name.endsWith(".png") || name.endsWith(".gif") ||
+				   name.endsWith(".bmp");
 			}
 			public String getDescription() {
 				return "Images (*.jpg, *.png, *.gif, *.bmp)";
 			}
 		});
-		
+
 		int result = fileChooser.showOpenDialog(parent);
 		if (result == JFileChooser.APPROVE_OPTION) {
-			File selectedFile = fileChooser.getSelectedFile();
-			try {
-				currentImage = ImageIO.read(selectedFile);
-				if (currentImage != null) {
-					zoomLevel = 1.0;
-					afficherImage();
-					JOptionPane.showMessageDialog(parent, 
-						"Image chargée avec succès !\nTaille: " + currentImage.getWidth() + "x" + currentImage.getHeight(),
-						"Succès", JOptionPane.INFORMATION_MESSAGE);
-				} else {
-					JOptionPane.showMessageDialog(parent, 
-						"Impossible de charger l'image.",
-						"Erreur", JOptionPane.ERROR_MESSAGE);
+			File[] fichiersChoisis = fileChooser.getSelectedFiles();
+			if (fichiersChoisis == null || fichiersChoisis.length == 0) {
+				fichiersChoisis = new File[] { fileChooser.getSelectedFile() };
+			}
+			boolean possedeDejaImages = !pileCouches.estVide();
+			int choix = JOptionPane.YES_OPTION; // YES = remplacer, NO = superposer
+			if (possedeDejaImages) {
+				String[] options = {"Remplacer", "Superposer", "Annuler"};
+				choix = JOptionPane.showOptionDialog(parent,
+					"Une image est déjà chargée. Que faire ?",
+					"Chargement d'images",
+					JOptionPane.YES_NO_CANCEL_OPTION,
+					JOptionPane.QUESTION_MESSAGE,
+					null,
+					options,
+					options[1]);
+			}
+			if (choix == JOptionPane.CANCEL_OPTION || choix == JOptionPane.CLOSED_OPTION) {
+				return;
+			}
+			if (choix == JOptionPane.YES_OPTION) { // Remplacer
+				pileCouches.vider();
+				sessionPlacement.annuler();
+				glisserEnCours = false;
+			}
+			boolean placementDemande = possedeDejaImages && choix == JOptionPane.NO_OPTION;
+			boolean premierePlacee = false;
+			for (File fichier : fichiersChoisis) {
+				try {
+					BufferedImage img = ImageIO.read(fichier);
+					if (img != null) {
+						if (placementDemande && !premierePlacee) {
+							demarrerPlacement(img);
+							premierePlacee = true;
+						} else {
+							pileCouches.ajouterCouche(img, obtenirTailleToile(), true);
+						}
+					} else {
+						JOptionPane.showMessageDialog(parent, "Impossible de charger " + fichier.getName(), "Erreur", JOptionPane.ERROR_MESSAGE);
+					}
+				} catch (Exception ex) {
+					JOptionPane.showMessageDialog(parent, "Erreur lors du chargement: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
 				}
-			} catch (Exception ex) {
-				JOptionPane.showMessageDialog(parent, 
-					"Erreur lors du chargement: " + ex.getMessage(),
-					"Erreur", JOptionPane.ERROR_MESSAGE);
+			}
+			if (!pileCouches.estVide()) {
+				afficherImage();
+				BufferedImage active = obtenirImageCourante();
+				JOptionPane.showMessageDialog(parent,
+					"Image(s) chargée(s) !\nActive: " + (active != null ? active.getWidth() + "x" + active.getHeight() : "-"),
+					"Succès", JOptionPane.INFORMATION_MESSAGE);
 			}
 		}
 	}
-	
+
 	public void enregistrerFichier(boolean nouveauFichier) {
-		if (currentImage == null) {
-			JOptionPane.showMessageDialog(parent, 
+		if (pileCouches.estVide()) {
+			JOptionPane.showMessageDialog(parent,
 				"Aucune image à enregistrer.",
 				"Information", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		
+
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setDialogTitle("Enregistrer l'image");
 		fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
 			public boolean accept(File f) {
 				if (f.isDirectory()) return true;
 				String name = f.getName().toLowerCase();
-				return name.endsWith(".jpg") || name.endsWith(".jpeg") || 
-					   name.endsWith(".png");
+				return name.endsWith(".jpg") || name.endsWith(".jpeg") ||
+				   name.endsWith(".png");
 			}
 			public String getDescription() {
 				return "Images (*.jpg, *.png)";
 			}
 		});
-		
+
 		int result = fileChooser.showSaveDialog(parent);
 		if (result == JFileChooser.APPROVE_OPTION) {
-			File selectedFile = fileChooser.getSelectedFile();
-			
-			String fileName = selectedFile.getName();
-			if (!fileName.toLowerCase().endsWith(".png") && !fileName.toLowerCase().endsWith(".jpg")) {
-				selectedFile = new File(selectedFile.getAbsolutePath() + ".png");
+			File fichierChoisi = fileChooser.getSelectedFile();
+			String nomFichier = fichierChoisi.getName();
+			if (!nomFichier.toLowerCase().endsWith(".png") && !nomFichier.toLowerCase().endsWith(".jpg")) {
+				fichierChoisi = new File(fichierChoisi.getAbsolutePath() + ".png");
+				nomFichier = fichierChoisi.getName();
 			}
-			
+
 			try {
-				String format = fileName.toLowerCase().endsWith(".jpg") ? "jpg" : "png";
-				ImageIO.write(currentImage, format, selectedFile);
-				JOptionPane.showMessageDialog(parent, 
+				String format = nomFichier.toLowerCase().endsWith(".jpg") ? "jpg" : "png";
+				BufferedImage composite = renduToile.construireComposite(pileCouches);
+				ImageIO.write(composite, format, fichierChoisi);
+				JOptionPane.showMessageDialog(parent,
 					"Image enregistrée avec succès !",
 					"Succès", JOptionPane.INFORMATION_MESSAGE);
 			} catch (Exception ex) {
-				JOptionPane.showMessageDialog(parent, 
+				JOptionPane.showMessageDialog(parent,
 					"Erreur lors de l'enregistrement: " + ex.getMessage(),
 					"Erreur", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
-	
+
 	private void afficherImage() {
-		if (currentImage == null) return;
-		
-		int newWidth = (int) (currentImage.getWidth() * zoomLevel);
-		int newHeight = (int) (currentImage.getHeight() * zoomLevel);
-		
-		Image scaledImage = currentImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
-		canvas.setIcon(new ImageIcon(scaledImage));
-		
-		// Forcer le rafraîchissement
-		canvas.revalidate();
-		canvas.repaint();
+		if (pileCouches.estVide()) return;
+		toile.setIcon(null);
+		toile.repaint();
 	}
-	
-	public void zoom(double factor) {
-		if (currentImage == null) return;
-		
-		zoomLevel *= factor;
-		// Limiter le zoom entre 10% et 500%
-		if (zoomLevel < 0.1) zoomLevel = 0.1;
-		if (zoomLevel > 5.0) zoomLevel = 5.0;
-		
+
+	private Dimension obtenirTailleToile() {
+		return new Dimension(Math.max(1, toile.getWidth()), Math.max(1, toile.getHeight()));
+	}
+
+	private void demarrerPlacement(BufferedImage img) {
+		sessionPlacement.demarrer(img, obtenirTailleToile(), pileCouches.niveauZoom(), pileCouches.limitesBase());
+		toile.requestFocusInWindow();
+		JOptionPane.showMessageDialog(parent,
+			"Clique sur la zone où placer l'image, puis appuie sur Entrée pour valider.",
+			"Placement de l'image", JOptionPane.INFORMATION_MESSAGE);
+		toile.repaint();
+	}
+
+	private void validerPlacement() {
+		if (!sessionPlacement.estActive()) return;
+		if (!sessionPlacement.intersecteBase(pileCouches.niveauZoom())) {
+			JOptionPane.showMessageDialog(parent, "L'image est totalement hors de la première et sera ignorée.", "Placement refusé", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		CoucheImage placee = sessionPlacement.valider();
+		if (placee != null) {
+			pileCouches.ajouterCouche(placee);
+		}
+		glisserEnCours = false;
+		toile.repaint();
+	}
+
+	private void installerRaccourcisClavier() {
+		InputMap im = toile.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+		ActionMap am = toile.getActionMap();
+		im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "validerPlacement");
+		am.put("validerPlacement", new AbstractAction() {
+			@Override
+			public void actionPerformed(java.awt.event.ActionEvent e) {
+				validerPlacement();
+			}
+		});
+	}
+
+	public void dessinerImage(Graphics g) {
+		renduToile.peindre(g, pileCouches, sessionPlacement);
+	}
+
+	public void zoomer(double facteur) {
+		if (pileCouches.estVide()) return;
+		pileCouches.zoomer(facteur);
 		afficherImage();
 	}
-	
-	public void resetZoom() {
-		if (currentImage == null) return;
-		zoomLevel = 1.0;
+
+	public void reinitialiserZoom() {
+		if (pileCouches.estVide()) return;
+		pileCouches.reinitialiserZoom();
 		afficherImage();
 	}
-	
-	public BufferedImage getCurrentImage() {
-		return currentImage;
+
+	public BufferedImage obtenirImageCourante() {
+		CoucheImage active = pileCouches.coucheActive();
+		return active != null ? active.image : null;
 	}
-	
-	public void setCurrentImage(BufferedImage image) {
-		this.currentImage = image;
+
+	public void definirImageCourante(BufferedImage image) {
+		pileCouches.vider();
+		sessionPlacement.annuler();
+		glisserEnCours = false;
+		if (image != null) {
+			pileCouches.ajouterCouche(image, obtenirTailleToile(), true);
+		}
 		afficherImage();
+	}
+
+	public void activerDeplacementImage() {
+		MouseAdapter adaptationSouris = new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if (!SwingUtilities.isLeftMouseButton(e)) return;
+				if (sessionPlacement.estActive()) {
+					sessionPlacement.deplacerAu(e.getPoint(), pileCouches.niveauZoom());
+					toile.repaint();
+					dernierePositionSouris = e.getPoint();
+					glisserEnCours = true;
+					toile.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+				}
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (SwingUtilities.isLeftMouseButton(e)) {
+					glisserEnCours = false;
+					toile.setCursor(Cursor.getDefaultCursor());
+				}
+			}
+
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				if (glisserEnCours && sessionPlacement.estActive()) {
+					Point positionActuelle = e.getPoint();
+					int dx = positionActuelle.x - dernierePositionSouris.x;
+					int dy = positionActuelle.y - dernierePositionSouris.y;
+					sessionPlacement.translater(dx, dy);
+					dernierePositionSouris = positionActuelle;
+					toile.repaint();
+				}
+			}
+		};
+
+		toile.addMouseListener(adaptationSouris);
+		toile.addMouseMotionListener(adaptationSouris);
 	}
 }

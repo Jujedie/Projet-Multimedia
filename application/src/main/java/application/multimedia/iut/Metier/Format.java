@@ -4,6 +4,4 @@ public class Format {
 	public void redimensionner() {
 		
 	}
-
-	public void 
 }

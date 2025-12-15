@@ -1,14 +1,13 @@
 package application.multimedia.iut.Vue;
 
 import javax.swing.*;
-import java.awt.event.ActionListener;
 
 public class MenuBarBuilder {
 	
-	private PaintPanel panel;
+	private PaintPanel panneau;
 	
-	public MenuBarBuilder(PaintPanel panel) {
-		this.panel = panel;
+	public MenuBarBuilder(PaintPanel panneau) {
+		this.panneau = panneau;
 	}
 	
 	public JMenuBar creerMenuBar() {
@@ -31,9 +30,9 @@ public class MenuBarBuilder {
 		JMenuItem enregistrerSousItem = new JMenuItem("Enregistrer sous...");
 		JMenuItem quitterItem = new JMenuItem("Quitter");
 		
-		ouvrirItem.addActionListener(e -> panel.ouvrirFichier());
-		enregistrerItem.addActionListener(e -> panel.enregistrerFichier(false));
-		enregistrerSousItem.addActionListener(e -> panel.enregistrerFichier(true));
+		ouvrirItem.addActionListener(e -> panneau.ouvrirFichier());
+		enregistrerItem.addActionListener(e -> panneau.enregistrerFichier(false));
+		enregistrerSousItem.addActionListener(e -> panneau.enregistrerFichier(true));
 		quitterItem.addActionListener(e -> System.exit(0));
 		
 		fichierMenu.add(nouveauItem);

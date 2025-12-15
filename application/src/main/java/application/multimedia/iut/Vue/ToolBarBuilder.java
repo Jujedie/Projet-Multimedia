@@ -4,13 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ToolBarBuilder {
-	
-	private PaintPanel panel;
-	private Color iconColor = new Color(60, 60, 60);
-	private int iconSize = 20;
-	
-	public ToolBarBuilder(PaintPanel panel) {
-		this.panel = panel;
+
+	private PaintPanel panneau;
+	private Color couleurIcone = new Color(60, 60, 60);
+	private int tailleIcone = 20;
+
+	public ToolBarBuilder(PaintPanel panneau) {
+		this.panneau = panneau;
 	}
 	
 	public JToolBar creerToolBar() {
@@ -70,9 +70,9 @@ public class ToolBarBuilder {
 		JButton sauvegarderBtn = creerBouton("save", "Sauvegarder");
 		JButton chargerBtn = creerBouton("folder-open", "Ouvrir");
 		JButton effacerBtn = creerBouton("trash-2", "Effacer tout");
-		
-		chargerBtn.addActionListener(e -> panel.ouvrirFichier());
-		sauvegarderBtn.addActionListener(e -> panel.enregistrerFichier(true));
+
+		chargerBtn.addActionListener(e -> panneau.ouvrirFichier());
+		sauvegarderBtn.addActionListener(e -> panneau.enregistrerFichier(true));
 		
 		barre.add(sauvegarderBtn);
 		barre.add(chargerBtn);
@@ -111,9 +111,9 @@ public class ToolBarBuilder {
 		JButton zoomOutBtn = creerBouton("zoom-out", "Zoom -");
 		JButton zoomResetBtn = creerBouton("maximize-2", "Zoom 100%");
 		
-		zoomInBtn.addActionListener(e -> panel.zoom(1.2));
-		zoomOutBtn.addActionListener(e -> panel.zoom(0.8));
-		zoomResetBtn.addActionListener(e -> panel.resetZoom());
+		zoomInBtn.addActionListener(e -> panneau.zoomer(1.2));
+		zoomOutBtn.addActionListener(e -> panneau.zoomer(0.8));
+		zoomResetBtn.addActionListener(e -> panneau.reinitialiserZoom());
 		
 		barre.add(zoomInBtn);
 		barre.add(zoomOutBtn);
@@ -140,20 +140,20 @@ public class ToolBarBuilder {
 		barre.add(miniCouleurPanel);
 	}
 	
-	private JToggleButton creerBoutonToggle(String iconName, String tooltip) {
-		JToggleButton btn = new JToggleButton(LucideIconLoader.loadIcon(iconName, iconSize, iconColor));
-		configurerBouton(btn, tooltip);
+	private JToggleButton creerBoutonToggle(String nomIcone, String infobulle) {
+		JToggleButton btn = new JToggleButton(LucideIconLoader.loadIcon(nomIcone, tailleIcone, couleurIcone));
+		configurerBouton(btn, infobulle);
+		return btn;
+	}
+
+	private JButton creerBouton(String nomIcone, String infobulle) {
+		JButton btn = new JButton(LucideIconLoader.loadIcon(nomIcone, tailleIcone, couleurIcone));
+		configurerBouton(btn, infobulle);
 		return btn;
 	}
 	
-	private JButton creerBouton(String iconName, String tooltip) {
-		JButton btn = new JButton(LucideIconLoader.loadIcon(iconName, iconSize, iconColor));
-		configurerBouton(btn, tooltip);
-		return btn;
-	}
-	
-	private void configurerBouton(AbstractButton btn, String tooltip) {
-		btn.setToolTipText(tooltip);
+	private void configurerBouton(AbstractButton btn, String infobulle) {
+		btn.setToolTipText(infobulle);
 		btn.setPreferredSize(new Dimension(40, 40));
 		btn.setFocusPainted(false);
 		btn.setBackground(new Color(240, 240, 240));
