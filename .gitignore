@@ -1,0 +1,5 @@
+# Fichiers compilés Java
+*.class
+
+# Images PNG
+*.png
