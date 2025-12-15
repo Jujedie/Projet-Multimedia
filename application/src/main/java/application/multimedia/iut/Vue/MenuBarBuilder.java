@@ -76,7 +76,6 @@ public class MenuBarBuilder {
 		imageMenu.add(flipVItem);
 		imageMenu.add(rotationItem);
 		imageMenu.add(redimensionnerItem);
-		
 		return imageMenu;
 	}
 	
