@@ -21,9 +21,6 @@ public class ImageManager {
         this.parent = parent;
     }
     
-    /**
-     * Ouvre un fichier image avec JFileChooser
-     */
     public void ouvrirFichier() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Ouvrir une image");
@@ -64,9 +61,6 @@ public class ImageManager {
         }
     }
     
-    /**
-     * Enregistre l'image actuelle
-     */
     public void enregistrerFichier(boolean nouveauFichier) {
         if (currentImage == null) {
             JOptionPane.showMessageDialog(parent, 
@@ -93,7 +87,6 @@ public class ImageManager {
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
             
-            // Ajouter l'extension si nécessaire
             String fileName = selectedFile.getName();
             if (!fileName.toLowerCase().endsWith(".png") && !fileName.toLowerCase().endsWith(".jpg")) {
                 selectedFile = new File(selectedFile.getAbsolutePath() + ".png");
@@ -113,9 +106,6 @@ public class ImageManager {
         }
     }
     
-    /**
-     * Affiche l'image dans le canvas avec le niveau de zoom actuel
-     */
     private void afficherImage() {
         if (currentImage == null) return;
         
@@ -130,9 +120,6 @@ public class ImageManager {
         canvas.repaint();
     }
     
-    /**
-     * Applique un zoom
-     */
     public void zoom(double factor) {
         if (currentImage == null) return;
         
@@ -144,25 +131,16 @@ public class ImageManager {
         afficherImage();
     }
     
-    /**
-     * Réinitialise le zoom à 100%
-     */
     public void resetZoom() {
         if (currentImage == null) return;
         zoomLevel = 1.0;
         afficherImage();
     }
     
-    /**
-     * Retourne l'image courante
-     */
     public BufferedImage getCurrentImage() {
         return currentImage;
     }
     
-    /**
-     * Définit l'image courante
-     */
     public void setCurrentImage(BufferedImage image) {
         this.currentImage = image;
         afficherImage();

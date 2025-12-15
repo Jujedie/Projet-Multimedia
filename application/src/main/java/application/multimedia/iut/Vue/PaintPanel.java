@@ -4,10 +4,6 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 
-/**
- * Panneau principal de l'application de retouche photo
- * Version refactorisée avec séparation des responsabilités
- */
 public class PaintPanel extends JPanel {
 	
 	private JLabel canvas;
@@ -17,23 +13,15 @@ public class PaintPanel extends JPanel {
 	public PaintPanel() {
 		setLayout(new BorderLayout());
 		
-		// Pré-charger les icônes Lucide en arrière-plan
 		new Thread(() -> LucideIconLoader.preloadCommonIcons()).start();
-
-		// Créer le panneau supérieur avec menu et barre d'outils
 		JPanel panneauHaut = creerPanneauSuperieur();
 		
-		// Créer le canvas central
 		creerCanvas();
 		
-		// Assembler les composants
 		add(panneauHaut, BorderLayout.NORTH);
 		add(scrollPane, BorderLayout.CENTER);
 	}
 	
-	/**
-	 * Crée le panneau supérieur avec menu et toolbar
-	 */
 	private JPanel creerPanneauSuperieur() {
 		JPanel panneauHaut = new JPanel(new BorderLayout());
 		
@@ -51,9 +39,6 @@ public class PaintPanel extends JPanel {
 		return panneauHaut;
 	}
 	
-	/**
-	 * Crée le canvas pour afficher l'image
-	 */
 	private void creerCanvas() {
 		canvas = new JLabel();
 		canvas.setHorizontalAlignment(JLabel.CENTER);
@@ -65,11 +50,9 @@ public class PaintPanel extends JPanel {
 		scrollPane = new JScrollPane(canvas);
 		scrollPane.setBackground(Color.DARK_GRAY);
 		
-		// Initialiser le gestionnaire d'images
 		imageManager = new ImageManager(canvas, this);
 	}
 	
-	// Méthodes publiques déléguées au ImageManager
 	
 	public void ouvrirFichier() {
 		imageManager.ouvrirFichier();

@@ -3,9 +3,6 @@ package application.multimedia.iut.Vue;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Classe responsable de la création de la barre d'outils
- */
 public class ToolBarBuilder {
     
     private PaintPanel panel;

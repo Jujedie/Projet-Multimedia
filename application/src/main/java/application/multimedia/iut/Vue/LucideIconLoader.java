@@ -16,21 +16,11 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Classe pour charger les icônes Lucide depuis le CDN
- */
 public class LucideIconLoader {
     
     private static final String LUCIDE_CDN_BASE = "https://unpkg.com/lucide-static@latest/icons/";
     private static final Map<String, Icon> iconCache = new HashMap<>();
-    
-    /**
-     * Charge une icône Lucide depuis le CDN
-     * @param iconName Nom de l'icône (ex: "save", "folder-open")
-     * @param size Taille en pixels
-     * @param color Couleur de l'icône
-     * @return ImageIcon ou null si erreur
-     */
+
     public static Icon loadIcon(String iconName, int size, Color color) {
         String cacheKey = iconName + "_" + size + "_" + color.getRGB();
         
@@ -56,13 +46,9 @@ public class LucideIconLoader {
             System.err.println("Erreur lors du chargement de l'icône " + iconName + ": " + e.getMessage());
         }
         
-        // Retourner une icône par défaut en cas d'erreur
         return createFallbackIcon(size, color);
     }
     
-    /**
-     * Télécharge le contenu SVG depuis le CDN Lucide
-     */
     private static String downloadSVG(String iconName) {
         try {
             URL url = new URL(LUCIDE_CDN_BASE + iconName + ".svg");
@@ -88,9 +74,6 @@ public class LucideIconLoader {
         return null;
     }
     
-    /**
-     * Convertit le SVG en BufferedImage
-     */
     private static BufferedImage convertSVGToImage(String svgContent, int size) {
         try {
             final BufferedImage[] imagePointer = new BufferedImage[1];
@@ -120,9 +103,6 @@ public class LucideIconLoader {
         }
     }
     
-    /**
-     * Crée une icône de secours simple
-     */
     private static Icon createFallbackIcon(int size, Color color) {
         BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = image.createGraphics();
@@ -134,9 +114,6 @@ public class LucideIconLoader {
         return new ImageIcon(image);
     }
     
-    /**
-     * Pré-charge les icônes couramment utilisées
-     */
     public static void preloadCommonIcons() {
         String[] commonIcons = {
             "square-dashed", "pencil", "eraser", "pipette", "paint-bucket", "type",

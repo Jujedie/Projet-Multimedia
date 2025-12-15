@@ -3,9 +3,6 @@ package application.multimedia.iut.Vue;
 import javax.swing.*;
 import java.awt.event.ActionListener;
 
-/**
- * Classe responsable de la création de la barre de menu
- */
 public class MenuBarBuilder {
     
     private PaintPanel panel;
