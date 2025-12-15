@@ -1,7 +1,13 @@
 package application.multimedia.iut;
 
+import application.multimedia.iut.Vue.PaintFrame;
+import javax.swing.SwingUtilities;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        SwingUtilities.invokeLater(() -> {
+            PaintFrame view = new PaintFrame();
+            view.setVisible(true);
+        });
     }
 }
