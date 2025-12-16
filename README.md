@@ -1,5 +1,6 @@
 # Projet-Multimedia
 
+## Aperçu de l'accueil de l'application
 ![tableau de bord de l'application](application/src/main/resources/accueil.png)
 
 
