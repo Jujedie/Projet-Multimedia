@@ -112,4 +112,62 @@ public class AjoutContenu {
 		return composite;
 	}
 
+	public static BufferedImage fusion(BufferedImage imgGauche, BufferedImage imgDroite, int fondu) {
+
+		if (fondu < 0 || fondu > imgGauche.getWidth() || fondu > imgDroite.getWidth()) {
+			throw new IllegalArgumentException(
+					"La largeur du fondu (" + fondu
+							+ ") doit être positive et inférieure aux largeurs des deux images.");
+		}
+
+		int width = imgGauche.getWidth() + imgDroite.getWidth() - fondu;
+		int height = Math.max(imgGauche.getHeight(), imgDroite.getHeight());
+
+		BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		Graphics g = result.getGraphics();
+
+		int xDebutFondu = imgGauche.getWidth() - fondu;
+
+		g.drawImage(imgGauche,
+				0, 0, xDebutFondu, height,
+				0, 0, xDebutFondu, imgGauche.getHeight(),
+				null);
+
+		g.drawImage(imgDroite,
+				imgGauche.getWidth(), 0, width, height,
+				fondu, 0, imgDroite.getWidth(), imgDroite.getHeight(),
+				null);
+
+		for (int x = 0; x < fondu; x++) {
+			float alpha = x / (float) fondu;
+
+			for (int y = 0; y < height; y++) {
+
+				int color1 = y < imgGauche.getHeight() ? imgGauche.getRGB(xDebutFondu + x, y) : Color.TRANSLUCENT;
+				int color2 = y < imgDroite.getHeight() ? imgDroite.getRGB(x, y) : Color.TRANSLUCENT;
+
+				int a1 = (color1 >> 24) & 0xff;
+				int r1 = (color1 >> 16) & 0xff;
+				int g1 = (color1 >> 8) & 0xff;
+				int b1 = color1 & 0xff;
+
+				int a2 = (color2 >> 24) & 0xff;
+				int r2 = (color2 >> 16) & 0xff;
+				int g2 = (color2 >> 8) & 0xff;
+				int b2 = color2 & 0xff;
+
+				int a = (int) (a1 * (1 - alpha) + a2 * alpha);
+				int r = (int) (r1 * (1 - alpha) + r2 * alpha);
+				int g_ = (int) (g1 * (1 - alpha) + g2 * alpha);
+				int b = (int) (b1 * (1 - alpha) + b2 * alpha);
+
+				int argb = (a << 24) | (r << 16) | (g_ << 8) | b;
+
+				result.setRGB(xDebutFondu + x, y, argb);
+			}
+		}
+
+		g.dispose();
+		return result;
+	}
 }
