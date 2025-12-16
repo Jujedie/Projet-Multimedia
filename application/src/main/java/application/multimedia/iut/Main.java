@@ -1,6 +1,6 @@
 package application.multimedia.iut;
 
-import application.multimedia.iut.Vue.PaintFrame;
+	import application.multimedia.iut.Vue.PaintFrame;
 import javax.swing.SwingUtilities;
 
 public class Main {
