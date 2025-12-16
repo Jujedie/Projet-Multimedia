@@ -31,6 +31,7 @@ import application.multimedia.iut.Metier.image.CoucheImage;
 import application.multimedia.iut.Metier.image.PileCouches;
 import application.multimedia.iut.Metier.image.RenduToile;
 import application.multimedia.iut.Metier.image.SessionPlacement;
+import application.multimedia.iut.Metier.OutilDessin;
 import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
 
 /**
@@ -41,6 +42,7 @@ public class ImageManager {
 	private final PileCouches pileCouches = new PileCouches();
 	private final SessionPlacement sessionPlacement = new SessionPlacement();
 	private final RenduToile renduToile = new RenduToile();
+	private final ControleurDessin controleurDessin = new ControleurDessin();
 	private final JLabel toile;
 	private final JComponent parent;
 
@@ -58,6 +60,10 @@ public class ImageManager {
 	public ImageManager(JLabel toile, JComponent parent) {
 		this.toile = toile;
 		this.parent = parent;
+		
+		// Créer une image blanche vide au démarrage pour permettre le dessin
+		creerImageVide(800, 600);
+		
 		installerRaccourcisClavier();
 	}
 
@@ -167,6 +173,7 @@ public class ImageManager {
 	/**
 	 * Valide et finalise le placement de l'image en cours.
 	 * Vérifie que l'image intersecte bien la zone de base.
+	 * Fusionne toutes les couches en une seule image composite.
 	 */
 	private void validerPlacement() {
 		if (!sessionPlacement.estActive()) return;
@@ -177,6 +184,21 @@ public class ImageManager {
 		CoucheImage placee = sessionPlacement.valider();
 		if (placee != null) {
 			pileCouches.ajouterCouche(placee);
+			// Sauvegarder le niveau de zoom actuel
+			double zoomActuel = pileCouches.niveauZoom();
+			// Réinitialiser le zoom pour la fusion
+			pileCouches.reinitialiserZoom();
+			// Fusionner toutes les couches en une seule image composite
+			BufferedImage imageComposite = renduToile.construireComposite(pileCouches);
+			if (imageComposite != null) {
+				// Remplacer toutes les couches par l'image fusionnée
+				pileCouches.vider();
+				pileCouches.ajouterCouche(imageComposite, obtenirTailleToile(), true);
+				// Restaurer le zoom si nécessaire
+				if (zoomActuel != 1.0) {
+					pileCouches.zoomer(zoomActuel);
+				}
+			}
 		}
 		glisserEnCours = false;
 		toile.repaint();
@@ -303,6 +325,7 @@ public class ImageManager {
 	/**
 	 * Trouve la couche visible à une position donnée.
 	 * Parcourt les couches du dessus vers le dessous.
+	 * Ignore les pixels transparents pour permettre la sélection des couches inférieures.
 	 *
 	 * @param p Le point à tester.
 	 * @return La couche trouvée, ou null si aucune.
@@ -315,7 +338,19 @@ public class ImageManager {
 			int largeur = couche.largeurRedimensionnee(zoom);
 			int hauteur = couche.hauteurRedimensionnee(zoom);
 			if (p.x >= couche.x && p.x <= couche.x + largeur && p.y >= couche.y && p.y <= couche.y + hauteur) {
-				return couche;
+				// Vérifier si le pixel à cette position n'est pas transparent
+				int pixelX = (int) ((p.x - couche.x) / zoom);
+				int pixelY = (int) ((p.y - couche.y) / zoom);
+				
+				// S'assurer que les coordonnées sont dans les limites de l'image
+				if (pixelX >= 0 && pixelX < couche.image.getWidth() && 
+				    pixelY >= 0 && pixelY < couche.image.getHeight()) {
+					int alpha = (couche.image.getRGB(pixelX, pixelY) >> 24) & 0xff;
+					// Si le pixel n'est pas transparent (alpha > 0), cette couche est cliquable
+					if (alpha > 0) {
+						return couche;
+					}
+				}
 			}
 		}
 		return null;
@@ -323,13 +358,26 @@ public class ImageManager {
 
 	/**
 	 * Active les gestionnaires de souris pour le déplacement des images.
-	 * Permet de glisser-déposer les couches et de placer de nouvelles images.
+	 * Permet de placer de nouvelles images en mode placement et de déplacer uniquement la première image (image de base).
 	 */
 	public void activerDeplacementImage() {
 		MouseAdapter adaptationSouris = new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if (!SwingUtilities.isLeftMouseButton(e)) return;
+				
+				// Gestion des outils de dessin
+				OutilDessin outilActif = controleurDessin.getOutilActif();
+				if (outilActif != OutilDessin.SELECTION && !pileCouches.estVide()) {
+					CoucheImage couche = pileCouches.coucheActive();
+					if (couche != null) {
+						controleurDessin.commencerDessin(couche.image, e.getX() - couche.x, e.getY() - couche.y);
+						toile.repaint();
+						return;
+					}
+				}
+				
+				// Gestion du placement
 				if (sessionPlacement.estActive()) {
 					sessionPlacement.deplacerAu(e.getPoint(), pileCouches.niveauZoom());
 					toile.repaint();
@@ -338,18 +386,25 @@ public class ImageManager {
 					toile.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 					return;
 				}
+				
+				// Autoriser uniquement le déplacement de la première image (index 0)
 				CoucheImage cible = coucheAuPoint(e.getPoint());
 				if (cible != null) {
-					coucheGlissee = cible;
-					dernierePositionSouris = e.getPoint();
-					glisserEnCours = true;
-					toile.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+					java.util.List<CoucheImage> couches = pileCouches.couches();
+					// Vérifier si c'est la première couche
+					if (!couches.isEmpty() && cible == couches.get(0)) {
+						coucheGlissee = cible;
+						dernierePositionSouris = e.getPoint();
+						glisserEnCours = true;
+						toile.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+					}
 				}
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if (SwingUtilities.isLeftMouseButton(e)) {
+					controleurDessin.terminerDessin();
 					glisserEnCours = false;
 					coucheGlissee = null;
 					toile.setCursor(Cursor.getDefaultCursor());
@@ -358,6 +413,17 @@ public class ImageManager {
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
+				// Gestion des outils de dessin
+				OutilDessin outilActif = controleurDessin.getOutilActif();
+				if (outilActif != OutilDessin.SELECTION && controleurDessin.estEnDessin()) {
+					CoucheImage couche = pileCouches.coucheActive();
+					if (couche != null) {
+						controleurDessin.continuerDessin(couche.image, e.getX() - couche.x, e.getY() - couche.y);
+						toile.repaint();
+						return;
+					}
+				}
+				
 				if (!glisserEnCours) return;
 				Point positionActuelle = e.getPoint();
 				int dx = positionActuelle.x - dernierePositionSouris.x;
@@ -365,6 +431,7 @@ public class ImageManager {
 				if (sessionPlacement.estActive()) {
 					sessionPlacement.translater(dx, dy);
 				} else if (coucheGlissee != null) {
+					// Déplacer uniquement la première couche
 					coucheGlissee.x += dx;
 					coucheGlissee.y += dy;
 				}
@@ -395,5 +462,55 @@ public class ImageManager {
 	 */
 	private void messageInfo(String titre, String message) {
 		JOptionPane.showMessageDialog(parent, message, titre, JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	/**
+	 * Obtient le contrôleur de dessin.
+	 *
+	 * @return Le contrôleur de dessin.
+	 */
+	public ControleurDessin getControleurDessin() {
+		return controleurDessin;
+	}
+	
+	/**
+	 * Crée une nouvelle image vide blanche avec les dimensions spécifiées.
+	 *
+	 * @param largeur Largeur de l'image.
+	 * @param hauteur Hauteur de l'image.
+	 */
+	private void creerImageVide(int largeur, int hauteur) {
+		BufferedImage imageVide = new BufferedImage(
+			Math.max(1, largeur), 
+			Math.max(1, hauteur), 
+			BufferedImage.TYPE_INT_ARGB
+		);
+		
+		// Remplir en blanc
+		Graphics2D g2d = imageVide.createGraphics();
+		g2d.setColor(Color.WHITE);
+		g2d.fillRect(0, 0, imageVide.getWidth(), imageVide.getHeight());
+		g2d.dispose();
+		
+		pileCouches.ajouterCouche(imageVide, obtenirTailleToile(), true);
+		afficherImage();
+	}
+
+	/**
+	 * Active un outil de dessin.
+	 *
+	 * @param outil L'outil à activer.
+	 */
+	public void activerOutil(OutilDessin outil) {
+		controleurDessin.setOutilActif(outil);
+	}
+
+	/**
+	 * Définit la couleur de dessin active.
+	 *
+	 * @param couleur La nouvelle couleur.
+	 */
+	public void definirCouleur(Color couleur) {
+		controleurDessin.definirCouleurActive(couleur);
 	}
 }
