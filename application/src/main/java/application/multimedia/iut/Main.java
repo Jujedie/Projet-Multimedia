@@ -8,8 +8,9 @@
 
 package application.multimedia.iut;
 
-	import application.multimedia.iut.Vue.PaintFrame;
-	import javax.swing.SwingUtilities;
+import javax.swing.SwingUtilities;
+
+import application.multimedia.iut.Vue.PaintFrame;
 
 public class Main {
     public static void main(String[] args) {

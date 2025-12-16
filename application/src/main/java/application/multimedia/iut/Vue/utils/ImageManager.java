@@ -6,19 +6,31 @@
  */
 package application.multimedia.iut.Vue.utils;
 
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+
+import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+
 import application.multimedia.iut.Metier.image.CoucheImage;
 import application.multimedia.iut.Metier.image.PileCouches;
 import application.multimedia.iut.Metier.image.RenduToile;
 import application.multimedia.iut.Metier.image.SessionPlacement;
 import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
 
 public class ImageManager {
 	private final PileCouches pileCouches = new PileCouches();
