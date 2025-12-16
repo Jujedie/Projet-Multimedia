@@ -1,6 +1,6 @@
 # Projet-Multimedia
 
-![tableau de bord de l'application](../Projet-Multimedia/application/src/main/resources/image.png)
+![tableau de bord de l'application](../Projet-Multimedia/application/src/main/resources/accueil.png)
 
 ## Description
 Projet-Multimedia est un projet Universitaire développé lors d'une SAE de 3ème année à l'IUT du Havre. Le but de ce projet est de manipuler des images au format PNG en utilisant le langage de programmation Java. L'application ressemble à des logiciels de retouche d'images basiques comme Paint.
