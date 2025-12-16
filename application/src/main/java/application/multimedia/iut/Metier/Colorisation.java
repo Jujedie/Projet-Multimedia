@@ -33,7 +33,7 @@ public class Colorisation {
 		}
 	}
 
-	public static int clamp(int v) {
+	private static int clamp(int v) {
         return Math.max(0, Math.min(255, v));
     }
 
@@ -117,7 +117,7 @@ public class Colorisation {
 		}
 	}
 
-	public static void potDePeintureRec  (BufferedImage image, int x, int y, int coulOrig, int coul, double distance) {
+	private static void potDePeintureRec  (BufferedImage image, int x, int y, int coulOrig, int coul, double distance) {
 
         int w = image.getWidth();
         int h = image.getHeight();
@@ -148,7 +148,7 @@ public class Colorisation {
         }
     }
 
-	public static double distance(int c1, int c2) {
+	private static double distance(int c1, int c2) {
         // retirer l'alpha
         c1 &= 0xFFFFFF;
         c2 &= 0xFFFFFF;
