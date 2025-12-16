@@ -8,7 +8,7 @@ public enum ActionTypeEnum {
 	LUMIERE(1),
 
 	// Actions de type Transformation
-	ROTATION(-1),
+	ROTATION(1),
 	REDIMENSIONNEMENT(-1), // true si changement de taille
 	COUPER(-1),
 	SYMETRIE_HORIZONTALE(-1), // Miroir horizontal
