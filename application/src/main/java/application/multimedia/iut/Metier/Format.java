@@ -7,95 +7,171 @@
 package application.multimedia.iut.Metier;
 
 import java.awt.image.BufferedImage;
-import java.awt.Image;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
 
 public class Format {
-	public static BufferedImage redimensionner(BufferedImage image, int largeur, int hauteur) {
 
-		Image imageMiseAEchelle = image.getScaledInstance(largeur, hauteur, Image.SCALE_SMOOTH);
+	public static BufferedImage redimensionner(BufferedImage source, int largeurCible, int hauteurCible) {
+		int largeurSource = source.getWidth();
+		int hauteurSource = source.getHeight();
 
-		BufferedImage imageRedimensionnee = new BufferedImage(largeur, hauteur, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage imageRedimensionnee = new BufferedImage(largeurCible, hauteurCible, BufferedImage.TYPE_INT_ARGB);
 
-		Graphics2D g2d = imageRedimensionnee.createGraphics();
+		double ratioX = (double) (largeurSource - 1) / largeurCible;
+		double ratioY = (double) (hauteurSource - 1) / hauteurCible;
 
-		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-		g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+		for (int y = 0; y < hauteurCible; y++) {
+			for (int x = 0; x < largeurCible; x++) {
 
-		g2d.drawImage(imageMiseAEchelle, 0, 0, null);
+				double sourceX = x * ratioX;
+				double sourceY = y * ratioY;
 
-		g2d.dispose();
+				int xSol = (int) sourceX;
+				int ySol = (int) sourceY;
+
+				int xPlafond = Math.min(xSol + 1, largeurSource - 1);
+				int yPlafond = Math.min(ySol + 1, hauteurSource - 1);
+
+				int rgbA = source.getRGB(xSol, ySol);
+				int rgbB = source.getRGB(xPlafond, ySol);
+				int rgbC = source.getRGB(xSol, yPlafond);
+				int rgbD = source.getRGB(xPlafond, yPlafond);
+
+				double poidsX = sourceX - xSol;
+				double poidsY = sourceY - ySol;
+
+				int alpha = interpoler(getAlpha(rgbA), getAlpha(rgbB), getAlpha(rgbC), getAlpha(rgbD),
+						poidsX, poidsY);
+				int rouge = interpoler(getRouge(rgbA), getRouge(rgbB), getRouge(rgbC), getRouge(rgbD), poidsX,
+						poidsY);
+				int vert = interpoler(getVert(rgbA), getVert(rgbB), getVert(rgbC), getVert(rgbD),
+						poidsX, poidsY);
+				int bleu = interpoler(getBleu(rgbA), getBleu(rgbB), getBleu(rgbC), getBleu(rgbD), poidsX,
+						poidsY);
+
+				int rgbFinal = (alpha << 24) | (rouge << 16) | (vert << 8) | bleu;
+				imageRedimensionnee.setRGB(x, y, rgbFinal);
+			}
+		}
 
 		return imageRedimensionnee;
 	}
 
+	private static int interpoler(int a, int b, int c, int d, double poidsX, double poidsY) {
+
+		double haut = a * (1 - poidsX) + b * poidsX;
+		double bas = c * (1 - poidsX) + d * poidsX;
+
+		double valeurFinale = haut * (1 - poidsY) + bas * poidsY;
+		return (int) Math.round(valeurFinale);
+	}
+
+	private static int getAlpha(int rgb) {
+		return (rgb >> 24) & 0xFF;
+	}
+
+	private static int getRouge(int rgb) {
+		return (rgb >> 16) & 0xFF;
+	}
+
+	private static int getVert(int rgb) {
+		return (rgb >> 8) & 0xFF;
+	}
+
+	private static int getBleu(int rgb) {
+		return rgb & 0xFF;
+	}
+
 	public static BufferedImage couper(BufferedImage source, int x1, int y1, int x2, int y2) {
 
-		int startX = Math.min(x1, x2);
-		int startY = Math.min(y1, y2);
+		int debutX = Math.min(x1, x2);
+		int debutY = Math.min(y1, y2);
+		int largeur = Math.abs(x2 - x1) + 1;
+		int hauteur = Math.abs(y2 - y1) + 1;
 
-		int width = Math.abs(x2 - x1) + 1;
-
-		int height = Math.abs(y2 - y1) + 1;
-
-		if (startX < 0 || startY < 0 || (startX + width) > source.getWidth()
-				|| (startY + height) > source.getHeight()) {
+		if (debutX < 0 || debutY < 0 || (debutX + largeur) > source.getWidth()
+				|| (debutY + hauteur) > source.getHeight()) {
 			throw new IllegalArgumentException(
 					"Les coordonnées (" + x1 + ", " + y1 + ") à (" + x2 + ", " + y2
 							+ ") sont en dehors des limites de l'image source (" + source.getWidth() + "x"
 							+ source.getHeight() + ").");
 		}
-
-		BufferedImage subImage = source.getSubimage(startX, startY, width, height);
-
-		return subImage;
+		BufferedImage sousImage = source.getSubimage(debutX, debutY, largeur, hauteur);
+		return sousImage;
 	}
 
-	public static BufferedImage rotation(BufferedImage source, double angle) {
+	public static BufferedImage rotation(BufferedImage src, double angleDeg) {
 
-		double angleRad = Math.toRadians(angle);
-		int largeur = source.getWidth();
-		int hauteur = source.getHeight();
+		angleDeg = ((angleDeg % 360) + 360) % 360;
 
-		int nouvelleLargeur = largeur;
-		int nouvelleHauteur = hauteur;
+		int w = src.getWidth();
+		int h = src.getHeight();
 
-		boolean angleDroit = angle % 180 != 0 && angle % 90 == 0;
-		if (angleDroit) {
-			nouvelleLargeur = hauteur;
-			nouvelleHauteur = largeur;
-		}
+		if (angleDeg == 90) {
+			BufferedImage dest = new BufferedImage(h, w, BufferedImage.TYPE_INT_ARGB);
+			for (int y = 0; y < h; y++)
+				for (int x = 0; x < w; x++)
+					dest.setRGB(h - 1 - y, x, src.getRGB(x, y));
+			return dest;
 
-		BufferedImage imageRotation = new BufferedImage(nouvelleLargeur, nouvelleHauteur, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g2d = imageRotation.createGraphics();
+		} else if (angleDeg == 180) {
+			BufferedImage dest = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+			for (int y = 0; y < h; y++)
+				for (int x = 0; x < w; x++)
+					dest.setRGB(w - 1 - x, h - 1 - y, src.getRGB(x, y));
+			return dest;
 
-		AffineTransform tx = new AffineTransform();
-
-		if (angleDroit) {
-			if (angle % 360 == 90 || angle % 360 == -270) {
-				tx.translate(nouvelleLargeur, 0);
-				tx.rotate(angleRad);
-			} else if (angle % 360 == 270 || angle % 360 == -90) {
-				tx.translate(0, nouvelleHauteur);
-				tx.rotate(angleRad);
-			} else if (angle % 360 == 180 || angle % 360 == -180) {
-				tx.translate(nouvelleLargeur, nouvelleHauteur);
-				tx.rotate(angleRad);
-			}
+		} else if (angleDeg == 270) {
+			BufferedImage dest = new BufferedImage(h, w, BufferedImage.TYPE_INT_ARGB);
+			for (int y = 0; y < h; y++)
+				for (int x = 0; x < w; x++)
+					dest.setRGB(y, w - 1 - x, src.getRGB(x, y));
+			return dest;
 
 		} else {
-			tx.translate(largeur / 2.0, hauteur / 2.0);
-			tx.rotate(angleRad);
-			tx.translate(-largeur / 2.0, -hauteur / 2.0);
+			return rotationRSamp(src, angleDeg);
 		}
+	}
 
-		g2d.setTransform(tx);
-		g2d.drawImage(source, 0, 0, null);
-		g2d.dispose();
+	public static BufferedImage rotationRSamp(BufferedImage src, double angleDeg) {
+		int srcWidth = src.getWidth();
+		int srcHeight = src.getHeight();
 
-		return imageRotation;
+		double angle = Math.toRadians(angleDeg);
+		double cosA = Math.abs(Math.cos(angle));
+		double sinA = Math.abs(Math.sin(angle));
+
+		int newWidth = (int) Math.ceil(srcWidth * cosA + srcHeight * sinA);
+		int newHeight = (int) Math.ceil(srcHeight * cosA + srcWidth * sinA);
+		BufferedImage dest = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+
+		int cxSrc = srcWidth / 2;
+		int cySrc = srcHeight / 2;
+
+		int cxDest = newWidth / 2;
+		int cyDest = newHeight / 2;
+
+		double cos = Math.cos(angle);
+		double sin = Math.sin(angle);
+
+		for (int yPrime = 0; yPrime < newHeight; yPrime++) {
+			for (int xPrime = 0; xPrime < newWidth; xPrime++) {
+				double xC = xPrime - cxDest;
+				double yC = yPrime - cyDest;
+
+				double x = xC * cos + yC * sin;
+				double y = -xC * sin + yC * cos;
+
+				int xSrc = (int) Math.round(x + cxSrc);
+				int ySrc = (int) Math.round(y + cySrc);
+
+				if (xSrc >= 0 && xSrc < srcWidth && ySrc >= 0 && ySrc < srcHeight) {
+					dest.setRGB(xPrime, yPrime, src.getRGB(xSrc, ySrc));
+				} else {
+					dest.setRGB(xPrime, yPrime, 0x000000); // fond noir
+				}
+			}
+		}
+		return dest;
 	}
 
 	public static BufferedImage symetrieHorizontale(BufferedImage source) {
@@ -103,15 +179,15 @@ public class Format {
 		int hauteur = source.getHeight();
 
 		BufferedImage imageSymetrique = new BufferedImage(largeur, hauteur, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g2d = imageSymetrique.createGraphics();
 
-		AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-		tx.translate(-largeur, 0);
-		g2d.setTransform(tx);
-		g2d.drawImage(source, 0, 0, null);
+		for (int y = 0; y < hauteur; y++) {
+			for (int x = 0; x < largeur; x++) {
+				int rgb = source.getRGB(x, y);
+				int nouveauX = largeur - 1 - x;
 
-		g2d.dispose();
-
+				imageSymetrique.setRGB(nouveauX, y, rgb);
+			}
+		}
 		return imageSymetrique;
 	}
 
@@ -120,15 +196,15 @@ public class Format {
 		int hauteur = source.getHeight();
 
 		BufferedImage imageSymetrique = new BufferedImage(largeur, hauteur, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g2d = imageSymetrique.createGraphics();
 
-		AffineTransform tx = AffineTransform.getScaleInstance(1, -1);
-		tx.translate(0, -hauteur);
-		g2d.setTransform(tx);
-		g2d.drawImage(source, 0, 0, null);
+		for (int y = 0; y < hauteur; y++) {
+			for (int x = 0; x < largeur; x++) {
+				int rgb = source.getRGB(x, y);
+				int nouveauY = hauteur - 1 - y;
 
-		g2d.dispose();
-
+				imageSymetrique.setRGB(x, nouveauY, rgb);
+			}
+		}
 		return imageSymetrique;
 	}
 }
