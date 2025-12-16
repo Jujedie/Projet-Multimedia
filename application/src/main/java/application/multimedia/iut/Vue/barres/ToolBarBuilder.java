@@ -1,5 +1,6 @@
 /**
- * Classe principale pour lancer l'application de retouche d'images.
+ * Classe construisant la barre d'outils de l'application.
+ * Contient les boutons d'accès rapide aux outils de dessin.
  * 
  * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
  * @version 1.0
@@ -11,16 +12,31 @@ import application.multimedia.iut.Vue.PaintPanel;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Constructeur de la barre d'outils de l'application.
+ * Fournit les boutons d'accès rapide aux outils de dessin et transformations.
+ */
 public class ToolBarBuilder {
 
 	private PaintPanel panneau;
 	private Color couleurIcone = new Color(60, 60, 60);
 	private int tailleIcone = 20;
 
+	/**
+	 * Constructeur du constructeur de barre d'outils.
+	 *
+	 * @param panneau Le panneau de peinture associé.
+	 */
 	public ToolBarBuilder(PaintPanel panneau) {
 		this.panneau = panneau;
 	}
 	
+	/**
+	 * Crée et assemble la barre d'outils complète.
+	 * Contient tous les outils de dessin, fichiers, transformations, etc.
+	 *
+	 * @return La barre d'outils construite.
+	 */
 	public JToolBar creerToolBar() {
 		JToolBar barreOutils = new JToolBar();
 		barreOutils.setFloatable(false);
@@ -50,6 +66,12 @@ public class ToolBarBuilder {
 		return barreOutils;
 	}
 	
+	/**
+	 * Ajoute les outils de dessin à la barre d'outils.
+	 * Contient : Sélection, Pinceau, Gomme, Pipette, Remplissage, Texte.
+	 *
+	 * @param barre La barre d'outils à modifier.
+	 */
 	private void ajouterOutilsDessin(JToolBar barre) {
 		ButtonGroup groupeOutils = new ButtonGroup();
 		
@@ -78,6 +100,12 @@ public class ToolBarBuilder {
 		barre.add(texteImageBtn);
 	}
 	
+	/**
+	 * Ajoute les outils de gestion de fichiers à la barre d'outils.
+	 * Contient : Sauvegarder, Ouvrir, Effacer tout.
+	 *
+	 * @param barre La barre d'outils à modifier.
+	 */
 	private void ajouterOutilsFichier(JToolBar barre) {
 		JButton sauvegarderBtn = creerBouton("save", "Sauvegarder");
 		JButton chargerBtn = creerBouton("folder-open", "Ouvrir");
@@ -91,6 +119,12 @@ public class ToolBarBuilder {
 		barre.add(effacerBtn);
 	}
 	
+	/**
+	 * Ajoute les outils de transformation d'images à la barre d'outils.
+	 * Contient : Flip H/V, Rotation, Redimensionner, Fusionner.
+	 *
+	 * @param barre La barre d'outils à modifier.
+	 */
 	private void ajouterOutilsTransformation(JToolBar barre) {
 		JButton flipHBtn = creerBouton("flip-horizontal", "Flip Horizontal");
 		JButton flipVBtn = creerBouton("flip-vertical", "Flip Vertical");
@@ -105,11 +139,23 @@ public class ToolBarBuilder {
 		barre.add(mergerBtn);
 	}
 	
+	/**
+	 * Ajoute les outils de filtres d'images à la barre d'outils.
+	 * Contient : Contraste.
+	 *
+	 * @param barre La barre d'outils à modifier.
+	 */
 	private void ajouterOutilsFiltres(JToolBar barre) {
 		JButton contrasteBtn = creerBouton("contrast", "Contraste");
 		barre.add(contrasteBtn);
 	}
 	
+	/**
+	 * Ajoute les outils d'historique à la barre d'outils.
+	 * Contient : Annuler, Refaire.
+	 *
+	 * @param barre La barre d'outils à modifier.
+	 */
 	private void ajouterOutilsHistorique(JToolBar barre) {
 		JButton undoBtn = creerBouton("undo", "Annuler");
 		JButton redoBtn = creerBouton("redo", "Refaire");
@@ -118,6 +164,12 @@ public class ToolBarBuilder {
 		barre.add(redoBtn);
 	}
 	
+	/**
+	 * Ajoute les contrôles de zoom à la barre d'outils.
+	 * Contient : Zoom+, Zoom-, Réinitialiser.
+	 *
+	 * @param barre La barre d'outils à modifier.
+	 */
 	private void ajouterOutilsZoom(JToolBar barre) {
 		JButton zoomInBtn = creerBouton("zoom-in", "Zoom +");
 		JButton zoomOutBtn = creerBouton("zoom-out", "Zoom -");
@@ -132,6 +184,12 @@ public class ToolBarBuilder {
 		barre.add(zoomResetBtn);
 	}
 	
+	/**
+	 * Ajoute le sélecteur de couleurs à la barre d'outils.
+	 * Affiche deux panneaux pour les couleurs principale et secondaire.
+	 *
+	 * @param barre La barre d'outils à modifier.
+	 */
 	private void ajouterSelecteurCouleurs(JToolBar barre) {
 		JPanel miniCouleurPanel = new JPanel(new GridLayout(1, 2, 2, 0));
 		miniCouleurPanel.setMaximumSize(new Dimension(50, 30));
@@ -152,18 +210,39 @@ public class ToolBarBuilder {
 		barre.add(miniCouleurPanel);
 	}
 	
+	/**
+	 * Crée un bouton toggle (sélectionnable) avec une icône.
+	 *
+	 * @param nomIcone Le nom de l'icône Lucide.
+	 * @param infobulle Le texte de l'infobulle.
+	 * @return Le bouton toggle configuré.
+	 */
 	private JToggleButton creerBoutonToggle(String nomIcone, String infobulle) {
 		JToggleButton btn = new JToggleButton(LucideIconLoader.loadIcon(nomIcone, tailleIcone, couleurIcone));
 		configurerBouton(btn, infobulle);
 		return btn;
 	}
 
+	/**
+	 * Crée un bouton standard avec une icône.
+	 *
+	 * @param nomIcone Le nom de l'icône Lucide.
+	 * @param infobulle Le texte de l'infobulle.
+	 * @return Le bouton configuré.
+	 */
 	private JButton creerBouton(String nomIcone, String infobulle) {
 		JButton btn = new JButton(LucideIconLoader.loadIcon(nomIcone, tailleIcone, couleurIcone));
 		configurerBouton(btn, infobulle);
 		return btn;
 	}
 	
+	/**
+	 * Configure le style et le comportement d'un bouton.
+	 * Applique les dimensions, couleurs et effets de survol.
+	 *
+	 * @param btn Le bouton à configurer.
+	 * @param infobulle Le texte de l'infobulle.
+	 */
 	private void configurerBouton(AbstractButton btn, String infobulle) {
 		btn.setToolTipText(infobulle);
 		btn.setPreferredSize(new Dimension(40, 40));

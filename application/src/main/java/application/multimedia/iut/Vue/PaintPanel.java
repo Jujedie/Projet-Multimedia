@@ -1,5 +1,6 @@
 /**
- * Classe principale pour lancer l'application de retouche d'images.
+ * Classe représentant le panel de dessin principal.
+ * Gère l'affichage et l'interaction avec les images.
  * 
  * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
  * @version 1.0
@@ -15,12 +16,20 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 
+/**
+ * Panneau de dessin principal affichant et gérant les images.
+ * Coordonne l'affichage du canevas et les interactions utilisateur.
+ */
 public class PaintPanel extends JPanel {
 
 	private JLabel toile;
 	private JScrollPane panneauDeroulement;
 	private ImageManager gestionnaireImages;
 	
+	/**
+	 * Constructeur du panneau de peinture.
+	 * Initialise l'interface et précharge les icônes.
+	 */
 	public PaintPanel() {
 		setLayout(new BorderLayout());
 		
@@ -33,6 +42,11 @@ public class PaintPanel extends JPanel {
 		add(panneauDeroulement, BorderLayout.CENTER);
 	}
 	
+	/**
+	 * Crée le panneau supérieur contenant la barre de menu et la barre d'outils.
+	 *
+	 * @return Le panneau supérieur assemblé.
+	 */
 	private JPanel creerPanneauSuperieur() {
 		JPanel panneauHaut = new JPanel(new BorderLayout());
 		
@@ -48,6 +62,9 @@ public class PaintPanel extends JPanel {
 		return panneauHaut;
 	}
 	
+	/**
+	 * Crée et configure la zone de dessin (toile) avec son gestionnaire d'images.
+	 */
 	private void creerToile() {
 		toile = new JLabel() {
 			@Override
@@ -72,30 +89,61 @@ public class PaintPanel extends JPanel {
 	}
 	
 	
+	/**
+	 * Ouvre une boîte de dialogue pour charger une ou plusieurs images.
+	 */
 	public void ouvrirFichier() {
 		gestionnaireImages.ouvrirFichier();
 	}
 	
+	/**
+	 * Enregistre l'image composite actuelle.
+	 *
+	 * @param nouveauFichier True pour "Enregistrer sous", false pour "Enregistrer".
+	 */
 	public void enregistrerFichier(boolean nouveauFichier) {
 		gestionnaireImages.enregistrerFichier(nouveauFichier);
 	}
 	
+	/**
+	 * Applique un facteur de zoom sur l'image courante.
+	 *
+	 * @param facteur Le facteur multiplicatif (ex: 1.2 pour +20%, 0.8 pour -20%).
+	 */
 	public void zoomer(double facteur) {
 		gestionnaireImages.zoomer(facteur);
 	}
 	
+	/**
+	 * Réinitialise le niveau de zoom à 100%.
+	 */
 	public void reinitialiserZoom() {
 		gestionnaireImages.reinitialiserZoom();
 	}
 	
+	/**
+	 * Obtient l'image de la couche actuellement active.
+	 *
+	 * @return L'image courante, ou null si aucune.
+	 */
 	public BufferedImage obtenirImageCourante() {
 		return gestionnaireImages.obtenirImageCourante();
 	}
 	
+	/**
+	 * Définit une nouvelle image comme couche active.
+	 * Remplace toutes les couches existantes.
+	 *
+	 * @param image La nouvelle image à définir.
+	 */
 	public void definirImageCourante(BufferedImage image) {
 		gestionnaireImages.definirImageCourante(image);
 	}
 	
+	/**
+	 * Ouvre la boîte de dialogue de création de texte avec image de fond.
+	 * Ajoute l'image générée si l'utilisateur valide.
+	 */
 	public void ouvrirEditeurTexteImage() {
 		Frame frame = (Frame) SwingUtilities.getWindowAncestor(this);
 		TexteImageEditorDialog dialogue = new TexteImageEditorDialog(frame);

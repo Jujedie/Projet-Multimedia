@@ -1,5 +1,6 @@
 /**
- * Classe principale pour lancer l'application de retouche d'images.
+ * Classe utilitaire pour les dialogues liés aux images.
+ * Gère les sélecteurs de fichiers et les choix utilisateur.
  * 
  * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
  * @version 1.0
@@ -12,11 +13,22 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+/**
+ * Utilitaire pour les dialogues de sélection et gestion d'images.
+ * Fournit des sélecteurs de fichiers et des dialogues de choix utilisateur.
+ */
 public final class ImageDialogs {
     private ImageDialogs() {}
 
     public enum LoadChoice { REPLACE, SUPERPOSE, CANCEL }
 
+    /**
+     * Ouvre un sélecteur de fichiers pour choisir une ou plusieurs images.
+     * Supporte les formats JPG, PNG, GIF et BMP.
+     *
+     * @param parent Le composant parent pour le dialogue.
+     * @return Un tableau de fichiers sélectionnés, ou null si annulé.
+     */
     public static File[] selectImages(Component parent) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Ouvrir une image");
@@ -45,6 +57,13 @@ public final class ImageDialogs {
         return files;
     }
 
+    /**
+     * Ouvre un sélecteur de fichier pour sauvegarder une image PNG.
+     * Ajoute automatiquement l'extension .png si nécessaire.
+     *
+     * @param parent Le composant parent pour le dialogue.
+     * @return Le fichier de destination, ou null si annulé.
+     */
     public static File selectSavePng(Component parent) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Enregistrer l'image (PNG)");
@@ -71,6 +90,13 @@ public final class ImageDialogs {
         return chosen;
     }
 
+    /**
+     * Demande à l'utilisateur comment charger une nouvelle image.
+     * Propose de remplacer ou superposer l'image existante.
+     *
+     * @param parent Le composant parent pour le dialogue.
+     * @return Le choix de l'utilisateur (REPLACE, SUPERPOSE ou CANCEL).
+     */
     public static LoadChoice askLoadChoice(Component parent) {
         String[] options = {"Remplacer", "Superposer", "Annuler"};
         int choice = JOptionPane.showOptionDialog(parent,

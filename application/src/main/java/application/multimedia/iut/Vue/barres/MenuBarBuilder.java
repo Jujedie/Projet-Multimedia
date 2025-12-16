@@ -1,5 +1,6 @@
 /**
- * Classe principale pour lancer l'application de retouche d'images.
+ * Classe construisant la barre de menu de l'application.
+ * Gère les menus Fichier, Édition, Image, etc.
  * 
  * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
  * @version 1.0
@@ -9,14 +10,29 @@ package application.multimedia.iut.Vue.barres;
 import application.multimedia.iut.Vue.PaintPanel;
 import javax.swing.*;
 
+/**
+ * Constructeur de la barre de menu de l'application.
+ * Crée les menus Fichier, Édition, Image avec leurs actions.
+ */
 public class MenuBarBuilder {
 
 	private PaintPanel panneau;
 
+	/**
+	 * Constructeur du constructeur de barre de menu.
+	 *
+	 * @param panneau Le panneau de peinture associé.
+	 */
 	public MenuBarBuilder(PaintPanel panneau) {
 		this.panneau = panneau;
 	}
 
+	/**
+	 * Crée et assemble la barre de menu complète.
+	 * Contient les menus Fichier, Édition, Image et Filtres.
+	 *
+	 * @return La barre de menu construite.
+	 */
 	public JMenuBar creerMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
 
@@ -28,6 +44,12 @@ public class MenuBarBuilder {
 		return menuBar;
 	}
 
+	/**
+	 * Crée le menu Fichier avec les opérations de gestion de fichiers.
+	 * Contient : Nouveau, Ouvrir, Enregistrer, Enregistrer sous, Quitter.
+	 *
+	 * @return Le menu Fichier.
+	 */
 	private JMenu creerMenuFichier() {
 		JMenu fichierMenu = new JMenu("Fichier");
 
@@ -52,6 +74,12 @@ public class MenuBarBuilder {
 		return fichierMenu;
 	}
 
+	/**
+	 * Crée le menu Édition avec les opérations d'édition.
+	 * Contient : Annuler, Refaire, Texte avec image, Effacer tout.
+	 *
+	 * @return Le menu Édition.
+	 */
 	private JMenu creerMenuEdition() {
 		JMenu editionMenu = new JMenu("Édition");
 
@@ -72,6 +100,12 @@ public class MenuBarBuilder {
 		return editionMenu;
 	}
 
+	/**
+	 * Crée le menu Image avec les transformations d'images.
+	 * Contient : Fusionner, Retourner, Rotation, Redimensionner.
+	 *
+	 * @return Le menu Image.
+	 */
 	private JMenu creerMenuImage() {
 		JMenu imageMenu = new JMenu("Image");
 
@@ -90,6 +124,12 @@ public class MenuBarBuilder {
 		return imageMenu;
 	}
 
+	/**
+	 * Crée le menu Filtres avec les effets applicables.
+	 * Contient : Contraste.
+	 *
+	 * @return Le menu Filtres.
+	 */
 	private JMenu creerMenuFiltres() {
 		JMenu filtresMenu = new JMenu("Filtres");
 

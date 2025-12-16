@@ -1,5 +1,6 @@
 /**
- * Classe principale pour lancer l'application de retouche d'images.
+ * Panneau d'aperçu en temps réel.
+ * Affiche le résultat généré du texte avec image.
  * 
  * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
  * @version 1.0
@@ -13,16 +14,32 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.function.Supplier;
 
+/**
+ * Panneau d'aperçu dynamique pour afficher le résultat en temps réel.
+ * Se met à jour automatiquement à chaque modification.
+ */
 public class PreviewPanel extends JPanel {
     
     private Supplier<BufferedImage> imageSupplier;
     
+    /**
+     * Constructeur du panneau d'aperçu.
+     * Crée un panneau qui affiche l'image fournie par le supplier.
+     *
+     * @param imageSupplier Le fournisseur d'image à afficher.
+     */
     public PreviewPanel(Supplier<BufferedImage> imageSupplier) {
         this.imageSupplier = imageSupplier;
         setBackground(StyleHelper.BACKGROUND_DARK);
         setBorder(StyleHelper.createTitledBorder("Aperçu", Color.WHITE));
     }
     
+    /**
+     * Dessine l'image dans le panneau.
+     * Centre l'image si elle est présente.
+     *
+     * @param g Le contexte graphique.
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);

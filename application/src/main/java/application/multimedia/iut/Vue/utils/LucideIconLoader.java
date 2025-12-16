@@ -1,5 +1,6 @@
 /**
- * Classe principale pour lancer l'application de retouche d'images.
+ * Classe utilitaire pour charger les icônes Lucide.
+ * Gère le chargement et la mise en cache des icônes SVG.
  * 
  * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
  * @version 1.0
@@ -27,11 +28,24 @@ import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.ImageTranscoder;
 
+/**
+ * Chargeur d'icônes Lucide depuis le CDN avec cache.
+ * Télécharge, colorise et redimensionne les icônes SVG.
+ */
 public class LucideIconLoader {
 	
 	private static final String LUCIDE_CDN_BASE = "https://unpkg.com/lucide-static@latest/icons/";
 	private static final Map<String, Icon> iconCache = new HashMap<>();
 
+	/**
+	 * Charge une icône Lucide depuis le CDN avec cache.
+	 * Télécharge, colorise et redimensionne l'icône SVG.
+	 *
+	 * @param iconName Le nom de l'icône (ex: "folder-open").
+	 * @param size La taille en pixels.
+	 * @param color La couleur à appliquer.
+	 * @return L'icône chargée, ou une icône de secours en cas d'échec.
+	 */
 	public static Icon loadIcon(String iconName, int size, Color color) {
 		String cacheKey = iconName + "_" + size + "_" + color.getRGB();
 		
@@ -59,6 +73,12 @@ public class LucideIconLoader {
 		return createFallbackIcon(size, color);
 	}
 	
+	/**
+	 * Télécharge le contenu SVG d'une icône depuis le CDN Lucide.
+	 *
+	 * @param iconName Le nom de l'icône.
+	 * @return Le contenu SVG sous forme de chaîne, ou null en cas d'échec.
+	 */
 	private static String downloadSVG(String iconName) {
 		try {
 			URL url = new URL(LUCIDE_CDN_BASE + iconName + ".svg");
@@ -84,6 +104,14 @@ public class LucideIconLoader {
 		return null;
 	}
 	
+	/**
+	 * Convertit du contenu SVG en BufferedImage avec la taille spécifiée.
+	 * Utilise Apache Batik pour le transcodage.
+	 *
+	 * @param svgContent Le contenu SVG sous forme de chaîne.
+	 * @param size La taille cible en pixels.
+	 * @return L'image générée, ou null en cas d'échec.
+	 */
 	private static BufferedImage convertSVGToImage(String svgContent, int size) {
 		try {
 			final BufferedImage[] imagePointer = new BufferedImage[1];
@@ -113,6 +141,14 @@ public class LucideIconLoader {
 		}
 	}
 	
+	/**
+	 * Crée une icône de secours simple (carré avec bordure).
+	 * Utilisée quand le téléchargement ou la conversion échoue.
+	 *
+	 * @param size La taille en pixels.
+	 * @param color La couleur de la bordure.
+	 * @return L'icône de secours.
+	 */
 	private static Icon createFallbackIcon(int size, Color color) {
 		BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2d = image.createGraphics();
@@ -124,6 +160,10 @@ public class LucideIconLoader {
 		return new ImageIcon(image);
 	}
 	
+	/**
+	 * Précharge en cache les icônes les plus couramment utilisées.
+	 * Améliore les performances au démarrage de l'application.
+	 */
 	public static void preloadCommonIcons() {
 		String[] commonIcons = {
 			"square-dashed", "pencil", "eraser", "pipette", "paint-bucket", "type",

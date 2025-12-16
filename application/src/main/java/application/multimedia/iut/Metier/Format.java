@@ -8,8 +8,21 @@ package application.multimedia.iut.Metier;
 
 import java.awt.image.BufferedImage;
 
+/**
+ * Fournit des transformations géométriques pour les images.
+ * Gère le redimensionnement, la rotation, et les opérations de flip.
+ */
 public class Format {
 
+	/**
+	 * Redimensionne une image aux dimensions spécifiées.
+	 * Utilise un algorithme de mise à l'échelle de haute qualité.
+	 *
+	 * @param source L'image source à redimensionner.
+	 * @param largeurCible La nouvelle largeur souhaitée.
+	 * @param hauteurCible La nouvelle hauteur souhaitée.
+	 * @return Une nouvelle image redimensionnée.
+	 */
 	public static BufferedImage redimensionner(BufferedImage source, int largeurCible, int hauteurCible) {
 		int largeurSource = source.getWidth();
 		int hauteurSource = source.getHeight();
@@ -81,6 +94,18 @@ public class Format {
 		return rgb & 0xFF;
 	}
 
+	/**
+	 * Découpe une région rectangulaire d'une image source.
+	 * Extrait la zone définie par deux points diagonaux.
+	 *
+	 * @param source L'image source à découper.
+	 * @param x1 Coordonnée X du premier point.
+	 * @param y1 Coordonnée Y du premier point.
+	 * @param x2 Coordonnée X du second point.
+	 * @param y2 Coordonnée Y du second point.
+	 * @return La sous-image extraite.
+	 * @throws IllegalArgumentException Si les coordonnées sont hors limites.
+	 */
 	public static BufferedImage couper(BufferedImage source, int x1, int y1, int x2, int y2) {
 
 		int debutX = Math.min(x1, x2);
@@ -99,6 +124,14 @@ public class Format {
 		return sousImage;
 	}
 
+	/**
+	 * Applique une rotation à une image selon un angle donné.
+	 * Gère les rotations à 90°, 180°, 270° et les angles arbitraires.
+	 *
+	 * @param src L'image source à faire pivoter.
+	 * @param angleDeg L'angle de rotation en degrés.
+	 * @return Une nouvelle image pivotée.
+	 */
 	public static BufferedImage rotation(BufferedImage src, double angleDeg) {
 
 		angleDeg = ((angleDeg % 360) + 360) % 360;
@@ -174,6 +207,13 @@ public class Format {
 		return dest;
 	}
 
+	/**
+	 * Applique une symétrie horizontale (flip horizontal) à une image.
+	 * Effectue un retournement de gauche à droite.
+	 *
+	 * @param source L'image source à retourner.
+	 * @return Une nouvelle image retournée horizontalement.
+	 */
 	public static BufferedImage symetrieHorizontale(BufferedImage source) {
 		int largeur = source.getWidth();
 		int hauteur = source.getHeight();
@@ -191,6 +231,13 @@ public class Format {
 		return imageSymetrique;
 	}
 
+	/**
+	 * Applique une symétrie verticale (flip vertical) à une image.
+	 * Effectue un retournement de haut en bas.
+	 *
+	 * @param source L'image source à retourner.
+	 * @return Une nouvelle image retournée verticalement.
+	 */
 	public static BufferedImage symetrieVerticale(BufferedImage source) {
 		int largeur = source.getWidth();
 		int hauteur = source.getHeight();
