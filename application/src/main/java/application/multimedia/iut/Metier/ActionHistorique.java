@@ -23,16 +23,27 @@ public class ActionHistorique {
 	public void faireAction(BufferedImage image) {
 		switch (this.actionType) {
 			case TEINTURE:
-				// Implémentation de l'action TEINTURE
+				int red   = (int) parametres[0];
+				int green = (int) parametres[1];
+				int blue  = (int) parametres[2];
+				int alpha = (int) parametres[3];
+				Colorisation.teinter(image, red, green, blue,  alpha);
 				break;
 			case CONTRASTE:
-				// Implémentation de l'action CONTRASTE
+				int contraste = (int) parametres[0];
+				Colorisation.contraste(image, contraste);
 				break;
 			case LUMIERE:
-				
+				int luminosite = (int) parametres[0];
+				Colorisation.luminosite(image, luminosite);
 				break;
 			case POT_DE_PEINTURE:
-				
+				int couleurDestination = (int) parametres[0];
+				int distance		   = (int) parametres[1];
+				boolean estContinue    = (boolean) parametres[2];
+				int xOrigine		   = (int) parametres[3];
+				int yOrigine		   = (int) parametres[4];
+				Colorisation.potDePeinture(image, couleurDestination, distance, estContinue, xOrigine, yOrigine);
 				break;
 
 			case ROTATION:

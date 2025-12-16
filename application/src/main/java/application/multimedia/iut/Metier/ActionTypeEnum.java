@@ -2,10 +2,10 @@ package application.multimedia.iut.Metier;
 
 public enum ActionTypeEnum {
 	// Actions de type Colorisation
-	POT_DE_PEINTURE(6),// false si distance == 0
-	TEINTURE(5),
-	CONTRASTE(2),
-	LUMIERE(2),
+	POT_DE_PEINTURE(5),// false si distance == 0
+	TEINTURE(4),
+	CONTRASTE(1),
+	LUMIERE(1),
 
 	// Actions de type Transformation
 	ROTATION(-1),
