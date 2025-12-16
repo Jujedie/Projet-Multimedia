@@ -1,7 +1,16 @@
+/**
+ * Classe principale pour lancer l'application de retouche d'images.
+ * 
+ * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
+ * @version 1.0
+ */
 package application.multimedia.iut.Vue;
 
 import application.multimedia.iut.Vue.barres.MenuBarBuilder;
 import application.multimedia.iut.Vue.barres.ToolBarBuilder;
+import application.multimedia.iut.Vue.dialogs.TexteImageEditorDialog;
+import application.multimedia.iut.Vue.utils.ImageManager;
+import application.multimedia.iut.Vue.utils.LucideIconLoader;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
@@ -85,5 +94,18 @@ public class PaintPanel extends JPanel {
 	
 	public void definirImageCourante(BufferedImage image) {
 		gestionnaireImages.definirImageCourante(image);
+	}
+	
+	public void ouvrirEditeurTexteImage() {
+		Frame frame = (Frame) SwingUtilities.getWindowAncestor(this);
+		TexteImageEditorDialog dialogue = new TexteImageEditorDialog(frame);
+		dialogue.setVisible(true);
+		
+		if (dialogue.estValide()) {
+			BufferedImage imageGeneree = dialogue.getImageGeneree();
+			if (imageGeneree != null) {
+				gestionnaireImages.ajouterImageAvecChoix(imageGeneree);
+			}
+		}
 	}
 }

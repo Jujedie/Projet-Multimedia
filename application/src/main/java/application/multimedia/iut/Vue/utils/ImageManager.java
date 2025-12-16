@@ -1,9 +1,16 @@
-package application.multimedia.iut.Vue;
+/**
+ * Classe principale pour lancer l'application de retouche d'images.
+ * 
+ * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
+ * @version 1.0
+ */
+package application.multimedia.iut.Vue.utils;
 
 import application.multimedia.iut.Metier.image.CoucheImage;
 import application.multimedia.iut.Metier.image.PileCouches;
 import application.multimedia.iut.Metier.image.RenduToile;
 import application.multimedia.iut.Metier.image.SessionPlacement;
+import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -31,118 +38,63 @@ public class ImageManager {
 	}
 
 	public void ouvrirFichier() {
-		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setDialogTitle("Ouvrir une image");
-		fileChooser.setMultiSelectionEnabled(true);
-		fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
-			public boolean accept(File f) {
-				if (f.isDirectory()) return true;
-				String name = f.getName().toLowerCase();
-				return name.endsWith(".jpg") || name.endsWith(".jpeg") ||
-				   name.endsWith(".png") || name.endsWith(".gif") ||
-				   name.endsWith(".bmp");
-			}
-			public String getDescription() {
-				return "Images (*.jpg, *.png, *.gif, *.bmp)";
-			}
-		});
+		File[] fichiersChoisis = ImageDialogs.selectImages(parent);
+		if (fichiersChoisis == null || fichiersChoisis.length == 0) return;
 
-		int result = fileChooser.showOpenDialog(parent);
-		if (result == JFileChooser.APPROVE_OPTION) {
-			File[] fichiersChoisis = fileChooser.getSelectedFiles();
-			if (fichiersChoisis == null || fichiersChoisis.length == 0) {
-				fichiersChoisis = new File[] { fileChooser.getSelectedFile() };
-			}
-			boolean possedeDejaImages = !pileCouches.estVide();
-			int choix = JOptionPane.YES_OPTION; // YES = remplacer, NO = superposer
-			if (possedeDejaImages) {
-				String[] options = {"Remplacer", "Superposer", "Annuler"};
-				choix = JOptionPane.showOptionDialog(parent,
-					"Une image est déjà chargée. Que faire ?",
-					"Chargement d'images",
-					JOptionPane.YES_NO_CANCEL_OPTION,
-					JOptionPane.QUESTION_MESSAGE,
-					null,
-					options,
-					options[1]);
-			}
-			if (choix == JOptionPane.CANCEL_OPTION || choix == JOptionPane.CLOSED_OPTION) {
-				return;
-			}
-			if (choix == JOptionPane.YES_OPTION) { // Remplacer
-				pileCouches.vider();
-				sessionPlacement.annuler();
-				glisserEnCours = false;
-			}
-			boolean placementDemande = possedeDejaImages && choix == JOptionPane.NO_OPTION;
-			boolean premierePlacee = false;
-			for (File fichier : fichiersChoisis) {
-				try {
-					BufferedImage img = ImageIO.read(fichier);
-					if (img != null) {
-						if (placementDemande && !premierePlacee) {
-							demarrerPlacement(img);
-							premierePlacee = true;
-						} else {
-							pileCouches.ajouterCouche(img, obtenirTailleToile(), true);
-						}
+		boolean possedeDejaImages = !pileCouches.estVide();
+		LoadChoice choix = LoadChoice.REPLACE;
+		if (possedeDejaImages) {
+			choix = ImageDialogs.askLoadChoice(parent);
+			if (choix == LoadChoice.CANCEL) return;
+		}
+
+		if (choix == LoadChoice.REPLACE) {
+			pileCouches.vider();
+			sessionPlacement.annuler();
+			glisserEnCours = false;
+		}
+
+		boolean placementDemande = possedeDejaImages && choix == LoadChoice.SUPERPOSE;
+		boolean premierePlacee = false;
+		for (File fichier : fichiersChoisis) {
+			try {
+				BufferedImage img = ImageIO.read(fichier);
+				if (img != null) {
+					if (placementDemande && !premierePlacee) {
+						demarrerPlacement(img);
+						premierePlacee = true;
 					} else {
-						JOptionPane.showMessageDialog(parent, "Impossible de charger " + fichier.getName(), "Erreur", JOptionPane.ERROR_MESSAGE);
+						pileCouches.ajouterCouche(img, obtenirTailleToile(), true);
 					}
-				} catch (Exception ex) {
-					JOptionPane.showMessageDialog(parent, "Erreur lors du chargement: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+				} else {
+					messageErreur("Erreur", "Impossible de charger " + fichier.getName());
 				}
+			} catch (Exception ex) {
+				messageErreur("Erreur", "Erreur lors du chargement: " + ex.getMessage());
 			}
-			if (!pileCouches.estVide()) {
-				afficherImage();
-				BufferedImage active = obtenirImageCourante();
-				JOptionPane.showMessageDialog(parent,
-					"Image(s) chargée(s) !\nActive: " + (active != null ? active.getWidth() + "x" + active.getHeight() : "-"),
-					"Succès", JOptionPane.INFORMATION_MESSAGE);
-			}
+		}
+		if (!pileCouches.estVide()) {
+			afficherImage();
+			BufferedImage active = obtenirImageCourante();
+			messageInfo("Succès", "Image(s) chargée(s) !\nActive: " + (active != null ? active.getWidth() + "x" + active.getHeight() : "-"));
 		}
 	}
 
 	public void enregistrerFichier(boolean nouveauFichier) {
 		if (pileCouches.estVide()) {
-			JOptionPane.showMessageDialog(parent,
-				"Aucune image à enregistrer.",
-				"Information", JOptionPane.INFORMATION_MESSAGE);
+			messageInfo("Information", "Aucune image à enregistrer.");
 			return;
 		}
 
-		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setDialogTitle("Enregistrer l'image (PNG)");
-		fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
-			public boolean accept(File f) {
-				if (f.isDirectory()) return true;
-				String name = f.getName().toLowerCase();
-				return name.endsWith(".png");
-			}
-			public String getDescription() {
-				return "Images (*.png)";
-			}
-		});
+		File fichierChoisi = ImageDialogs.selectSavePng(parent);
+		if (fichierChoisi == null) return;
 
-		int result = fileChooser.showSaveDialog(parent);
-		if (result == JFileChooser.APPROVE_OPTION) {
-			File fichierChoisi = fileChooser.getSelectedFile();
-			String nomFichier = fichierChoisi.getName();
-			if (!nomFichier.toLowerCase().endsWith(".png")) {
-				fichierChoisi = new File(fichierChoisi.getAbsolutePath() + ".png");
-			}
-
-			try {
-				BufferedImage composite = renduToile.construireComposite(pileCouches);
-				ImageIO.write(composite, "png", fichierChoisi);
-				JOptionPane.showMessageDialog(parent,
-					"Image enregistrée avec succès !",
-					"Succès", JOptionPane.INFORMATION_MESSAGE);
-			} catch (Exception ex) {
-				JOptionPane.showMessageDialog(parent,
-					"Erreur lors de l'enregistrement: " + ex.getMessage(),
-					"Erreur", JOptionPane.ERROR_MESSAGE);
-			}
+		try {
+			BufferedImage composite = renduToile.construireComposite(pileCouches);
+			ImageIO.write(composite, "png", fichierChoisi);
+			messageInfo("Succès", "Image enregistrée avec succès !");
+		} catch (Exception ex) {
+			messageErreur("Erreur", "Erreur lors de l'enregistrement: " + ex.getMessage());
 		}
 	}
 
@@ -222,6 +174,40 @@ public class ImageManager {
 		}
 		afficherImage();
 	}
+	
+	public void ajouterImageCommeNouvelleCouche(BufferedImage image) {
+		if (image == null) return;
+		
+		if (pileCouches.estVide()) {
+			pileCouches.ajouterCouche(image, obtenirTailleToile(), true);
+		} else {
+			demarrerPlacement(image);
+		}
+		afficherImage();
+	}
+	
+	public void ajouterImageAvecChoix(BufferedImage image) {
+		if (image == null) return;
+		
+		boolean possedeDejaImages = !pileCouches.estVide();
+		LoadChoice choix = possedeDejaImages ? ImageDialogs.askLoadChoice(parent) : LoadChoice.REPLACE;
+		
+		if (choix == LoadChoice.CANCEL) return;
+		
+		boolean placementDemande = possedeDejaImages && choix == LoadChoice.SUPERPOSE;
+		
+		if (choix == LoadChoice.REPLACE) {
+			pileCouches.vider();
+		}
+		
+		if (placementDemande) {
+			demarrerPlacement(image);
+		} else {
+			pileCouches.ajouterCouche(image, obtenirTailleToile(), true);
+		}
+		
+		afficherImage();
+	}
 
 	private CoucheImage coucheAuPoint(Point p) {
 		java.util.List<CoucheImage> couches = pileCouches.couches();
@@ -287,5 +273,13 @@ public class ImageManager {
 
 		toile.addMouseListener(adaptationSouris);
 		toile.addMouseMotionListener(adaptationSouris);
+	}
+
+	private void messageErreur(String titre, String message) {
+		JOptionPane.showMessageDialog(parent, message, titre, JOptionPane.ERROR_MESSAGE);
+	}
+
+	private void messageInfo(String titre, String message) {
+		JOptionPane.showMessageDialog(parent, message, titre, JOptionPane.INFORMATION_MESSAGE);
 	}
 }

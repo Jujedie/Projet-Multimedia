@@ -1,4 +1,10 @@
-package application.multimedia.iut.Vue;
+/**
+ * Classe principale pour lancer l'application de retouche d'images.
+ * 
+ * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
+ * @version 1.0
+ */
+package application.multimedia.iut.Vue.utils;
 
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
@@ -31,7 +37,6 @@ public class LucideIconLoader {
 		try {
 			String svgContent = downloadSVG(iconName);
 			if (svgContent != null) {
-				// Modifier la couleur du SVG
 				svgContent = svgContent.replaceAll("stroke=\"[^\"]*\"", 
 					String.format("stroke=\"rgb(%d,%d,%d)\"", color.getRed(), color.getGreen(), color.getBlue()));
 				

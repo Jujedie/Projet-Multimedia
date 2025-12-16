@@ -1,6 +1,11 @@
+/**
+ * Classe principale pour lancer l'application de retouche d'images.
+ * 
+ * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
+ * @version 1.0
+ */
 package application.multimedia.iut.Metier.image;
 
-import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Composite;
@@ -43,7 +48,6 @@ public class RenduToile {
 			Shape clipAncien = g2d.getClip();
 			if (base != null) g2d.setClip(base);
 			Composite compAncien = g2d.getComposite();
-			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f));
 			g2d.drawImage(enAttente.image, enAttente.x, enAttente.y, largeur, hauteur, null);
 			g2d.setComposite(compAncien);
 			g2d.setColor(Color.RED);
@@ -82,26 +86,119 @@ public class RenduToile {
 			hauteurImg = Math.max(1, maxY - minY);
 		}
 		BufferedImage composite = new BufferedImage(largeurImg, hauteurImg, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g2d = composite.createGraphics();
-		g2d.setComposite(AlphaComposite.Src);
-		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		
 		List<CoucheImage> couches = pile.couches();
 		double zoom = pile.niveauZoom();
+		
 		for (int i = 0; i < couches.size(); i++) {
 			CoucheImage couche = couches.get(i);
 			int largeur = couche.largeurRedimensionnee(zoom);
 			int hauteur = couche.hauteurRedimensionnee(zoom);
+			int posX = couche.x - minX;
+			int posY = couche.y - minY;
+			
+			BufferedImage imageRedim = redimensionnerImage(couche.image, largeur, hauteur);
+			
 			if (i > 0 && base != null) {
-				Shape clipAncien = g2d.getClip();
-				g2d.setClip(0, 0, base.width, base.height);
-				g2d.drawImage(couche.image, couche.x - minX, couche.y - minY, largeur, hauteur, null);
-				g2d.setClip(clipAncien);
+				superposerAvecClip(composite, imageRedim, posX, posY, base.width, base.height);
 			} else {
-				g2d.drawImage(couche.image, couche.x - minX, couche.y - minY, largeur, hauteur, null);
+				superposerImage(composite, imageRedim, posX, posY);
 			}
 		}
-		g2d.dispose();
+		
 		return composite;
+	}
+	
+	private BufferedImage redimensionnerImage(BufferedImage source, int largeur, int hauteur) {
+		if (source.getWidth() == largeur && source.getHeight() == hauteur) {
+			return source;
+		}
+		
+		BufferedImage resultat = new BufferedImage(largeur, hauteur, BufferedImage.TYPE_INT_ARGB);
+		double ratioX = (double) source.getWidth() / largeur;
+		double ratioY = (double) source.getHeight() / hauteur;
+		
+		for (int y = 0; y < hauteur; y++) {
+			for (int x = 0; x < largeur; x++) {
+				int srcX = Math.min((int) (x * ratioX), source.getWidth() - 1);
+				int srcY = Math.min((int) (y * ratioY), source.getHeight() - 1);
+				resultat.setRGB(x, y, source.getRGB(srcX, srcY));
+			}
+		}
+		
+		return resultat;
+	}
+	
+	private void superposerImage(BufferedImage dest, BufferedImage source, int posX, int posY) {
+		int largeurDest = dest.getWidth();
+		int hauteurDest = dest.getHeight();
+		int largeurSource = source.getWidth();
+		int hauteurSource = source.getHeight();
+		
+		for (int y = 0; y < hauteurSource; y++) {
+			for (int x = 0; x < largeurSource; x++) {
+				int destX = posX + x;
+				int destY = posY + y;
+				
+				if (destX >= 0 && destX < largeurDest && destY >= 0 && destY < hauteurDest) {
+					int coulSource = source.getRGB(x, y);
+					int alphaSource = (coulSource >> 24) & 0xFF;
+					
+					if (alphaSource == 255) {
+						dest.setRGB(destX, destY, coulSource);
+					} else if (alphaSource > 0) {
+						int coulDest = dest.getRGB(destX, destY);
+						int nouvelleCoul = melangerCouleurs(coulDest, coulSource, alphaSource);
+						dest.setRGB(destX, destY, nouvelleCoul);
+					}
+				}
+			}
+		}
+	}
+	
+	private void superposerAvecClip(BufferedImage dest, BufferedImage source, int posX, int posY, int clipW, int clipH) {
+		int largeurSource = source.getWidth();
+		int hauteurSource = source.getHeight();
+		
+		for (int y = 0; y < hauteurSource; y++) {
+			for (int x = 0; x < largeurSource; x++) {
+				int destX = posX + x;
+				int destY = posY + y;
+				
+				if (destX >= 0 && destX < clipW && destY >= 0 && destY < clipH) {
+					int coulSource = source.getRGB(x, y);
+					int alphaSource = (coulSource >> 24) & 0xFF;
+					
+					if (alphaSource == 255) {
+						dest.setRGB(destX, destY, coulSource);
+					} else if (alphaSource > 0) {
+						int coulDest = dest.getRGB(destX, destY);
+						int nouvelleCoul = melangerCouleurs(coulDest, coulSource, alphaSource);
+						dest.setRGB(destX, destY, nouvelleCoul);
+					}
+				}
+			}
+		}
+	}
+	
+	private int melangerCouleurs(int coulDest, int coulSource, int alphaSource) {
+		int alphaDest = (coulDest >> 24) & 0xFF;
+		int rougeDest = (coulDest >> 16) & 0xFF;
+		int vertDest = (coulDest >> 8) & 0xFF;
+		int bleuDest = coulDest & 0xFF;
+		
+		int rougeSource = (coulSource >> 16) & 0xFF;
+		int vertSource = (coulSource >> 8) & 0xFF;
+		int bleuSource = coulSource & 0xFF;
+		
+		float ratioSource = alphaSource / 255f;
+		float ratioDest = 1f - ratioSource;
+		
+		int rouge = (int) (rougeSource * ratioSource + rougeDest * ratioDest);
+		int vert = (int) (vertSource * ratioSource + vertDest * ratioDest);
+		int bleu = (int) (bleuSource * ratioSource + bleuDest * ratioDest);
+		int alpha = Math.max(alphaDest, alphaSource);
+		
+		return (alpha << 24) | (rouge << 16) | (vert << 8) | bleu;
 	}
 }

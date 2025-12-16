@@ -1,3 +1,9 @@
+/**
+ * Classe principale pour lancer l'application de retouche d'images.
+ * 
+ * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
+ * @version 1.0
+ */
 package application.multimedia.iut.Vue.barres;
 
 import application.multimedia.iut.Vue.PaintPanel;
@@ -52,9 +58,14 @@ public class MenuBarBuilder {
 		JMenuItem annulerItem = new JMenuItem("Annuler");
 		JMenuItem refaireItem = new JMenuItem("Refaire");
 		JMenuItem effacerItem = new JMenuItem("Effacer tout");
+		JMenuItem texteImageItem = new JMenuItem("Texte avec image...");
+		
+		texteImageItem.addActionListener(e -> panneau.ouvrirEditeurTexteImage());
 
 		editionMenu.add(annulerItem);
 		editionMenu.add(refaireItem);
+		editionMenu.addSeparator();
+		editionMenu.add(texteImageItem);
 		editionMenu.addSeparator();
 		editionMenu.add(effacerItem);
 

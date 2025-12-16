@@ -1,6 +1,12 @@
+/**
+ * Classe principale pour lancer l'application de retouche d'images.
+ * 
+ * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
+ * @version 1.0
+ */
 package application.multimedia.iut.Vue.barres;
 
-import application.multimedia.iut.Vue.LucideIconLoader;
+import application.multimedia.iut.Vue.utils.LucideIconLoader;
 import application.multimedia.iut.Vue.PaintPanel;
 import javax.swing.*;
 import java.awt.*;
@@ -53,6 +59,9 @@ public class ToolBarBuilder {
 		JToggleButton pipetteBtn = creerBoutonToggle("pipette", "Pipette");
 		JToggleButton remplissageBtn = creerBoutonToggle("paint-bucket", "Remplissage");
 		JButton texteBtn = creerBouton("type", "Texte");
+		JButton texteImageBtn = creerBouton("image", "Texte avec image");
+		
+		texteImageBtn.addActionListener(e -> panneau.ouvrirEditeurTexteImage());
 		
 		groupeOutils.add(selectionBtn);
 		groupeOutils.add(pinceauBtn);
@@ -66,6 +75,7 @@ public class ToolBarBuilder {
 		barre.add(pipetteBtn);
 		barre.add(remplissageBtn);
 		barre.add(texteBtn);
+		barre.add(texteImageBtn);
 	}
 	
 	private void ajouterOutilsFichier(JToolBar barre) {
@@ -165,7 +175,6 @@ public class ToolBarBuilder {
 		));
 		btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
-		// Effet hover
 		btn.addMouseListener(new java.awt.event.MouseAdapter() {
 			Color originalColor = btn.getBackground();
 			public void mouseEntered(java.awt.event.MouseEvent evt) {
