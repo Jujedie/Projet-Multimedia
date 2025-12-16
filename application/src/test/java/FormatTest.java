@@ -6,8 +6,8 @@ import javax.imageio.ImageIO;
 import application.multimedia.iut.Metier.Format;
 
 public class FormatTest {
-	public final static File inputFile = new File("Projet-Multimedia/application/src/main/resources/tortue.png");
-	public static final String outputDir = "Projet-Multimedia/application/src/test/resources/testFormatResultats";
+	public final static File inputFile = new File("application/src/main/resources/tortue.png");
+	public static final String outputDir = "application/src/test/resources/testFormatResultats";
 
 	public static void main(String[] args) {
 
