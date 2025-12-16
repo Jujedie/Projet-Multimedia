@@ -71,28 +71,62 @@ public class TexteAvecImage {
         int hauteur = fm.getHeight();
         g.dispose();
         
-        BufferedImage image = new BufferedImage(largeur, hauteur, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = image.createGraphics();
+        BufferedImage texteImage = new BufferedImage(largeur, hauteur, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = texteImage.createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g2d.setFont(police);
+        g2d.setColor(Color.WHITE);
+        g2d.drawString(texte, 0, fm.getAscent());
+        g2d.dispose();
+        
+        BufferedImage resultat = new BufferedImage(largeur, hauteur, BufferedImage.TYPE_INT_ARGB);
         
         if (imageFond != null && regionSelectionnee != null) {
-            g2d.setColor(Color.WHITE);
-            g2d.drawString(texte, 0, fm.getAscent());
-            
             BufferedImage imageRedim = redimensionnerRegion(largeur, hauteur);
             if (imageRedim != null) {
-                g2d.setComposite(AlphaComposite.SrcIn);
-                g2d.drawImage(imageRedim, 0, 0, null);
+                appliquerImageSurTexte(resultat, texteImage, imageRedim);
+            } else {
+                copierImageSimple(resultat, texteImage, couleurTexte.getRGB());
             }
         } else {
-            g2d.setColor(couleurTexte);
-            g2d.drawString(texte, 0, fm.getAscent());
+            copierImageSimple(resultat, texteImage, couleurTexte.getRGB());
         }
         
-        g2d.dispose();
-        return image;
+        return resultat;
+    }
+    
+    private void appliquerImageSurTexte(BufferedImage dest, BufferedImage masque, BufferedImage image) {
+        int largeur = dest.getWidth();
+        int hauteur = dest.getHeight();
+        
+        for (int y = 0; y < hauteur; y++) {
+            for (int x = 0; x < largeur; x++) {
+                int coulMasque = masque.getRGB(x, y);
+                int alpha = (coulMasque >> 24) & 0xFF;
+                
+                if (alpha > 0) {
+                    int coulImage = image.getRGB(x, y);
+                    dest.setRGB(x, y, coulImage);
+                }
+            }
+        }
+    }
+    
+    private void copierImageSimple(BufferedImage dest, BufferedImage masque, int couleur) {
+        int largeur = dest.getWidth();
+        int hauteur = dest.getHeight();
+        
+        for (int y = 0; y < hauteur; y++) {
+            for (int x = 0; x < largeur; x++) {
+                int coulMasque = masque.getRGB(x, y);
+                int alpha = (coulMasque >> 24) & 0xFF;
+                
+                if (alpha > 0) {
+                    dest.setRGB(x, y, couleur | (alpha << 24));
+                }
+            }
+        }
     }
     
     private BufferedImage redimensionnerRegion(int largeur, int hauteur) {
@@ -105,11 +139,26 @@ public class TexteAvecImage {
             return null;
         }
         
-        BufferedImage region = imageFond.getSubimage(x, y, w, h);
+        BufferedImage region = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        for (int j = 0; j < h; j++) {
+            for (int i = 0; i < w; i++) {
+                region.setRGB(i, j, imageFond.getRGB(x + i, y + j));
+            }
+        }
+        
         BufferedImage resultat = new BufferedImage(largeur, hauteur, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = resultat.createGraphics();
-        g.drawImage(region, 0, 0, largeur, hauteur, null);
-        g.dispose();
+        
+        double ratioX = (double) w / largeur;
+        double ratioY = (double) h / hauteur;
+        
+        for (int j = 0; j < hauteur; j++) {
+            for (int i = 0; i < largeur; i++) {
+                int srcX = (int) (i * ratioX);
+                int srcY = (int) (j * ratioY);
+                resultat.setRGB(i, j, region.getRGB(srcX, srcY));
+            }
+        }
+        
         return resultat;
     }
 }
