@@ -30,6 +30,8 @@ public class PaintPanel extends JPanel {
 	 * Constructeur du panneau de peinture.
 	 * Initialise l'interface et précharge les icônes.
 	 */
+	private ToolBarBuilder toolBarBuilder;
+
 	public PaintPanel() {
 		setLayout(new BorderLayout());
 		
@@ -37,6 +39,11 @@ public class PaintPanel extends JPanel {
 		JPanel panneauHaut = creerPanneauSuperieur();
 		
 		creerToile();
+		
+		// Connecter l'écouteur de couleur maintenant que gestionnaireImages est initialisé
+		if (toolBarBuilder != null) {
+			toolBarBuilder.connecterEcouteurCouleur();
+		}
 		
 		add(panneauHaut, BorderLayout.NORTH);
 		add(panneauDeroulement, BorderLayout.CENTER);
@@ -53,7 +60,7 @@ public class PaintPanel extends JPanel {
 		MenuBarBuilder menuBuilder = new MenuBarBuilder(this);
 		JMenuBar menuBar = menuBuilder.creerMenuBar();
 		
-		ToolBarBuilder toolBarBuilder = new ToolBarBuilder(this);
+		toolBarBuilder = new ToolBarBuilder(this);
 		JToolBar barreOutils = toolBarBuilder.creerToolBar();
 		
 		panneauHaut.add(menuBar, BorderLayout.NORTH);
@@ -155,5 +162,32 @@ public class PaintPanel extends JPanel {
 				gestionnaireImages.ajouterImageAvecChoix(imageGeneree);
 			}
 		}
+	}
+	
+	/**
+	 * Active un outil de dessin.
+	 *
+	 * @param outil L'outil à activer.
+	 */
+	public void activerOutilDessin(application.multimedia.iut.Metier.OutilDessin outil) {
+		gestionnaireImages.activerOutil(outil);
+	}
+	
+	/**
+	 * Définit la couleur de dessin active.
+	 *
+	 * @param couleur La nouvelle couleur.
+	 */
+	public void definirCouleurDessin(java.awt.Color couleur) {
+		gestionnaireImages.definirCouleur(couleur);
+	}
+	
+	/**
+	 * Enregistre un écouteur pour les changements de couleur (pipette).
+	 *
+	 * @param ecouteur L'écouteur à enregistrer.
+	 */
+	public void enregistrerEcouteurCouleur(application.multimedia.iut.Vue.utils.ControleurDessin.EcouteurCouleur ecouteur) {
+		gestionnaireImages.getControleurDessin().ajouterEcouteurCouleur(ecouteur);
 	}
 }

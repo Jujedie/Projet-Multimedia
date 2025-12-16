@@ -21,6 +21,9 @@ public class ToolBarBuilder {
 	private PaintPanel panneau;
 	private Color couleurIcone = new Color(60, 60, 60);
 	private int tailleIcone = 20;
+	private JPanel couleurPrincipale;
+	private JPanel couleurSecondaire;
+	private application.multimedia.iut.Vue.utils.ControleurDessin.EcouteurCouleur ecouteurCouleurPipette;
 
 	/**
 	 * Constructeur du constructeur de barre d'outils.
@@ -83,7 +86,15 @@ public class ToolBarBuilder {
 		JButton texteBtn = creerBouton("type", "Texte");
 		JButton texteImageBtn = creerBouton("image", "Texte avec image");
 		
+		// Connecter les boutons aux outils
+		selectionBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.OutilDessin.SELECTION));
+		pinceauBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.OutilDessin.PINCEAU));
+		gommeBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.OutilDessin.GOMME));
+		pipetteBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.OutilDessin.PIPETTE));
+		texteBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.OutilDessin.TEXTE));
 		texteImageBtn.addActionListener(e -> panneau.ouvrirEditeurTexteImage());
+		
+		selectionBtn.setSelected(true);
 		
 		groupeOutils.add(selectionBtn);
 		groupeOutils.add(pinceauBtn);
@@ -195,12 +206,24 @@ public class ToolBarBuilder {
 		miniCouleurPanel.setMaximumSize(new Dimension(50, 30));
 		miniCouleurPanel.setPreferredSize(new Dimension(50, 30));
 		
-		JPanel couleurPrincipale = new JPanel();
+		couleurPrincipale = new JPanel();
 		couleurPrincipale.setBackground(Color.BLACK);
 		couleurPrincipale.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
 		couleurPrincipale.setToolTipText("Couleur principale");
 		
-		JPanel couleurSecondaire = new JPanel();
+		// Ajouter un listener pour changer la couleur en cliquant
+		couleurPrincipale.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override
+			public void mouseClicked(java.awt.event.MouseEvent e) {
+				Color nouvelleCouleur = JColorChooser.showDialog(panneau, "Choisir une couleur", couleurPrincipale.getBackground());
+				if (nouvelleCouleur != null) {
+					couleurPrincipale.setBackground(nouvelleCouleur);
+					panneau.definirCouleurDessin(nouvelleCouleur);
+				}
+			}
+		});
+		
+		couleurSecondaire = new JPanel();
 		couleurSecondaire.setBackground(Color.WHITE);
 		couleurSecondaire.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
 		couleurSecondaire.setToolTipText("Couleur secondaire");
@@ -208,6 +231,22 @@ public class ToolBarBuilder {
 		miniCouleurPanel.add(couleurPrincipale);
 		miniCouleurPanel.add(couleurSecondaire);
 		barre.add(miniCouleurPanel);
+		
+		// Créer l'écouteur de changement de couleur depuis la pipette
+		// Il sera enregistré plus tard quand le gestionnaire d'images sera initialisé
+		ecouteurCouleurPipette = couleur -> {
+			couleurPrincipale.setBackground(couleur);
+		};
+	}
+	
+	/**
+	 * Connecte l'écouteur de couleur au contrôleur de dessin.
+	 * Doit être appelé après l'initialisation du gestionnaire d'images.
+	 */
+	public void connecterEcouteurCouleur() {
+		if (ecouteurCouleurPipette != null) {
+			panneau.enregistrerEcouteurCouleur(ecouteurCouleurPipette);
+		}
 	}
 	
 	/**
