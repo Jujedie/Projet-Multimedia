@@ -3,9 +3,6 @@
 ## Aperçu de l'accueil de l'application
 ![tableau de bord de l'application](application/src/main/resources/accueil.png)
 
-## Aperçu de l'accueil de l'application
-![tableau de bord de l'application](application/src/main/resources/accueil.png)
-
 ![tableau de bord de l'application](image.png)
 
 ## Description
