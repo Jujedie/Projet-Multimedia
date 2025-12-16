@@ -20,6 +20,7 @@ public class TexteImageEditorDialog extends JDialog {
         super(parent, "Texte avec image de fond", true);
         modele = new TexteAvecImage();
         initComponents();
+        mettreAJourModele();
         setSize(1000, 750);
         setLocationRelativeTo(parent);
     }

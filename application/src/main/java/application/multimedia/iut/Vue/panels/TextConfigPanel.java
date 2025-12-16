@@ -13,7 +13,6 @@ public class TextConfigPanel extends JPanel {
     private JTextField champTexte;
     private JComboBox<String> comboPolice;
     private JSpinner spinnerTaille;
-    private JButton btnCouleur;
     private JButton btnChargerImage;
     
     public TextConfigPanel(Consumer<Void> onChange, Runnable onLoadImage) {
@@ -70,28 +69,9 @@ public class TextConfigPanel extends JPanel {
     
     private void creerConfigCouleurEtImage(GridBagConstraints gbc, Consumer<Void> onChange, Runnable onLoadImage) {
         gbc.gridx = 0; gbc.gridy = 2;
-        add(StyleHelper.createLabel("Couleur :"), gbc);
-        
-        gbc.gridx = 1;
-        btnCouleur = StyleHelper.createButton("Choisir couleur");
-        btnCouleur.setBackground(Color.WHITE);
-        btnCouleur.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(180, 180, 180), 1),
-            BorderFactory.createEmptyBorder(5, 15, 5, 15)
-        ));
-        btnCouleur.addActionListener(e -> {
-            Color nouvelleCouleur = JColorChooser.showDialog(this, "Choisir une couleur", btnCouleur.getBackground());
-            if (nouvelleCouleur != null) {
-                btnCouleur.setBackground(nouvelleCouleur);
-                onChange.accept(null);
-            }
-        });
-        add(btnCouleur, gbc);
-        
-        gbc.gridx = 2;
         add(StyleHelper.createLabel("Image de fond :"), gbc);
         
-        gbc.gridx = 3;
+        gbc.gridx = 1; gbc.gridwidth = 3;
         btnChargerImage = StyleHelper.createButton("Charger image");
         btnChargerImage.setBackground(StyleHelper.BUTTON_INFO);
         btnChargerImage.setForeground(Color.WHITE);
@@ -111,6 +91,6 @@ public class TextConfigPanel extends JPanel {
     }
     
     public Color getCouleurTexte() {
-        return btnCouleur.getBackground();
+        return Color.WHITE;
     }
 }
