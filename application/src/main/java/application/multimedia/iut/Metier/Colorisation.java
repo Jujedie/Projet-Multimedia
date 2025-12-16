@@ -121,8 +121,7 @@ public class Colorisation {
 			int coulOrig = image.getRGB( xOrig, yOrig ) & 0xFFFFFF;
 			for(int x = 0; x < image.getWidth(); x++){
 				for (int y = 0; y < image.getHeight(); y++){
-					System.out.println(distance(image.getRGB( x, y ),coulOrig));
-					if (distance(image.getRGB( x, y ),coulOrig) < distance)
+					if (distance(image.getRGB( x, y ),coulOrig) <= distance)
 						image.setRGB(x,y, coulDest);
 				}
 			}
@@ -133,7 +132,7 @@ public class Colorisation {
 		if ( x < 0 || x >= image.getWidth() ) return;
 		if ( y < 0 || y >= image.getHeight()) return;
 
-		if ( !(distance(image.getRGB( x, y ),coulOrig) < distance) ){ return;}
+		if ( (distance(image.getRGB( x, y ),coulOrig) > distance) ){ return;}
 
 		image.setRGB(x, y, coul);
 
@@ -144,18 +143,22 @@ public class Colorisation {
 	}
 
 	public static double distance(int c1, int c2) {
-		int r1 = c1 / (256*256);
-		int g1 = c1 / 256 % 256;
-		int b1 = c1 % 256;
+        // retirer l'alpha si présent
+        c1 &= 0xFFFFFF;
+        c2 &= 0xFFFFFF;
 
-		int r2 = c2 / (256*256);
-		int g2 = c2 / 256 % 256;
-		int b2 = c2 % 256;
+        int r1 = (c1 >> 16) & 0xFF;
+        int g1 = (c1 >> 8) & 0xFF;
+        int b1 = c1 & 0xFF;
 
-		int dr = r1 - r2;
-		int dg = g1 - g2;
-		int db = b1 - b2;
+        int r2 = (c2 >> 16) & 0xFF;
+        int g2 = (c2 >> 8) & 0xFF;
+        int b2 = c2 & 0xFF;
 
-		return Math.sqrt((double)(dr * dr + dg * dg + db * db));
-	}
+        int dr = r1 - r2;
+        int dg = g1 - g2;
+        int db = b1 - b2;
+
+        return Math.sqrt((double)(dr * dr + dg * dg + db * db));
+    }
 }

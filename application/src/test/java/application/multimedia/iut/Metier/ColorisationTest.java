@@ -1,11 +1,6 @@
 package application.multimedia.iut.Metier;
 
-// Exemple simple montrant comment importer et utiliser une classe du répertoire `main`.
-// Le package de la classe `Colorisation` est `application.multimedia.iut.Metier` —
-// depuis ce fichier de test (même package) vous pouvez accéder directement à la classe
-// sans écrire d'import explicite. Si vous étiez dans un autre package, ajoutez :
-// import application.multimedia.iut.Metier.Colorisation;
-
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
@@ -83,7 +78,7 @@ public class ColorisationTest {
 		}
 
 		try {
-			 image = ImageIO.read(new File("./application/src/main/resources/chat.png"));
+			 image = ImageIO.read(new File("./application/src/main/resources/test.png"));
 		}
 		catch (Exception e) {
 			System.err.println("Erreur de lecture de l'image : " + e.getMessage());
@@ -92,10 +87,10 @@ public class ColorisationTest {
 
 
 		// Test Pot de peinture
-		Colorisation.potDePeinture(image, (new java.awt.Color(255, 255, 255)).getRGB(), 50, false, 150, 5);
+		Colorisation.potDePeinture(image, (new Color(0, 20, 120)).getRGB(), 100, false, 0, 0);
 
 		try {
-			ImageIO.write(image, "png", new File("./application/src/test/resources/chat_potDePeinture.png"));
+			ImageIO.write(image, "png", new File("./application/src/test/resources/test_potDePeinture.png"));
 		}
 		catch (Exception e) {
 			System.err.println("Erreur d'écriture de l'image : " + e.getMessage());
