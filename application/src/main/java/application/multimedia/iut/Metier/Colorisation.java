@@ -69,17 +69,6 @@ public class Colorisation {
 		}
 	}
 
-	public static int luminance (Color coul) {
-		int r = coul.getRed();
-		int g = coul.getGreen();
-		int b = coul.getBlue();
-
-		int min = Math.min ( r, Math.min(g,b));
-		int max = Math.max ( r, Math.max(g,b));
-
-		return (max + min) / 2;
-	}
-
 	public static void luminosite(BufferedImage image, int luminosite) {
 		for(int x = 0; x < image.getWidth(); x++){
 			for (int y = 0; y < image.getHeight(); y++){
