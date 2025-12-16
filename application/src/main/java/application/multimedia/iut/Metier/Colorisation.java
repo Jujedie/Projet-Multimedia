@@ -129,21 +129,38 @@ public class Colorisation {
 	}
 
 	public static void potDePeintureRec  (BufferedImage image, int x, int y, int coulOrig, int coul, double distance) {
-		if ( x < 0 || x >= image.getWidth() ) return;
-		if ( y < 0 || y >= image.getHeight()) return;
 
-		if ( (distance(image.getRGB( x, y ),coulOrig) > distance) ){ return;}
+        int w = image.getWidth();
+        int h = image.getHeight();
 
-		image.setRGB(x, y, coul);
+		boolean[][] visited = new boolean[w][h];
 
-		potDePeintureRec(image, x+1, y, coulOrig, coul, distance);
-		potDePeintureRec(image, x-1, y, coulOrig, coul, distance);
-		potDePeintureRec(image, x, y+1, coulOrig, coul, distance);
-		potDePeintureRec(image, x, y-1, coulOrig, coul, distance);
-	}
+		java.util.ArrayDeque<int[]> stack = new java.util.ArrayDeque<>();
+        stack.push(new int[] { x, y });
+
+        while (!stack.isEmpty()) {
+
+            int[] p = stack.pop();
+            int px = p[0];
+            int py = p[1];
+
+            if (px < 0 || px >= w || py < 0 || py >= h) continue;
+            if (visited[px][py]) continue;
+            visited[px][py] = true;
+
+            if (distance(image.getRGB(px, py), coulOrig) > distance) continue;
+
+            image.setRGB(px, py, coul);
+
+            stack.push(new int[] { px + 1, py });
+            stack.push(new int[] { px - 1, py });
+            stack.push(new int[] { px, py + 1 });
+            stack.push(new int[] { px, py - 1 });
+        }
+    }
 
 	public static double distance(int c1, int c2) {
-        // retirer l'alpha si présent
+        // retirer l'alpha
         c1 &= 0xFFFFFF;
         c2 &= 0xFFFFFF;
 

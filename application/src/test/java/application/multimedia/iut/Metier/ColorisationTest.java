@@ -78,7 +78,7 @@ public class ColorisationTest {
 		}
 
 		try {
-			 image = ImageIO.read(new File("./application/src/main/resources/test.png"));
+			 image = ImageIO.read(new File("./application/src/main/resources/tortue.png"));
 		}
 		catch (Exception e) {
 			System.err.println("Erreur de lecture de l'image : " + e.getMessage());
@@ -87,10 +87,10 @@ public class ColorisationTest {
 
 
 		// Test Pot de peinture
-		Colorisation.potDePeinture(image, (new Color(0, 20, 120)).getRGB(), 100, false, 0, 0);
+		Colorisation.potDePeinture(image, (new Color(0, 20, 120)).getRGB(), 100, true, 0, 0);
 
 		try {
-			ImageIO.write(image, "png", new File("./application/src/test/resources/test_potDePeinture.png"));
+			ImageIO.write(image, "png", new File("./application/src/test/resources/tortue_potDePeinture.png"));
 		}
 		catch (Exception e) {
 			System.err.println("Erreur d'écriture de l'image : " + e.getMessage());
