@@ -1,5 +1,6 @@
 /**
- * Classe principale pour lancer l'application de retouche d'images.
+ * Classe gérant la colorisation et les transformations de couleur des images.
+ * Permet d'appliquer des filtres de couleur et des ajustements.
  * 
  * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
  * @version 1.0
@@ -9,9 +10,23 @@ package application.multimedia.iut.Metier;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
+/**
+ * Fournit des outils de colorisation et de transformation de couleurs.
+ * Permet d'appliquer teinte, contraste, luminosité et pot de peinture.
+ */
 public class Colorisation {
 	static public final int VALEUR_MOYENNE = 127;
 
+	/**
+	 * Applique une teinte de couleur sur l'image avec alpha blending.
+	 * Mélange la couleur de teinte avec chaque pixel selon le niveau d'alpha.
+	 *
+	 * @param image L'image à teinter (modifiée).
+	 * @param red La composante rouge de la teinte (0-255).
+	 * @param green La composante verte de la teinte (0-255).
+	 * @param blue La composante bleue de la teinte (0-255).
+	 * @param alpha L'intensité de la teinte (0-255, 0=transparent, 255=opaque).
+	 */
 	public static void teinter( BufferedImage image, int red, int green, int blue, int alpha) {
 		red   = clamp(red);
         green = clamp(green);
@@ -39,10 +54,23 @@ public class Colorisation {
 		}
 	}
 
+	/**
+	 * Limite une valeur entre 0 et 255.
+	 *
+	 * @param v La valeur à limiter.
+	 * @return La valeur clampée dans l'intervalle [0, 255].
+	 */
 	public static int clamp(int v) {
         return Math.max(0, Math.min(255, v));
     }
 
+	/**
+	 * Ajuste le contraste de l'image.
+	 * Augmente ou diminue l'écart entre les couleurs et la valeur moyenne (127).
+	 *
+	 * @param image L'image à modifier (modifiée).
+	 * @param contraste Le niveau de contraste (-100 à +100).
+	 */
 	public static void contraste( BufferedImage image, int contraste) {
 		for(int x = 0; x < image.getWidth(); x++){
 			for (int y = 0; y < image.getHeight(); y++){
@@ -75,6 +103,13 @@ public class Colorisation {
 		}
 	}
 
+	/**
+	 * Calcule la luminance d'une couleur.
+	 * Utilise la moyenne des composantes min et max (HSL lightness).
+	 *
+	 * @param coul La couleur à analyser.
+	 * @return La valeur de luminance (0-255).
+	 */
 	public static int luminance (Color coul) {
 		int r = coul.getRed();
 		int g = coul.getGreen();
@@ -86,6 +121,13 @@ public class Colorisation {
 		return (max + min) / 2;
 	}
 
+	/**
+	 * Ajuste la luminosité de l'image.
+	 * Ajoute ou soustrait une valeur à chaque composante RGB.
+	 *
+	 * @param image L'image à modifier (modifiée).
+	 * @param luminosite Le niveau de luminosité (-255 à +255).
+	 */
 	public static void luminosite(BufferedImage image, int luminosite) {
 		for(int x = 0; x < image.getWidth(); x++){
 			for (int y = 0; y < image.getHeight(); y++){
@@ -119,6 +161,17 @@ public class Colorisation {
 		}
 	}
 
+	/**
+	 * Remplit une région de l'image avec une couleur (outil pot de peinture).
+	 * Peut fonctionner en mode continu (propagation) ou global.
+	 *
+	 * @param image L'image à modifier (modifiée).
+	 * @param coulDest La couleur de remplissage (RGB).
+	 * @param distance La tolérance de couleur (0-441, distance euclidienne RGB).
+	 * @param estContinue true pour remplissage continu, false pour global.
+	 * @param xOrig La coordonnée X du point de départ.
+	 * @param yOrig La coordonnée Y du point de départ.
+	 */
 	public static void potDePeinture (BufferedImage image, int coulDest, int distance, Boolean estContinue, int xOrig, int yOrig) {
 		if (estContinue) {
 			potDePeintureRec (image, xOrig, yOrig, image.getRGB( xOrig, yOrig ) & 0xFFFFFF, coulDest, distance);
@@ -134,6 +187,17 @@ public class Colorisation {
 		}
 	}
 
+	/**
+	 * Implémentation récursive (avec pile) du pot de peinture.
+	 * Propage le remplissage aux pixels adjacents dans la tolérance.
+	 *
+	 * @param image L'image à modifier (modifiée).
+	 * @param x La coordonnée X de départ.
+	 * @param y La coordonnée Y de départ.
+	 * @param coulOrig La couleur d'origine à remplacer (RGB sans alpha).
+	 * @param coul La couleur de remplissage.
+	 * @param distance La tolérance de distance de couleur.
+	 */
 	public static void potDePeintureRec  (BufferedImage image, int x, int y, int coulOrig, int coul, double distance) {
 
         int w = image.getWidth();
@@ -165,6 +229,14 @@ public class Colorisation {
         }
     }
 
+	/**
+	 * Calcule la distance euclidienne entre deux couleurs dans l'espace RGB.
+	 * Ignore le canal alpha.
+	 *
+	 * @param c1 La première couleur (ARGB).
+	 * @param c2 La deuxième couleur (ARGB).
+	 * @return La distance euclidienne (0-441, √(255²+255²+255²)).
+	 */
 	public static double distance(int c1, int c2) {
         // retirer l'alpha
         c1 &= 0xFFFFFF;

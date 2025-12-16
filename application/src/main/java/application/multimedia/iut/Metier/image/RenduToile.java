@@ -1,5 +1,6 @@
 /**
- * Classe principale pour lancer l'application de retouche d'images.
+ * Classe gérant le rendu et la composition des couches d'images.
+ * Effectue la fusion pixel par pixel des différentes couches.
  * 
  * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
  * @version 1.0
@@ -17,7 +18,19 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
+/**
+ * Moteur de rendu pour composer les couches d'images.
+ * Effectue la fusion pixel par pixel avec gestion du clipping et de l'alpha.
+ */
 public class RenduToile {
+	/**
+	 * Peint la pile de couches sur le contexte graphique.
+	 * Gère le rendu des couches, le clipping et la prévisualisation de placement.
+	 *
+	 * @param g Le contexte graphique où dessiner.
+	 * @param pile La pile de couches à rendre.
+	 * @param placement La session de placement en cours, ou null.
+	 */
 	public void peindre(Graphics g, PileCouches pile, SessionPlacement placement) {
 		if (pile.estVide()) return;
 		Graphics2D g2d = (Graphics2D) g;
@@ -57,6 +70,13 @@ public class RenduToile {
 		}
 	}
 
+	/**
+	 * Construit une image composite à partir de la pile de couches.
+	 * Fusionne toutes les couches en une seule image avec gestion du clipping.
+	 *
+	 * @param pile La pile de couches à composer.
+	 * @return L'image résultante de la composition, ou null si pile vide.
+	 */
 	public BufferedImage construireComposite(PileCouches pile) {
 		if (pile.estVide()) return null;
 		Rectangle base = pile.limitesBase();
@@ -109,6 +129,15 @@ public class RenduToile {
 		return composite;
 	}
 	
+	/**
+	 * Redimensionne une image en utilisant un échantillonnage pixel par pixel.
+	 * Retourne l'image source si les dimensions sont identiques.
+	 *
+	 * @param source L'image à redimensionner.
+	 * @param largeur La largeur cible en pixels.
+	 * @param hauteur La hauteur cible en pixels.
+	 * @return L'image redimensionnée.
+	 */
 	private BufferedImage redimensionnerImage(BufferedImage source, int largeur, int hauteur) {
 		if (source.getWidth() == largeur && source.getHeight() == hauteur) {
 			return source;
@@ -129,6 +158,15 @@ public class RenduToile {
 		return resultat;
 	}
 	
+	/**
+	 * Superpose une image source sur une image destination.
+	 * Gère la transparence alpha et le mélange de couleurs pixel par pixel.
+	 *
+	 * @param dest L'image de destination (modifiée).
+	 * @param source L'image source à superposer.
+	 * @param posX La position horizontale de départ.
+	 * @param posY La position verticale de départ.
+	 */
 	private void superposerImage(BufferedImage dest, BufferedImage source, int posX, int posY) {
 		int largeurDest = dest.getWidth();
 		int hauteurDest = dest.getHeight();
@@ -156,6 +194,17 @@ public class RenduToile {
 		}
 	}
 	
+	/**
+	 * Superpose une image avec clipping dans une zone rectangulaire.
+	 * Limite le rendu à la zone de clipping spécifiée.
+	 *
+	 * @param dest L'image de destination (modifiée).
+	 * @param source L'image source à superposer.
+	 * @param posX La position horizontale de départ.
+	 * @param posY La position verticale de départ.
+	 * @param clipW La largeur de la zone de clipping.
+	 * @param clipH La hauteur de la zone de clipping.
+	 */
 	private void superposerAvecClip(BufferedImage dest, BufferedImage source, int posX, int posY, int clipW, int clipH) {
 		int largeurSource = source.getWidth();
 		int hauteurSource = source.getHeight();
@@ -181,6 +230,15 @@ public class RenduToile {
 		}
 	}
 	
+	/**
+	 * Mélange deux couleurs en utilisant l'alpha blending.
+	 * Applique la formule de composition alpha standard.
+	 *
+	 * @param coulDest La couleur de destination (ARGB).
+	 * @param coulSource La couleur source (ARGB).
+	 * @param alphaSource Le niveau d'opacité de la source (0-255).
+	 * @return La couleur résultante après mélange (ARGB).
+	 */
 	private int melangerCouleurs(int coulDest, int coulSource, int alphaSource) {
 		int alphaDest = (coulDest >> 24) & 0xFF;
 		int rougeDest = (coulDest >> 16) & 0xFF;

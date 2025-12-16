@@ -1,5 +1,6 @@
 /**
- * Classe principale pour lancer l'application de retouche d'images.
+ * Panneau de sélection d'une région de l'image.
+ * Permet de définir la zone de l'image à utiliser comme fond.
  * 
  * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
  * @version 1.0
@@ -13,18 +14,32 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.function.Consumer;
 
+/**
+ * Panneau de sélection rectangulaire dans une image.
+ * Permet de définir interactivement la région d'image à utiliser.
+ */
 public class SelectionPanel extends JPanel {
     private BufferedImage image;
     private Rectangle selection;
     private Point start;
     private final Consumer<Rectangle> selectionListener;
 
+    /**
+     * Constructeur du panneau de sélection de région.
+     * Permet de sélectionner une zone rectangulaire dans une image.
+     *
+     * @param selectionListener Callback appelé quand une sélection est faite.
+     */
     public SelectionPanel(Consumer<Rectangle> selectionListener) {
         this.selectionListener = selectionListener;
         setBackground(Color.WHITE);
         installerGestionSouris();
     }
 
+    /**
+     * Installe les gestionnaires d'événements souris pour la sélection.
+     * Gère le cliquer-glisser pour définir la zone.
+     */
     private void installerGestionSouris() {
         MouseAdapter adapter = new MouseAdapter() {
             @Override
@@ -69,6 +84,12 @@ public class SelectionPanel extends JPanel {
         addMouseMotionListener(adapter);
     }
 
+    /**
+     * Définit l'image à afficher dans le panneau.
+     * Initialise la sélection à l'image entière.
+     *
+     * @param img L'image à afficher.
+     */
     public void setImage(BufferedImage img) {
         this.image = img;
         if (img != null) {
@@ -79,6 +100,12 @@ public class SelectionPanel extends JPanel {
         repaint();
     }
 
+    /**
+     * Dessine l'image et la zone de sélection.
+     * Affiche un overlay sombre sur les zones non sélectionnées.
+     *
+     * @param g Le contexte graphique.
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -93,6 +120,11 @@ public class SelectionPanel extends JPanel {
         dessinerOverlaySelection((Graphics2D) g);
     }
 
+    /**
+     * Dessine un message d'instruction quand aucune image n'est chargée.
+     *
+     * @param g Le contexte graphique.
+     */
     private void dessinerMessageVide(Graphics g) {
         g.setColor(Color.GRAY);
         String msg = "Cliquez sur 'Charger image' pour sélectionner une image";
@@ -102,6 +134,12 @@ public class SelectionPanel extends JPanel {
         g.drawString(msg, x, y);
     }
 
+    /**
+     * Dessine l'overlay de sélection avec le rectangle et les dimensions.
+     * Assombrit les zones non sélectionnées et encadre la sélection.
+     *
+     * @param g2d Le contexte graphique 2D.
+     */
     private void dessinerOverlaySelection(Graphics2D g2d) {
         g2d.setColor(new Color(0, 0, 0, 120));
         g2d.fillRect(0, 0, image.getWidth(), image.getHeight());
@@ -125,6 +163,12 @@ public class SelectionPanel extends JPanel {
         g2d.drawString(dims, selection.x + 5, selection.y - 5);
     }
 
+    /**
+     * Retourne la taille préférée du panneau.
+     * Correspond aux dimensions de l'image, ou 400x400 par défaut.
+     *
+     * @return Les dimensions préférées.
+     */
     @Override
     public Dimension getPreferredSize() {
         if (image != null) {

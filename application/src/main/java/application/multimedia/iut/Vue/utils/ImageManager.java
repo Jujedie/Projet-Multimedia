@@ -1,5 +1,6 @@
 /**
- * Classe principale pour lancer l'application de retouche d'images.
+ * Classe utilitaire pour la gestion des images.
+ * Gère le chargement, l'ajout et la manipulation des images.
  * 
  * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
  * @version 1.0
@@ -20,6 +21,10 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
+/**
+ * Gestionnaire centralisé pour toutes les opérations sur images.
+ * Coordonne le chargement, l'enregistrement, le zoom, et le placement d'images.
+ */
 public class ImageManager {
 	private final PileCouches pileCouches = new PileCouches();
 	private final SessionPlacement sessionPlacement = new SessionPlacement();
@@ -31,12 +36,23 @@ public class ImageManager {
 	private boolean glisserEnCours = false;
 	private CoucheImage coucheGlissee;
 
+	/**
+	 * Constructeur du gestionnaire d'images.
+	 * Initialise le gestionnaire avec une toile et un composant parent.
+	 *
+	 * @param toile Le label servant de zone de dessin.
+	 * @param parent Le composant parent pour les dialogues.
+	 */
 	public ImageManager(JLabel toile, JComponent parent) {
 		this.toile = toile;
 		this.parent = parent;
 		installerRaccourcisClavier();
 	}
 
+	/**
+	 * Ouvre une boîte de dialogue pour sélectionner et charger des images.
+	 * Gère le remplacement ou la superposition d'images existantes.
+	 */
 	public void ouvrirFichier() {
 		File[] fichiersChoisis = ImageDialogs.selectImages(parent);
 		if (fichiersChoisis == null || fichiersChoisis.length == 0) return;
@@ -80,6 +96,11 @@ public class ImageManager {
 		}
 	}
 
+	/**
+	 * Enregistre l'image composite dans un fichier PNG.
+	 *
+	 * @param nouveauFichier True pour "Enregistrer sous", false pour "Enregistrer".
+	 */
 	public void enregistrerFichier(boolean nouveauFichier) {
 		if (pileCouches.estVide()) {
 			messageInfo("Information", "Aucune image à enregistrer.");
@@ -98,16 +119,30 @@ public class ImageManager {
 		}
 	}
 
+	/**
+	 * Rafraîchit l'affichage de l'image sur la toile.
+	 */
 	private void afficherImage() {
 		if (pileCouches.estVide()) return;
 		toile.setIcon(null);
 		toile.repaint();
 	}
 
+	/**
+	 * Obtient les dimensions actuelles de la zone de dessin.
+	 *
+	 * @return Les dimensions de la toile.
+	 */
 	private Dimension obtenirTailleToile() {
 		return new Dimension(Math.max(1, toile.getWidth()), Math.max(1, toile.getHeight()));
 	}
 
+	/**
+	 * Démarre le mode de placement interactif d'une nouvelle image.
+	 * Affiche un message d'instruction à l'utilisateur.
+	 *
+	 * @param img L'image à placer.
+	 */
 	private void demarrerPlacement(BufferedImage img) {
 		sessionPlacement.demarrer(img, obtenirTailleToile(), pileCouches.niveauZoom(), pileCouches.limitesBase());
 		toile.requestFocusInWindow();
@@ -117,6 +152,10 @@ public class ImageManager {
 		toile.repaint();
 	}
 
+	/**
+	 * Valide et finalise le placement de l'image en cours.
+	 * Vérifie que l'image intersecte bien la zone de base.
+	 */
 	private void validerPlacement() {
 		if (!sessionPlacement.estActive()) return;
 		if (!sessionPlacement.intersecteBase(pileCouches.niveauZoom())) {
@@ -131,6 +170,10 @@ public class ImageManager {
 		toile.repaint();
 	}
 
+	/**
+	 * Installe les raccourcis clavier pour le mode de placement.
+	 * Configure la touche Entrée pour valider le placement.
+	 */
 	private void installerRaccourcisClavier() {
 		InputMap im = toile.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 		ActionMap am = toile.getActionMap();
@@ -143,27 +186,51 @@ public class ImageManager {
 		});
 	}
 
+	/**
+	 * Dessine l'image composée de toutes les couches sur le contexte graphique.
+	 *
+	 * @param g Le contexte graphique pour le rendu.
+	 */
 	public void dessinerImage(Graphics g) {
 		renduToile.peindre(g, pileCouches, sessionPlacement);
 	}
 
+	/**
+	 * Applique un facteur de zoom sur toutes les couches.
+	 *
+	 * @param facteur Le multiplicateur de zoom (&gt;1 pour agrandir, &lt;1 pour réduire).
+	 */
 	public void zoomer(double facteur) {
 		if (pileCouches.estVide()) return;
 		pileCouches.zoomer(facteur);
 		afficherImage();
 	}
 
+	/**
+	 * Réinitialise le zoom à 100% (facteur 1.0).
+	 */
 	public void reinitialiserZoom() {
 		if (pileCouches.estVide()) return;
 		pileCouches.reinitialiserZoom();
 		afficherImage();
 	}
 
+	/**
+	 * Récupère l'image de la couche actuellement active.
+	 *
+	 * @return L'image de la couche active, ou null si aucune.
+	 */
 	public BufferedImage obtenirImageCourante() {
 		CoucheImage active = pileCouches.coucheActive();
 		return active != null ? active.image : null;
 	}
 
+	/**
+	 * Remplace toutes les couches par une nouvelle image unique.
+	 * Réinitialise la pile de couches et les sessions en cours.
+	 *
+	 * @param image La nouvelle image à définir comme base.
+	 */
 	public void definirImageCourante(BufferedImage image) {
 		pileCouches.vider();
 		sessionPlacement.annuler();
@@ -175,6 +242,12 @@ public class ImageManager {
 		afficherImage();
 	}
 	
+	/**
+	 * Ajoute une image comme nouvelle couche sur les couches existantes.
+	 * Démarre le mode placement si des couches existent déjà.
+	 *
+	 * @param image L'image à ajouter.
+	 */
 	public void ajouterImageCommeNouvelleCouche(BufferedImage image) {
 		if (image == null) return;
 		
@@ -186,6 +259,12 @@ public class ImageManager {
 		afficherImage();
 	}
 	
+	/**
+	 * Ajoute une image en proposant à l'utilisateur le mode d'ajout.
+	 * Demande si l'image doit remplacer ou se superposer.
+	 *
+	 * @param image L'image à ajouter.
+	 */
 	public void ajouterImageAvecChoix(BufferedImage image) {
 		if (image == null) return;
 		
@@ -209,6 +288,13 @@ public class ImageManager {
 		afficherImage();
 	}
 
+	/**
+	 * Trouve la couche visible à une position donnée.
+	 * Parcourt les couches du dessus vers le dessous.
+	 *
+	 * @param p Le point à tester.
+	 * @return La couche trouvée, ou null si aucune.
+	 */
 	private CoucheImage coucheAuPoint(Point p) {
 		java.util.List<CoucheImage> couches = pileCouches.couches();
 		double zoom = pileCouches.niveauZoom();
@@ -223,6 +309,10 @@ public class ImageManager {
 		return null;
 	}
 
+	/**
+	 * Active les gestionnaires de souris pour le déplacement des images.
+	 * Permet de glisser-déposer les couches et de placer de nouvelles images.
+	 */
 	public void activerDeplacementImage() {
 		MouseAdapter adaptationSouris = new MouseAdapter() {
 			@Override
@@ -275,10 +365,22 @@ public class ImageManager {
 		toile.addMouseMotionListener(adaptationSouris);
 	}
 
+	/**
+	 * Affiche un message d'erreur dans une boîte de dialogue.
+	 *
+	 * @param titre Le titre de la fenêtre.
+	 * @param message Le message d'erreur.
+	 */
 	private void messageErreur(String titre, String message) {
 		JOptionPane.showMessageDialog(parent, message, titre, JOptionPane.ERROR_MESSAGE);
 	}
 
+	/**
+	 * Affiche un message d'information dans une boîte de dialogue.
+	 *
+	 * @param titre Le titre de la fenêtre.
+	 * @param message Le message informatif.
+	 */
 	private void messageInfo(String titre, String message) {
 		JOptionPane.showMessageDialog(parent, message, titre, JOptionPane.INFORMATION_MESSAGE);
 	}

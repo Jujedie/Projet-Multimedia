@@ -1,5 +1,6 @@
 /**
- * Classe principale pour lancer l'application de retouche d'images.
+ * Panneau de configuration du texte.
+ * Permet de saisir le texte, choisir la police et la taille.
  * 
  * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
  * @version 1.0
@@ -14,6 +15,10 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.function.Consumer;
 
+/**
+ * Panneau de configuration des paramètres de texte.
+ * Permet de saisir le texte, choisir police, taille et charger une image.
+ */
 public class TextConfigPanel extends JPanel {
     
     private JTextField champTexte;
@@ -21,6 +26,13 @@ public class TextConfigPanel extends JPanel {
     private JSpinner spinnerTaille;
     private JButton btnChargerImage;
     
+    /**
+     * Constructeur du panneau de configuration de texte.
+     * Crée l'interface pour saisir le texte et choisir sa mise en forme.
+     *
+     * @param onChange Callback appelé lors d'un changement de configuration.
+     * @param onLoadImage Callback appelé lors du chargement d'une image.
+     */
     public TextConfigPanel(Consumer<Void> onChange, Runnable onLoadImage) {
         setLayout(new GridBagLayout());
         setBackground(Color.WHITE);
@@ -38,6 +50,13 @@ public class TextConfigPanel extends JPanel {
         creerConfigCouleurEtImage(gbc, onChange, onLoadImage);
     }
     
+    /**
+     * Crée le champ de saisie du texte.
+     * Notifie les changements lors de la frappe.
+     *
+     * @param gbc Les contraintes de placement.
+     * @param onChange Callback de changement.
+     */
     private void creerChampTexte(GridBagConstraints gbc, Consumer<Void> onChange) {
         gbc.gridx = 0; gbc.gridy = 0;
         add(StyleHelper.createLabel("Texte :"), gbc);
@@ -53,6 +72,13 @@ public class TextConfigPanel extends JPanel {
         add(champTexte, gbc);
     }
     
+    /**
+     * Crée les contrôles de sélection de police et de taille.
+     * Liste toutes les polices système disponibles.
+     *
+     * @param gbc Les contraintes de placement.
+     * @param onChange Callback de changement.
+     */
     private void creerSelecteurPolice(GridBagConstraints gbc, Consumer<Void> onChange) {
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0; gbc.gridwidth = 1;
         add(StyleHelper.createLabel("Police :"), gbc);
@@ -73,6 +99,13 @@ public class TextConfigPanel extends JPanel {
         add(spinnerTaille, gbc);
     }
     
+    /**
+     * Crée le bouton de chargement d'image de fond.
+     *
+     * @param gbc Les contraintes de placement.
+     * @param onChange Callback de changement.
+     * @param onLoadImage Callback de chargement d'image.
+     */
     private void creerConfigCouleurEtImage(GridBagConstraints gbc, Consumer<Void> onChange, Runnable onLoadImage) {
         gbc.gridx = 0; gbc.gridy = 2;
         add(StyleHelper.createLabel("Image de fond :"), gbc);
@@ -86,16 +119,33 @@ public class TextConfigPanel extends JPanel {
         add(btnChargerImage, gbc);
     }
     
+    /**
+     * Obtient le texte saisi par l'utilisateur.
+     *
+     * @return Le texte du champ.
+     */
     public String getTexte() {
         return champTexte.getText();
     }
     
+    /**
+     * Obtient la police sélectionnée avec sa taille.
+     * Retourne une police en gras.
+     *
+     * @return La police configurée.
+     */
     public Font getPolice() {
         String nomPolice = (String) comboPolice.getSelectedItem();
         int taillePolice = (Integer) spinnerTaille.getValue();
         return new Font(nomPolice, Font.BOLD, taillePolice);
     }
     
+    /**
+     * Obtient la couleur du texte.
+     * Actuellement fixée à blanc.
+     *
+     * @return La couleur du texte.
+     */
     public Color getCouleurTexte() {
         return Color.WHITE;
     }

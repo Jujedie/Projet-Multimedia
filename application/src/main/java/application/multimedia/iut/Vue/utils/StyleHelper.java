@@ -1,5 +1,6 @@
 /**
- * Classe principale pour lancer l'application de retouche d'images.
+ * Classe utilitaire pour le style de l'interface.
+ * Définit les couleurs, polices et composants standardisés.
  * 
  * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
  * @version 1.0
@@ -10,6 +11,10 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 
+/**
+ * Utilitaire de style pour l'interface utilisateur.
+ * Définit les thèmes de couleurs, polices et composants standardisés.
+ */
 public class StyleHelper {
     
     public static final Color BACKGROUND_LIGHT = new Color(245, 245, 245);
@@ -21,12 +26,27 @@ public class StyleHelper {
     public static final Color TEXT_DARK = new Color(80, 80, 80);
     public static final Color TEXT_LIGHT = new Color(70, 70, 70);
     
+    /**
+     * Crée un label avec le style standard.
+     * Police Arial, gras, taille 13.
+     *
+     * @param text Le texte du label.
+     * @return Le JLabel configuré.
+     */
     public static JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
         label.setFont(new Font("Arial", Font.BOLD, 13));
         return label;
     }
     
+    /**
+     * Crée un champ de texte avec le style standard.
+     * Bordure arrondie et padding.
+     *
+     * @param defaultText Le texte par défaut.
+     * @param columns Le nombre de colonnes.
+     * @return Le JTextField configuré.
+     */
     public static JTextField createTextField(String defaultText, int columns) {
         JTextField field = new JTextField(defaultText, columns);
         field.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -37,6 +57,13 @@ public class StyleHelper {
         return field;
     }
     
+    /**
+     * Crée un bouton avec le style de base.
+     * Curseur main et sans focus visible.
+     *
+     * @param text Le texte du bouton.
+     * @return Le JButton configuré.
+     */
     public static JButton createButton(String text) {
         JButton button = new JButton(text);
         button.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -45,6 +72,15 @@ public class StyleHelper {
         return button;
     }
     
+    /**
+     * Crée un bouton primaire avec le style vert.
+     * Fond vert, texte blanc, dimensions personnalisées.
+     *
+     * @param text Le texte du bouton.
+     * @param width La largeur en pixels.
+     * @param height La hauteur en pixels.
+     * @return Le JButton configuré.
+     */
     public static JButton createPrimaryButton(String text, int width, int height) {
         JButton button = new JButton(text);
         button.setFont(new Font("Arial", Font.BOLD, 13));
@@ -57,6 +93,15 @@ public class StyleHelper {
         return button;
     }
     
+    /**
+     * Crée un bouton secondaire avec le style gris.
+     * Fond gris clair, bordure, dimensions personnalisées.
+     *
+     * @param text Le texte du bouton.
+     * @param width La largeur en pixels.
+     * @param height La hauteur en pixels.
+     * @return Le JButton configuré.
+     */
     public static JButton createSecondaryButton(String text, int width, int height) {
         JButton button = new JButton(text);
         button.setFont(new Font("Arial", Font.PLAIN, 13));
@@ -72,6 +117,14 @@ public class StyleHelper {
         return button;
     }
     
+    /**
+     * Crée une bordure avec titre.
+     * Bordure encadrée avec titre en haut à gauche.
+     *
+     * @param title Le titre de la bordure.
+     * @param textColor La couleur du texte du titre.
+     * @return La bordure configurée.
+     */
     public static Border createTitledBorder(String title, Color textColor) {
         return BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(BORDER_COLOR, 1),
