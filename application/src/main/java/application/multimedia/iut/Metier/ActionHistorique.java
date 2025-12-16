@@ -7,7 +7,7 @@ public class ActionHistorique {
 	private ActionTypeEnum actionType;
 	private Object[]       parametres;
 
-	public ActionHistorique creerActionHistorique(ActionTypeEnum actionType, Object[] parametres) {
+	public static ActionHistorique creerActionHistorique(ActionTypeEnum actionType, Object[] parametres) {
 		if (parametres.length != actionType.getNbParametres() && actionType.getNbParametres() != -1) {
 			throw new IllegalArgumentException("Le nombre de paramètres ne correspond pas à l'action.");
 		}

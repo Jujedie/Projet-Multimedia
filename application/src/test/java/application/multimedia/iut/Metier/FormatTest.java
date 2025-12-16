@@ -1,9 +1,10 @@
+package application.multimedia.iut.Metier;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import javax.imageio.ImageIO;
 
-import application.multimedia.iut.Metier.Format;
+import javax.imageio.ImageIO;
 
 public class FormatTest {
 	public final static File inputFile = new File("application/src/main/resources/tortue.png");
