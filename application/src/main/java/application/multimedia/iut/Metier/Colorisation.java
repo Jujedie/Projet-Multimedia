@@ -129,7 +129,7 @@ public class Colorisation {
 		}
 	}
 
-	public static void potDePeintureRec  (BufferedImage image, int x, int y, int coulOrig, int coul, int distance) {
+	public static void potDePeintureRec  (BufferedImage image, int x, int y, int coulOrig, int coul, double distance) {
 		if ( x < 0 || x >= image.getWidth() ) return;
 		if ( y < 0 || y >= image.getHeight()) return;
 
