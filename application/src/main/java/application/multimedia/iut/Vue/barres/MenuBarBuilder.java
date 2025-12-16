@@ -52,9 +52,14 @@ public class MenuBarBuilder {
 		JMenuItem annulerItem = new JMenuItem("Annuler");
 		JMenuItem refaireItem = new JMenuItem("Refaire");
 		JMenuItem effacerItem = new JMenuItem("Effacer tout");
+		JMenuItem texteImageItem = new JMenuItem("Texte avec image...");
+		
+		texteImageItem.addActionListener(e -> panneau.ouvrirEditeurTexteImage());
 
 		editionMenu.add(annulerItem);
 		editionMenu.add(refaireItem);
+		editionMenu.addSeparator();
+		editionMenu.add(texteImageItem);
 		editionMenu.addSeparator();
 		editionMenu.add(effacerItem);
 
