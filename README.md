@@ -71,9 +71,7 @@ mvn clean compile
 ```
 
 ### Exécution
-```bash
-mvn exec:java -Dexec.mainClass="application.multimedia.iut.Main"
-```
+.jar
 
 Ou via IDE (Eclipse, IntelliJ, VS Code) en exécutant `Main.java`
 
