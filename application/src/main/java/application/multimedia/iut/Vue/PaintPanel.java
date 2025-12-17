@@ -12,7 +12,7 @@ import application.multimedia.iut.Metier.GestionnaireOutils;
 import application.multimedia.iut.Vue.barres.MenuBarBuilder;
 import application.multimedia.iut.Vue.barres.ToolBarBuilder;
 import application.multimedia.iut.Vue.dialogs.TexteImageEditorDialog;
-import application.multimedia.iut.Vue.utils.ImageManager;
+import application.multimedia.iut.Vue.utils.ImageManagerVue;
 import application.multimedia.iut.Vue.utils.LucideIconLoader;
 import java.awt.*;
 import javax.swing.*;
@@ -26,7 +26,7 @@ public class PaintPanel extends JPanel {
 
 	private JLabel toile;
 	private JScrollPane panneauDeroulement;
-	private ImageManager gestionnaireImages;
+	private ImageManagerVue gestionnaireImages;
 	private MainControlleur.Controleur controleur;
 	
 	/**
@@ -96,7 +96,7 @@ public class PaintPanel extends JPanel {
 		panneauDeroulement = new JScrollPane(toile);
 		panneauDeroulement.setBackground(Color.DARK_GRAY);
 		
-		gestionnaireImages = new ImageManager(toile, this, controleur);
+		gestionnaireImages = new ImageManagerVue(toile, this, controleur);
 		gestionnaireImages.activerDeplacementImage();
 	}
 	
@@ -202,5 +202,68 @@ public class PaintPanel extends JPanel {
 	 */
 	public void enregistrerEcouteurCouleur(GestionnaireOutils.EcouteurCouleur ecouteur) {
 		controleur.ajouterEcouteurCouleur(ecouteur);
+	}
+	
+	// ========================================
+	// MÉTHODES DE COLORISATION
+	// ========================================
+	
+	/**
+	 * Applique une teinte de couleur sur l'image courante.
+	 * 
+	 * @param red La composante rouge de la teinte (0-255).
+	 * @param green La composante verte de la teinte (0-255).
+	 * @param blue La composante bleue de la teinte (0-255).
+	 * @param alpha L'intensité de la teinte (0-255).
+	 */
+	public void appliquerTeinte(int red, int green, int blue, int alpha) {
+		BufferedImage imageCourante = gestionnaireImages.obtenirImageCourante();
+		if (imageCourante != null) {
+			controleur.appliquerTeinte(imageCourante, red, green, blue, alpha);
+			gestionnaireImages.rafraichirAffichage();
+		}
+	}
+	
+	/**
+	 * Ajuste le contraste de l'image courante.
+	 * 
+	 * @param contraste Le niveau de contraste (-100 à +100).
+	 */
+	public void appliquerContraste(int contraste) {
+		BufferedImage imageCourante = gestionnaireImages.obtenirImageCourante();
+		if (imageCourante != null) {
+			controleur.appliquerContraste(imageCourante, contraste);
+			gestionnaireImages.rafraichirAffichage();
+		}
+	}
+	
+	/**
+	 * Ajuste la luminosité de l'image courante.
+	 * 
+	 * @param luminosite Le niveau de luminosité (-255 à +255).
+	 */
+	public void appliquerLuminosite(int luminosite) {
+		BufferedImage imageCourante = gestionnaireImages.obtenirImageCourante();
+		if (imageCourante != null) {
+			controleur.appliquerLuminosite(imageCourante, luminosite);
+			gestionnaireImages.rafraichirAffichage();
+		}
+	}
+	
+	/**
+	 * Applique l'outil pot de peinture sur l'image courante.
+	 * 
+	 * @param couleurDest La couleur de remplissage (RGB).
+	 * @param distance La tolérance de couleur (0-441).
+	 * @param estContinue true pour remplissage continu, false pour global.
+	 * @param xOrig La coordonnée X du point de départ.
+	 * @param yOrig La coordonnée Y du point de départ.
+	 */
+	public void appliquerPotDePeinture(int couleurDest, int distance, boolean estContinue, int xOrig, int yOrig) {
+		BufferedImage imageCourante = gestionnaireImages.obtenirImageCourante();
+		if (imageCourante != null) {
+			controleur.appliquerPotDePeinture(imageCourante, couleurDest, distance, estContinue, xOrig, yOrig);
+			gestionnaireImages.rafraichirAffichage();
+		}
 	}
 }

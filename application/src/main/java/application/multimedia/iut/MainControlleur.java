@@ -10,19 +10,27 @@
 package application.multimedia.iut;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 import javax.swing.SwingUtilities;
 
 import application.multimedia.iut.Metier.ActionHistorique;
 import application.multimedia.iut.Metier.GestionnaireOutils;
 import application.multimedia.iut.Metier.Journaux;
+import application.multimedia.iut.Metier.image.CoucheImage;
+import application.multimedia.iut.Metier.image.ImageManagerMetier;
 import application.multimedia.iut.Metier.image.PileCouches;
 import application.multimedia.iut.Metier.image.RenduToile;
 import application.multimedia.iut.Metier.image.SessionPlacement;
 import application.multimedia.iut.Metier.outils.OutilDessin;
 import application.multimedia.iut.Vue.PaintFrame;
+import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
 
 /**
  * Point d'entrée de l'application de retouche d'images.
@@ -59,6 +67,7 @@ public class MainControlleur {
 		private final PileCouches pileCouches;
 		private final SessionPlacement sessionPlacement;
 		private final RenduToile renduToile;
+		private final ImageManagerMetier imageManagerMetier;
 		
 		// ========== MODÈLE - Gestion des outils ==========
 		private final GestionnaireOutils gestionnaireOutils;
@@ -72,6 +81,7 @@ public class MainControlleur {
 			this.pileCouches = new PileCouches();
 			this.sessionPlacement = new SessionPlacement();
 			this.renduToile = new RenduToile();
+			this.imageManagerMetier = new ImageManagerMetier(pileCouches, sessionPlacement, renduToile);
 			
 			// Initialisation du gestionnaire d'outils
 			this.gestionnaireOutils = new GestionnaireOutils();
@@ -87,20 +97,85 @@ public class MainControlleur {
 			return pileCouches;
 		}
 		
+		public boolean pileCouchesEstVide() {
+			return pileCouches.estVide();
+		}
+		
+		
 		public SessionPlacement getSessionPlacement() {
 			return sessionPlacement;
 		}
+
 		
 		public RenduToile getRenduToile() {
 			return renduToile;
 		}
+
+		public void peindre(Graphics g) {
+			renduToile.peindre(g, pileCouches, sessionPlacement);
+		}
+
 		
 		public void suppressionTotale() {
 			pileCouches.vider();
 			sessionPlacement.annuler();
 			gestionnaireOutils.terminerDessin();
 		}
+
+
+		public void definirImageCourante(BufferedImage image, Dimension tailleToile) {
+			imageManagerMetier.definirImageCourante(image, tailleToile);
+		}
+
+		public void demarrerPlacement(BufferedImage img, Dimension tailleToile) {
+			imageManagerMetier.demarrerPlacement(img, tailleToile);
+		}
+
+		public boolean sessionPlacementValide() {
+			return imageManagerMetier.validerPlacement();
+		}
+
+		public void zoomer(double facteur) {
+			imageManagerMetier.zoomer(facteur);
+		}
+
+		public void reinitialiserZoom() {
+			imageManagerMetier.reinitialiserZoom();
+		}
+
+		public BufferedImage obtenirImageCourante() {
+			return imageManagerMetier.obtenirImageCourante();
+		}
+
+		public void ajouterImageCommeNouvelleCouche(BufferedImage image, Dimension tailleToile) {
+			imageManagerMetier.ajouterImageCommeNouvelleCouche(image, tailleToile);
+		}
 		
+		public void ajouterImageAvecChoix(BufferedImage image, LoadChoice choix, Dimension tailleToile) {
+			imageManagerMetier.ajouterImageAvecChoix(image, choix, tailleToile);
+		}
+
+		public CoucheImage coucheAuPoint(Point p) {
+			return imageManagerMetier.coucheAuPoint(p);
+		}
+
+		public void creerImageVide(int largeur, int hauteur, Dimension tailleToile) {
+			imageManagerMetier.creerImageVide(largeur, hauteur, tailleToile);
+		}
+		
+		public void enregistrerFichier(File fichier) throws IOException {
+			imageManagerMetier.enregistrerFichier(fichier);
+		}
+
+		public BufferedImage ouvrirFichier(File fichier, LoadChoice choix, Dimension tailleToile) throws IOException {
+			imageManagerMetier.ouvrirFichier(fichier, choix, tailleToile);
+			return obtenirImageCourante();
+		}
+
+		public boolean imageInitialePresente() {
+			return imageManagerMetier.imageInitialePresente();
+		}
+
 		// ========================================
 		// DÉLÉGATION - Gestion des outils
 		// ========================================
@@ -201,6 +276,65 @@ public class MainControlleur {
 		
 		public boolean estEnDessin() {
 			return gestionnaireOutils.estEnDessin();
+		}
+		
+		// ========================================
+		// DÉLÉGATION - Colorisation
+		// ========================================
+		
+		/**
+		 * Applique une teinte de couleur sur l'image.
+		 * 
+		 * @param image L'image à teinter.
+		 * @param red La composante rouge de la teinte (0-255).
+		 * @param green La composante verte de la teinte (0-255).
+		 * @param blue La composante bleue de la teinte (0-255).
+		 * @param alpha L'intensité de la teinte (0-255).
+		 */
+		public void appliquerTeinte(BufferedImage image, int red, int green, int blue, int alpha) {
+			if (this.historiqueModification != null && image != null) {
+				application.multimedia.iut.Metier.Colorisation.teinter(image, red, green, blue, alpha);
+			}
+		}
+		
+		/**
+		 * Ajuste le contraste de l'image.
+		 * 
+		 * @param image L'image à modifier.
+		 * @param contraste Le niveau de contraste (-100 à +100).
+		 */
+		public void appliquerContraste(BufferedImage image, int contraste) {
+			if (this.historiqueModification != null && image != null) {
+				application.multimedia.iut.Metier.Colorisation.contraste(image, contraste);
+			}
+		}
+		
+		/**
+		 * Ajuste la luminosité de l'image.
+		 * 
+		 * @param image L'image à modifier.
+		 * @param luminosite Le niveau de luminosité (-255 à +255).
+		 */
+		public void appliquerLuminosite(BufferedImage image, int luminosite) {
+			if (this.historiqueModification != null && image != null) {
+				application.multimedia.iut.Metier.Colorisation.luminosite(image, luminosite);
+			}
+		}
+		
+		/**
+		 * Applique l'outil pot de peinture sur l'image.
+		 * 
+		 * @param image L'image à modifier.
+		 * @param couleurDest La couleur de remplissage (RGB).
+		 * @param distance La tolérance de couleur (0-441).
+		 * @param estContinue true pour remplissage continu, false pour global.
+		 * @param xOrig La coordonnée X du point de départ.
+		 * @param yOrig La coordonnée Y du point de départ.
+		 */
+		public void appliquerPotDePeinture(BufferedImage image, int couleurDest, int distance, boolean estContinue, int xOrig, int yOrig) {
+			if (this.historiqueModification != null && image != null) {
+				application.multimedia.iut.Metier.Colorisation.potDePeinture(image, couleurDest, distance, estContinue, xOrig, yOrig);
+			}
 		}
 	}
 }

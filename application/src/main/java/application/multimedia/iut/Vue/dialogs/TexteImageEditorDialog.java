@@ -133,11 +133,11 @@ public class TexteImageEditorDialog extends JDialog {
      * Affiche l'image dans le panneau de sélection après chargement.
      */
     private void chargerImage() {
-        File[] fichiers = ImageDialogs.selectImages(this);
-        if (fichiers == null || fichiers.length == 0) return;
+        File fichier = ImageDialogs.selectImage(this);
+        if (fichier == null) return;
 
         try {
-            BufferedImage img = ImageIO.read(fichiers[0]);
+            BufferedImage img = ImageIO.read(fichier);
             if (img == null) throw new IllegalArgumentException("Image illisible");
             modele.setImageFond(img);
             panneauSelection.setImage(img);
