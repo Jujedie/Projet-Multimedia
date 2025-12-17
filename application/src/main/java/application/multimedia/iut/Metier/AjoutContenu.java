@@ -112,12 +112,27 @@ public class AjoutContenu {
 		return composite;
 	}
 
-	public static BufferedImage fusion(BufferedImage imgGauche, BufferedImage imgDroite, int fondu) {
+	public static BufferedImage fusionHorizontale(BufferedImage imgGauche, BufferedImage imgDroite, int fondu) {
 
 		if (fondu < 0 || fondu > imgGauche.getWidth() || fondu > imgDroite.getWidth()) {
 			throw new IllegalArgumentException(
 					"La largeur du fondu (" + fondu
 							+ ") doit être positive et inférieure aux largeurs des deux images.");
+		}
+
+		if (imgGauche.getHeight() != imgDroite.getHeight()) {
+
+			if (imgGauche.getHeight() > imgDroite.getHeight()) {
+				double ratio = (double) imgDroite.getHeight() / imgGauche.getHeight();
+				int newWidth = (int) (imgGauche.getWidth() * ratio);
+				imgGauche = Format.redimensionner(imgGauche, newWidth, imgDroite.getHeight());
+			}
+
+			if (imgGauche.getHeight() < imgDroite.getHeight()) {
+				double ratio = (double) imgGauche.getHeight() / imgDroite.getHeight();
+				int newWidth = (int) (imgDroite.getWidth() * ratio);
+				imgDroite = Format.redimensionner(imgDroite, newWidth, imgGauche.getHeight());
+			}
 		}
 
 		int width = imgGauche.getWidth() + imgDroite.getWidth() - fondu;
@@ -170,4 +185,78 @@ public class AjoutContenu {
 		g.dispose();
 		return result;
 	}
+
+public static BufferedImage fusionVerticale(BufferedImage imgHaut, BufferedImage imgBas, int fondu) {
+
+        if (fondu < 0 || fondu > imgHaut.getHeight() || fondu > imgBas.getHeight()) {
+            throw new IllegalArgumentException(
+                    "La hauteur du fondu (" + fondu
+                            + ") doit être positive et inférieure aux hauteurs des deux images.");
+        }
+
+        if (imgHaut.getWidth() != imgBas.getWidth()) {
+
+            if (imgHaut.getWidth() > imgBas.getWidth()) {
+                double ratio = (double) imgBas.getWidth() / imgHaut.getWidth();
+                int newHeight = (int) (imgHaut.getHeight() * ratio);
+                imgHaut = Format.redimensionner(imgHaut, imgBas.getWidth(), newHeight);
+            }
+
+            if (imgHaut.getWidth() < imgBas.getWidth()) {
+                double ratio = (double) imgHaut.getWidth() / imgBas.getWidth();
+                int newHeight = (int) (imgBas.getHeight() * ratio);
+                imgBas = Format.redimensionner(imgBas, imgHaut.getWidth(), newHeight);
+            }
+        }
+
+        int width = Math.max(imgHaut.getWidth(), imgBas.getWidth());
+        int height = imgHaut.getHeight() + imgBas.getHeight() - fondu;
+
+        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = result.getGraphics();
+
+        int yDebutFondu = imgHaut.getHeight() - fondu;
+
+        g.drawImage(imgHaut,
+                0, 0, width, yDebutFondu,
+                0, 0, imgHaut.getWidth(), yDebutFondu,
+                null);
+
+        g.drawImage(imgBas,
+                0, imgHaut.getHeight(), width, height,
+                0, fondu, imgBas.getWidth(), imgBas.getHeight(),
+                null);
+
+        for (int y = 0; y < fondu; y++) {
+            float alpha = y / (float) fondu;
+
+            for (int x = 0; x < width; x++) {
+
+                int color1 = x < imgHaut.getWidth() ? imgHaut.getRGB(x, yDebutFondu + y) : Color.TRANSLUCENT;
+                int color2 = x < imgBas.getWidth() ? imgBas.getRGB(x, y) : Color.TRANSLUCENT;
+
+                int a1 = (color1 >> 24) & 0xff;
+                int r1 = (color1 >> 16) & 0xff;
+                int g1 = (color1 >> 8) & 0xff;
+                int b1 = color1 & 0xff;
+
+                int a2 = (color2 >> 24) & 0xff;
+                int r2 = (color2 >> 16) & 0xff;
+                int g2 = (color2 >> 8) & 0xff;
+                int b2 = color2 & 0xff;
+
+                int a = (int) (a1 * (1 - alpha) + a2 * alpha);
+                int r = (int) (r1 * (1 - alpha) + r2 * alpha);
+                int g_ = (int) (g1 * (1 - alpha) + g2 * alpha);
+                int b = (int) (b1 * (1 - alpha) + b2 * alpha);
+
+                int argb = (a << 24) | (r << 16) | (g_ << 8) | b;
+
+                result.setRGB(x, yDebutFondu + y, argb);
+            }
+        }
+
+        g.dispose();
+        return result;
+    }
 }
