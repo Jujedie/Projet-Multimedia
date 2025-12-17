@@ -7,7 +7,7 @@
  */
 package application.multimedia.iut.Vue.barres;
 
-import application.multimedia.iut.Main;
+import application.multimedia.iut.Metier.GestionnaireOutils;
 import application.multimedia.iut.Vue.utils.LucideIconLoader;
 import application.multimedia.iut.Vue.PaintPanel;
 import javax.swing.*;
@@ -23,7 +23,7 @@ public class ToolBarBuilder {
 	private Color couleurIcone = new Color(60, 60, 60);
 	private int tailleIcone = 20;
 	private JPanel couleurPrincipale;
-	private Main.Controleur.EcouteurCouleur ecouteurCouleurPipette;
+	private GestionnaireOutils.EcouteurCouleur ecouteurCouleurPipette;
 
 	/**
 	 * Constructeur du constructeur de barre d'outils.
@@ -87,11 +87,11 @@ public class ToolBarBuilder {
 		JButton texteImageBtn = creerBouton("image", "Texte avec image");
 		
 		// Connecter les boutons aux outils
-		selectionBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.OutilDessin.SELECTION));
-		pinceauBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.OutilDessin.PINCEAU));
-		gommeBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.OutilDessin.GOMME));
-		pipetteBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.OutilDessin.PIPETTE));
-		texteBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.OutilDessin.TEXTE));
+		selectionBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.SELECTION));
+		pinceauBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.PINCEAU));
+		gommeBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.GOMME));
+		pipetteBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.PIPETTE));
+		texteBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.TEXTE));
 		texteImageBtn.addActionListener(e -> panneau.ouvrirEditeurTexteImage());
 		
 		selectionBtn.setSelected(true);

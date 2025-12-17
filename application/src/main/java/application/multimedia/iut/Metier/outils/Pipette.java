@@ -4,7 +4,7 @@
  * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
  * @version 1.0
  */
-package application.multimedia.iut.Metier;
+package application.multimedia.iut.Metier.outils;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;

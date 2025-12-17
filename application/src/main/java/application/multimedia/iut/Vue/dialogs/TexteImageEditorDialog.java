@@ -7,7 +7,7 @@
  */
 package application.multimedia.iut.Vue.dialogs;
 
-import application.multimedia.iut.Metier.TexteAvecImage;
+import application.multimedia.iut.Metier.outils.TexteAvecImage;
 import application.multimedia.iut.Vue.panels.*;
 import application.multimedia.iut.Vue.utils.*;
 import javax.imageio.ImageIO;

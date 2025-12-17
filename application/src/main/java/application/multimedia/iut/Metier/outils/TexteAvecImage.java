@@ -6,7 +6,7 @@
  * @version 1.0
  */
 
-package application.multimedia.iut.Metier;
+package application.multimedia.iut.Metier.outils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

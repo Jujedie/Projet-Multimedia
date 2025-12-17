@@ -9,18 +9,16 @@
 
 package application.multimedia.iut;
 
-import application.multimedia.iut.Metier.*;
+import application.multimedia.iut.Metier.GestionnaireOutils;
 import application.multimedia.iut.Metier.image.PileCouches;
 import application.multimedia.iut.Metier.image.RenduToile;
 import application.multimedia.iut.Metier.image.SessionPlacement;
+import application.multimedia.iut.Metier.outils.OutilDessin;
 import application.multimedia.iut.Vue.PaintFrame;
 import javax.swing.SwingUtilities;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Point d'entrée de l'application de retouche d'images.
@@ -46,8 +44,8 @@ public class Main {
 	}
 	
 	/**
-	 * Contrôleur central gérant toutes les interactions entre le modèle et la vue.
-	 * Coordonne les opérations de dessin, de gestion des couches et des outils.
+	 * Contrôleur central - Connecteur simple entre le modèle et la vue.
+	 * Délègue la logique métier aux classes appropriées.
 	 */
 	public static class Controleur {
 		
@@ -56,287 +54,123 @@ public class Main {
 		private final SessionPlacement sessionPlacement;
 		private final RenduToile renduToile;
 		
-		// ========== MODÈLE - Outils de dessin ==========
-		private final Pinceau pinceau;
-		private final Gomme gomme;
-		private final Pipette pipette;
-		private final OutilTexte outilTexte;
+		// ========== MODÈLE - Gestion des outils ==========
+		private final GestionnaireOutils gestionnaireOutils;
 		
-		// ========== ÉTAT DU CONTRÔLEUR ==========
-		private OutilDessin outilActif;
-		private Color couleurActive;
-		private Point dernierPoint;
-		private boolean dessinEnCours;
-		
-		// ========== ÉCOUTEURS ==========
-		private List<EcouteurCouleur> ecouteursCouleur;
-		
- 
+		/**
+		 * Constructeur du contrôleur.
+		 * Initialise les composants du modèle.
+		 */
 		public Controleur() {
 			// Initialisation du modèle de gestion d'images
 			this.pileCouches = new PileCouches();
 			this.sessionPlacement = new SessionPlacement();
 			this.renduToile = new RenduToile();
 			
-			// Initialisation des outils de dessin
-			this.pinceau = new Pinceau();
-			this.gomme = new Gomme();
-			this.pipette = new Pipette();
-			this.outilTexte = new OutilTexte();
-			
-			// Initialisation de l'état
-			this.outilActif = OutilDessin.SELECTION;
-			this.couleurActive = Color.BLACK;
-			this.dessinEnCours = false;
-			this.ecouteursCouleur = new ArrayList<>();
+			// Initialisation du gestionnaire d'outils
+			this.gestionnaireOutils = new GestionnaireOutils();
 		}
 		
 		// ========================================
-		// MÉTHODES DE GESTION DES COUCHES
+		// ACCÈS AU MODÈLE - Gestion des images
 		// ========================================
 		
-		/**
-		 * Obtient la pile de couches du modèle.
-		 * @return La pile de couches.
-		 */
 		public PileCouches getPileCouches() {
 			return pileCouches;
 		}
 		
-		/**
-		 * Obtient la session de placement du modèle.
-		 * @return La session de placement.
-		 */
 		public SessionPlacement getSessionPlacement() {
 			return sessionPlacement;
 		}
 		
-		/**
-		 * Obtient le moteur de rendu de la toile.
-		 * @return Le rendu toile.
-		 */
 		public RenduToile getRenduToile() {
 			return renduToile;
 		}
 		
-		/**
-		 * Supprime tout le contenu de l'affichage.
-		 * Vide toutes les couches et annule les sessions en cours.
-		 */
 		public void suppressionTotale() {
 			pileCouches.vider();
 			sessionPlacement.annuler();
-			terminerDessin();
+			gestionnaireOutils.terminerDessin();
 		}
 		
 		// ========================================
-		// MÉTHODES DE GESTION DES OUTILS
+		// DÉLÉGATION - Gestion des outils
 		// ========================================
 		
-		/**
-		 * Démarre une action de dessin à une position donnée.
-		 * @param image L'image sur laquelle dessiner.
-		 * @param x Coordonnée X.
-		 * @param y Coordonnée Y.
-		 */
 		public void commencerDessin(BufferedImage image, int x, int y) {
-			if (image == null) return;
-			
-			dernierPoint = new Point(x, y);
-			dessinEnCours = true;
-			
-			switch (outilActif) {
-				case PINCEAU:
-					pinceau.setCouleur(couleurActive);
-					pinceau.dessinerPoint(image, x, y);
-					break;
-				case GOMME:
-					gomme.setCouleurEffacement(Color.WHITE);
-					gomme.effacerPoint(image, x, y);
-					break;
-				case PIPETTE:
-					Color couleur = pipette.preleverCouleur(image, x, y);
-					if (couleur != null) {
-						definirCouleurActive(couleur);
-					}
-					break;
-				default:
-					break;
-			}
+			gestionnaireOutils.commencerDessin(image, x, y);
 		}
 		
-		/**
-		 * Continue une action de dessin vers une nouvelle position.
-		 * @param image L'image sur laquelle dessiner.
-		 * @param x Coordonnée X.
-		 * @param y Coordonnée Y.
-		 */
 		public void continuerDessin(BufferedImage image, int x, int y) {
-			if (image == null || !dessinEnCours || dernierPoint == null) return;
-			
-			switch (outilActif) {
-				case PINCEAU:
-					pinceau.setCouleur(couleurActive);
-					pinceau.dessinerTrait(image, dernierPoint.x, dernierPoint.y, x, y);
-					break;
-				case GOMME:
-					gomme.setCouleurEffacement(Color.WHITE);
-					gomme.effacer(image, dernierPoint.x, dernierPoint.y, x, y);
-					break;
-				default:
-					break;
-			}
-			
-			dernierPoint = new Point(x, y);
+			gestionnaireOutils.continuerDessin(image, x, y);
 		}
 		
-		/**
-		 * Termine l'action de dessin en cours.
-		 */
 		public void terminerDessin() {
-			dessinEnCours = false;
-			dernierPoint = null;
+			gestionnaireOutils.terminerDessin();
 		}
 		
-		/**
-		 * Dessine du texte sur l'image à une position donnée.
-		 * @param image L'image sur laquelle dessiner.
-		 * @param texte Le texte à écrire.
-		 * @param x Coordonnée X.
-		 * @param y Coordonnée Y.
-		 */
 		public void dessinerTexte(BufferedImage image, String texte, int x, int y) {
-			if (image == null || texte == null || texte.isEmpty()) return;
-			outilTexte.dessinerTexte(image, texte, x, y);
+			gestionnaireOutils.dessinerTexte(image, texte, x, y);
 		}
 		
-		/**
-		 * Définit l'outil actif.
-		 * @param outil Le nouvel outil à activer.
-		 */
 		public void setOutilActif(OutilDessin outil) {
-			this.outilActif = outil;
-			terminerDessin();
+			gestionnaireOutils.setOutilActif(outil);
 		}
 		
-		/**
-		 * Obtient l'outil actuellement actif.
-		 * @return L'outil actif.
-		 */
 		public OutilDessin getOutilActif() {
-			return outilActif;
+			return gestionnaireOutils.getOutilActif();
 		}
 		
 		// ========================================
-		// MÉTHODES DE GESTION DE LA COULEUR
+		// DÉLÉGATION - Gestion de la couleur
 		// ========================================
 		
-		/**
-		 * Définit la couleur active pour le dessin.
-		 * @param couleur La nouvelle couleur.
-		 */
 		public void definirCouleurActive(Color couleur) {
-			this.couleurActive = couleur;
-			pinceau.setCouleur(couleur);
-			outilTexte.setCouleur(couleur);
-			notifierChangementCouleur(couleur);
+			gestionnaireOutils.definirCouleurActive(couleur);
 		}
 		
-		/**
-		 * Obtient la couleur actuellement active.
-		 * @return La couleur active.
-		 */
 		public Color getCouleurActive() {
-			return couleurActive;
+			return gestionnaireOutils.getCouleurActive();
 		}
 		
 		// ========================================
-		// MÉTHODES DE CONFIGURATION DES OUTILS
+		// DÉLÉGATION - Configuration des outils
 		// ========================================
 		
-		/**
-		 * Définit l'épaisseur du pinceau.
-		 * @param epaisseur La nouvelle épaisseur en pixels.
-		 */
 		public void setEpaisseurPinceau(int epaisseur) {
-			pinceau.setEpaisseur(epaisseur);
+			gestionnaireOutils.setEpaisseurPinceau(epaisseur);
 		}
 		
-		/**
-		 * Obtient l'épaisseur actuelle du pinceau.
-		 * @return L'épaisseur en pixels.
-		 */
 		public int getEpaisseurPinceau() {
-			return pinceau.getEpaisseur();
+			return gestionnaireOutils.getEpaisseurPinceau();
 		}
 		
-		/**
-		 * Définit la taille de la gomme.
-		 * @param taille La nouvelle taille en pixels.
-		 */
 		public void setTailleGomme(int taille) {
-			gomme.setTaille(taille);
+			gestionnaireOutils.setTailleGomme(taille);
 		}
 		
-		/**
-		 * Obtient la taille actuelle de la gomme.
-		 * @return La taille en pixels.
-		 */
 		public int getTailleGomme() {
-			return gomme.getTaille();
+			return gestionnaireOutils.getTailleGomme();
 		}
 		
-		/**
-		 * Définit la police pour l'outil texte.
-		 * @param police La nouvelle police.
-		 */
 		public void setPoliceTexte(Font police) {
-			outilTexte.setPolice(police);
+			gestionnaireOutils.setPoliceTexte(police);
 		}
 		
-		/**
-		 * Obtient la police actuelle de l'outil texte.
-		 * @return La police.
-		 */
 		public Font getPoliceTexte() {
-			return outilTexte.getPolice();
+			return gestionnaireOutils.getPoliceTexte();
 		}
 		
 		// ========================================
-		// MÉTHODES DE GESTION DES ÉCOUTEURS
+		// DÉLÉGATION - Gestion des écouteurs
 		// ========================================
 		
-		/**
-		 * Ajoute un écouteur pour les changements de couleur.
-		 * @param ecouteur L'écouteur à ajouter.
-		 */
-		public void ajouterEcouteurCouleur(EcouteurCouleur ecouteur) {
-			ecouteursCouleur.add(ecouteur);
+		public void ajouterEcouteurCouleur(GestionnaireOutils.EcouteurCouleur ecouteur) {
+			gestionnaireOutils.ajouterEcouteurCouleur(ecouteur);
 		}
 		
-		/**
-		 * Notifie tous les écouteurs d'un changement de couleur.
-		 * @param nouvelleCouleur La nouvelle couleur choisie par la personne.
-		 */
-		private void notifierChangementCouleur(Color nouvelleCouleur) {
-			for (EcouteurCouleur ecouteur : ecouteursCouleur) {
-				ecouteur.couleurChangee(nouvelleCouleur);
-			}
-		}
-		
-		/**
-		 * Vérifie si un dessin est en cours.
-		 * @return true si un dessin est en cours, false sinon.
-		 */
 		public boolean estEnDessin() {
-			return dessinEnCours;
-		}
-		
-		/**
-		 * Interface pour écouter les changements de couleur.
-		 */
-		public interface EcouteurCouleur {
-			void couleurChangee(Color nouvelleCouleur);
+			return gestionnaireOutils.estEnDessin();
 		}
 	}
 }

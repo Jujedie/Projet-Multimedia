@@ -8,6 +8,7 @@
 package application.multimedia.iut.Vue;
 
 import application.multimedia.iut.Main;
+import application.multimedia.iut.Metier.GestionnaireOutils;
 import application.multimedia.iut.Vue.barres.MenuBarBuilder;
 import application.multimedia.iut.Vue.barres.ToolBarBuilder;
 import application.multimedia.iut.Vue.dialogs.TexteImageEditorDialog;
@@ -173,7 +174,7 @@ public class PaintPanel extends JPanel {
 	 *
 	 * @param outil L'outil à activer.
 	 */
-	public void activerOutilDessin(application.multimedia.iut.Metier.OutilDessin outil) {
+	public void activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin outil) {
 		gestionnaireImages.activerOutil(outil);
 	}
 	
@@ -199,7 +200,7 @@ public class PaintPanel extends JPanel {
 	 *
 	 * @param ecouteur L'écouteur à enregistrer.
 	 */
-	public void enregistrerEcouteurCouleur(application.multimedia.iut.Main.Controleur.EcouteurCouleur ecouteur) {
+	public void enregistrerEcouteurCouleur(GestionnaireOutils.EcouteurCouleur ecouteur) {
 		controleur.ajouterEcouteurCouleur(ecouteur);
 	}
 }

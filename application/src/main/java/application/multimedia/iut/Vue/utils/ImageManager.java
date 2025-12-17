@@ -12,7 +12,7 @@ import application.multimedia.iut.Metier.image.CoucheImage;
 import application.multimedia.iut.Metier.image.PileCouches;
 import application.multimedia.iut.Metier.image.RenduToile;
 import application.multimedia.iut.Metier.image.SessionPlacement;
-import application.multimedia.iut.Metier.OutilDessin;
+import application.multimedia.iut.Metier.outils.OutilDessin;
 import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
 import javax.imageio.ImageIO;
 import javax.swing.*;

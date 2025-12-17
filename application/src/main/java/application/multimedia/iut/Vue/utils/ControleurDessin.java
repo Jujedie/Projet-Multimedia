@@ -7,7 +7,7 @@
  */
 package application.multimedia.iut.Vue.utils;
 
-import application.multimedia.iut.Metier.*;
+import application.multimedia.iut.Metier.outils.*;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Point;
