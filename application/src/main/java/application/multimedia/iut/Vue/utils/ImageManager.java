@@ -7,6 +7,7 @@
  */
 package application.multimedia.iut.Vue.utils;
 
+import application.multimedia.iut.Main;
 import application.multimedia.iut.Metier.image.CoucheImage;
 import application.multimedia.iut.Metier.image.PileCouches;
 import application.multimedia.iut.Metier.image.RenduToile;
@@ -27,27 +28,35 @@ import java.io.File;
  * Coordonne le chargement, l'enregistrement, le zoom, et le placement d'images.
  */
 public class ImageManager {
-	private final PileCouches pileCouches = new PileCouches();
-	private final SessionPlacement sessionPlacement = new SessionPlacement();
-	private final RenduToile renduToile = new RenduToile();
-	private final ControleurDessin controleurDessin = new ControleurDessin();
+	private final Main.Controleur controleur;
+	private final PileCouches pileCouches;
+	private final SessionPlacement sessionPlacement;
+	private final RenduToile renduToile;
 	private final JLabel toile;
 	private final JComponent parent;
 
 	private Point dernierePositionSouris;
 	private boolean glisserEnCours = false;
 	private CoucheImage coucheGlissee;
+	private boolean imageInitialePresente = true; // Flag pour la première ouverture d'image
 
 	/**
 	 * Constructeur du gestionnaire d'images.
-	 * Initialise le gestionnaire avec une toile et un composant parent.
+	 * Initialise le gestionnaire avec une toile, un composant parent et le contrôleur.
 	 *
 	 * @param toile Le label servant de zone de dessin.
 	 * @param parent Le composant parent pour les dialogues.
+	 * @param controleur Le contrôleur central de l'application.
 	 */
-	public ImageManager(JLabel toile, JComponent parent) {
+	public ImageManager(JLabel toile, JComponent parent, Main.Controleur controleur) {
 		this.toile = toile;
 		this.parent = parent;
+		this.controleur = controleur;
+		
+		// Récupérer les références du modèle depuis le contrôleur
+		this.pileCouches = controleur.getPileCouches();
+		this.sessionPlacement = controleur.getSessionPlacement();
+		this.renduToile = controleur.getRenduToile();
 		
 		// Créer une image blanche vide au démarrage pour permettre le dessin
 		creerImageVide(800, 600);
@@ -63,17 +72,20 @@ public class ImageManager {
 		File[] fichiersChoisis = ImageDialogs.selectImages(parent);
 		if (fichiersChoisis == null || fichiersChoisis.length == 0) return;
 
-		boolean possedeDejaImages = !pileCouches.estVide();
+		// Si c'est la première image chargée (image blanche initiale encore présente)
+		// on remplace directement sans demander
+		boolean possedeDejaImages = !pileCouches.estVide() && !imageInitialePresente;
 		LoadChoice choix = LoadChoice.REPLACE;
 		if (possedeDejaImages) {
 			choix = ImageDialogs.askLoadChoice(parent);
 			if (choix == LoadChoice.CANCEL) return;
 		}
 
-		if (choix == LoadChoice.REPLACE) {
+		if (choix == LoadChoice.REPLACE || imageInitialePresente) {
 			pileCouches.vider();
 			sessionPlacement.annuler();
 			glisserEnCours = false;
+			imageInitialePresente = false; // Marquer que l'image initiale a été remplacée
 		}
 
 		boolean placementDemande = possedeDejaImages && choix == LoadChoice.SUPERPOSE;
@@ -355,11 +367,11 @@ public class ImageManager {
 				if (!SwingUtilities.isLeftMouseButton(e)) return;
 				
 				// Gestion des outils de dessin
-				OutilDessin outilActif = controleurDessin.getOutilActif();
+				OutilDessin outilActif = controleur.getOutilActif();
 				if (outilActif != OutilDessin.SELECTION && !pileCouches.estVide()) {
 					CoucheImage couche = pileCouches.coucheActive();
 					if (couche != null) {
-						controleurDessin.commencerDessin(couche.image, e.getX() - couche.x, e.getY() - couche.y);
+						controleur.commencerDessin(couche.image, e.getX() - couche.x, e.getY() - couche.y);
 						toile.repaint();
 						return;
 					}
@@ -392,7 +404,7 @@ public class ImageManager {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if (SwingUtilities.isLeftMouseButton(e)) {
-					controleurDessin.terminerDessin();
+					controleur.terminerDessin();
 					glisserEnCours = false;
 					coucheGlissee = null;
 					toile.setCursor(Cursor.getDefaultCursor());
@@ -402,11 +414,11 @@ public class ImageManager {
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				// Gestion des outils de dessin
-				OutilDessin outilActif = controleurDessin.getOutilActif();
-				if (outilActif != OutilDessin.SELECTION && controleurDessin.estEnDessin()) {
+				OutilDessin outilActif = controleur.getOutilActif();
+				if (outilActif != OutilDessin.SELECTION && controleur.estEnDessin()) {
 					CoucheImage couche = pileCouches.coucheActive();
 					if (couche != null) {
-						controleurDessin.continuerDessin(couche.image, e.getX() - couche.x, e.getY() - couche.y);
+						controleur.continuerDessin(couche.image, e.getX() - couche.x, e.getY() - couche.y);
 						toile.repaint();
 						return;
 					}
@@ -453,12 +465,12 @@ public class ImageManager {
 	}
 
 	/**
-	 * Obtient le contrôleur de dessin.
+	 * Obtient le contrôleur principal.
 	 *
-	 * @return Le contrôleur de dessin.
+	 * @return Le contrôleur principal.
 	 */
-	public ControleurDessin getControleurDessin() {
-		return controleurDessin;
+	public Main.Controleur getControleur() {
+		return controleur;
 	}
 	
 	/**
@@ -490,7 +502,7 @@ public class ImageManager {
 	 * @param outil L'outil à activer.
 	 */
 	public void activerOutil(OutilDessin outil) {
-		controleurDessin.setOutilActif(outil);
+		controleur.setOutilActif(outil);
 	}
 
 	/**
@@ -499,6 +511,6 @@ public class ImageManager {
 	 * @param couleur La nouvelle couleur.
 	 */
 	public void definirCouleur(Color couleur) {
-		controleurDessin.definirCouleurActive(couleur);
+		controleur.definirCouleurActive(couleur);
 	}
 }

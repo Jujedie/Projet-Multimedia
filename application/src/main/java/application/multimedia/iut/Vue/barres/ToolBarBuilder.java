@@ -7,6 +7,7 @@
  */
 package application.multimedia.iut.Vue.barres;
 
+import application.multimedia.iut.Main;
 import application.multimedia.iut.Vue.utils.LucideIconLoader;
 import application.multimedia.iut.Vue.PaintPanel;
 import javax.swing.*;
@@ -23,7 +24,7 @@ public class ToolBarBuilder {
 	private int tailleIcone = 20;
 	private JPanel couleurPrincipale;
 	private JPanel couleurSecondaire;
-	private application.multimedia.iut.Vue.utils.ControleurDessin.EcouteurCouleur ecouteurCouleurPipette;
+	private Main.Controleur.EcouteurCouleur ecouteurCouleurPipette;
 
 	/**
 	 * Constructeur du constructeur de barre d'outils.

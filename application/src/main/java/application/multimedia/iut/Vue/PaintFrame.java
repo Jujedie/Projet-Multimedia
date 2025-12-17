@@ -7,6 +7,7 @@
  */
 package application.multimedia.iut.Vue;
 
+import application.multimedia.iut.Main;
 import javax.swing.*;
 
 /**
@@ -15,17 +16,20 @@ import javax.swing.*;
  */
 public class PaintFrame extends JFrame {
 	private PaintPanel panneauPeinture;
+	private Main.Controleur controleur;
 
 	/**
 	 * Constructeur de la fenêtre principale.
 	 * Initialise l'interface graphique et configure les paramètres de la fenêtre.
+	 * @param controleur Le contrôleur central de l'application.
 	 */
-	public PaintFrame() {
+	public PaintFrame(Main.Controleur controleur) {
+		this.controleur = controleur;
 		setTitle("Projet Multimédia");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(1000, 700);
 
-		panneauPeinture = new PaintPanel();
+		panneauPeinture = new PaintPanel(controleur);
 		add(panneauPeinture);
 	}
 

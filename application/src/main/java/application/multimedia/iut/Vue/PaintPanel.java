@@ -7,6 +7,7 @@
  */
 package application.multimedia.iut.Vue;
 
+import application.multimedia.iut.Main;
 import application.multimedia.iut.Vue.barres.MenuBarBuilder;
 import application.multimedia.iut.Vue.barres.ToolBarBuilder;
 import application.multimedia.iut.Vue.dialogs.TexteImageEditorDialog;
@@ -25,14 +26,17 @@ public class PaintPanel extends JPanel {
 	private JLabel toile;
 	private JScrollPane panneauDeroulement;
 	private ImageManager gestionnaireImages;
+	private Main.Controleur controleur;
 	
 	/**
 	 * Constructeur du panneau de peinture.
 	 * Initialise l'interface et précharge les icônes.
+	 * @param controleur Le contrôleur central de l'application.
 	 */
 	private ToolBarBuilder toolBarBuilder;
 
-	public PaintPanel() {
+	public PaintPanel(Main.Controleur controleur) {
+		this.controleur = controleur;
 		setLayout(new BorderLayout());
 		
 		new Thread(() -> LucideIconLoader.preloadCommonIcons()).start();
@@ -91,7 +95,7 @@ public class PaintPanel extends JPanel {
 		panneauDeroulement = new JScrollPane(toile);
 		panneauDeroulement.setBackground(Color.DARK_GRAY);
 		
-		gestionnaireImages = new ImageManager(toile, this);
+		gestionnaireImages = new ImageManager(toile, this, controleur);
 		gestionnaireImages.activerDeplacementImage();
 	}
 	
@@ -187,7 +191,7 @@ public class PaintPanel extends JPanel {
 	 *
 	 * @param ecouteur L'écouteur à enregistrer.
 	 */
-	public void enregistrerEcouteurCouleur(application.multimedia.iut.Vue.utils.ControleurDessin.EcouteurCouleur ecouteur) {
-		gestionnaireImages.getControleurDessin().ajouterEcouteurCouleur(ecouteur);
+	public void enregistrerEcouteurCouleur(application.multimedia.iut.Main.Controleur.EcouteurCouleur ecouteur) {
+		controleur.ajouterEcouteurCouleur(ecouteur);
 	}
 }
