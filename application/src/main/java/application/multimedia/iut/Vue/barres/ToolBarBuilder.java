@@ -91,6 +91,7 @@ public class ToolBarBuilder {
 		pinceauBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.PINCEAU));
 		gommeBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.GOMME));
 		pipetteBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.PIPETTE));
+		remplissageBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.REMPLISSAGE));
 		texteBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.TEXTE));
 		texteImageBtn.addActionListener(e -> panneau.ouvrirEditeurTexteImage());
 		

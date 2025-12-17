@@ -207,9 +207,7 @@ public class MainControlleur {
 		}
 		
 		public void setOutilActif(OutilDessin outil) {
-			if (this.historiqueModification != null){ 
-				gestionnaireOutils.setOutilActif(outil);
-			}
+			gestionnaireOutils.setOutilActif(outil);
 		}
 		
 		public OutilDessin getOutilActif() {
@@ -221,9 +219,7 @@ public class MainControlleur {
 		// ========================================
 		
 		public void definirCouleurActive(Color couleur) {
-			if (this.historiqueModification != null){ 
-				gestionnaireOutils.definirCouleurActive(couleur);
-			}
+			gestionnaireOutils.definirCouleurActive(couleur);
 		}
 		
 		public Color getCouleurActive() {
