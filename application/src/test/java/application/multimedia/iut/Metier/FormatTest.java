@@ -1,14 +1,17 @@
 package application.multimedia.iut.Metier;
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+
 import javax.imageio.ImageIO;
 
-import application.multimedia.iut.Metier.Format;
-
 public class FormatTest {
-	public final static File inputFile = new File("application/src/main/resources/tortue.png");
-	public static final String outputDir = "application/src/test/resources/testFormatResultats";
+	public final static File inputFile = new File("application/src/main/resources/chat.png");
+	public static final String outputDir = "application/src/test/resources/testFormatResultats_";
 
 	public static void main(String[] args) {
 
@@ -36,15 +39,15 @@ public class FormatTest {
 			System.out.println("Image coupée sauvegardée : " + fichierCoupe.getAbsolutePath());
 
 			System.out.println("\n--- Test rotation ---");
-			BufferedImage imageRotie90 = Format.rotation(imageOriginale, 90.0);
+			BufferedImage imagePivotee90 = Format.rotation(imageOriginale, 180.0);
 			File fichierRotation90 = new File(outputDir + "image_rotation_90_test.png");
-			ImageIO.write(imageRotie90, "png", fichierRotation90);
+			ImageIO.write(imagePivotee90, "png", fichierRotation90);
 			System.out.println("Image pivotée (90°) sauvegardée : " + fichierRotation90.getAbsolutePath());
 
-			BufferedImage imageRotie147 = Format.rotation(imageOriginale, 147.0);
-			File fichierRotation147 = new File(outputDir + "image_rotation_147_test.png");
-			ImageIO.write(imageRotie147, "png", fichierRotation147);
-			System.out.println("Image pivotée (147°) sauvegardée : " + fichierRotation147.getAbsolutePath());
+			BufferedImage imagePivotee147 = Format.rotation(imageOriginale, 147.0);
+			File fichierRotation147 = new File(outputDir + "image_rotation_147__test.png");
+			ImageIO.write(imagePivotee147, "png", fichierRotation147);
+			System.out.println("Image pivotée (, 147°) sauvegardée : " + fichierRotation147.getAbsolutePath());
 
 			System.out.println("\n--- Test symétrie ---");
 			BufferedImage imageSymetrieH = Format.symetrieHorizontale(imageOriginale);
