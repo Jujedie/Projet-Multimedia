@@ -145,6 +145,14 @@ public class ImageManager {
 		toile.setIcon(null);
 		toile.repaint();
 	}
+	
+	/**
+	 * Rafraîchit l'affichage (version publique).
+	 */
+	public void rafraichirAffichage() {
+		toile.setIcon(null);
+		toile.repaint();
+	}
 
 	/**
 	 * Obtient les dimensions actuelles de la zone de dessin.

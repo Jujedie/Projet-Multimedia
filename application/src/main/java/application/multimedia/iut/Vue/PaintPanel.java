@@ -187,6 +187,14 @@ public class PaintPanel extends JPanel {
 	}
 	
 	/**
+	 * Supprime tout le contenu de l'affichage.
+	 */
+	public void supprimerTout() {
+		controleur.suppressionTotale();
+		gestionnaireImages.rafraichirAffichage();
+	}
+	
+	/**
 	 * Enregistre un écouteur pour les changements de couleur (pipette).
 	 *
 	 * @param ecouteur L'écouteur à enregistrer.

@@ -27,7 +27,7 @@ public class PaintFrame extends JFrame {
 		this.controleur = controleur;
 		setTitle("Projet Multimédia");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(1000, 700);
+		setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 		panneauPeinture = new PaintPanel(controleur);
 		add(panneauPeinture);

@@ -23,7 +23,6 @@ public class ToolBarBuilder {
 	private Color couleurIcone = new Color(60, 60, 60);
 	private int tailleIcone = 20;
 	private JPanel couleurPrincipale;
-	private JPanel couleurSecondaire;
 	private Main.Controleur.EcouteurCouleur ecouteurCouleurPipette;
 
 	/**
@@ -125,6 +124,7 @@ public class ToolBarBuilder {
 
 		chargerBtn.addActionListener(e -> panneau.ouvrirFichier());
 		sauvegarderBtn.addActionListener(e -> panneau.enregistrerFichier(true));
+		effacerBtn.addActionListener(e -> panneau.supprimerTout());
 		
 		barre.add(sauvegarderBtn);
 		barre.add(chargerBtn);
@@ -224,13 +224,7 @@ public class ToolBarBuilder {
 			}
 		});
 		
-		couleurSecondaire = new JPanel();
-		couleurSecondaire.setBackground(Color.WHITE);
-		couleurSecondaire.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-		couleurSecondaire.setToolTipText("Couleur secondaire");
-		
 		miniCouleurPanel.add(couleurPrincipale);
-		miniCouleurPanel.add(couleurSecondaire);
 		barre.add(miniCouleurPanel);
 		
 		// Créer l'écouteur de changement de couleur depuis la pipette
