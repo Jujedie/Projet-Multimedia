@@ -13,19 +13,24 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 import javax.swing.SwingUtilities;
 
 import application.multimedia.iut.Metier.ActionHistorique;
 import application.multimedia.iut.Metier.GestionnaireOutils;
 import application.multimedia.iut.Metier.Journaux;
+import application.multimedia.iut.Metier.image.CoucheImage;
 import application.multimedia.iut.Metier.image.ImageManagerMetier;
 import application.multimedia.iut.Metier.image.PileCouches;
 import application.multimedia.iut.Metier.image.RenduToile;
 import application.multimedia.iut.Metier.image.SessionPlacement;
 import application.multimedia.iut.Metier.outils.OutilDessin;
 import application.multimedia.iut.Vue.PaintFrame;
+import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
 
 /**
  * Point d'entrée de l'application de retouche d'images.
@@ -146,7 +151,31 @@ public class MainControlleur {
 			imageManagerMetier.ajouterImageCommeNouvelleCouche(image, tailleToile);
 		}
 		
+		public void ajouterImageAvecChoix(BufferedImage image, LoadChoice choix, Dimension tailleToile) {
+			imageManagerMetier.ajouterImageAvecChoix(image, choix, tailleToile);
+		}
+
+		public CoucheImage coucheAuPoint(Point p) {
+			return imageManagerMetier.coucheAuPoint(p);
+		}
+
+		public void creerImageVide(int largeur, int hauteur, Dimension tailleToile) {
+			imageManagerMetier.creerImageVide(largeur, hauteur, tailleToile);
+		}
 		
+		public void enregistrerFichier(File fichier) throws IOException {
+			imageManagerMetier.enregistrerFichier(fichier);
+		}
+
+		public BufferedImage ouvrirFichier(File fichier, LoadChoice choix, Dimension tailleToile) throws IOException {
+			imageManagerMetier.ouvrirFichier(fichier, choix, tailleToile);
+			return obtenirImageCourante();
+		}
+
+		public boolean imageInitialePresente() {
+			return imageManagerMetier.imageInitialePresente();
+		}
+
 		// ========================================
 		// DÉLÉGATION - Gestion des outils
 		// ========================================

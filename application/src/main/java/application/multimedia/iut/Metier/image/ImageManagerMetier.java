@@ -2,12 +2,15 @@ package application.multimedia.iut.Metier.image;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import application.multimedia.iut.Vue.utils.ImageDialogs;
 import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
 
 /**
@@ -32,7 +35,7 @@ public class ImageManagerMetier {
 	/**
 	 * Crée une image vide blanche et l'ajoute comme couche de base.
 	 */
-	public BufferedImage creerImageVide(int largeur, int hauteur, Dimension tailleToile) {
+	public void creerImageVide(int largeur, int hauteur, Dimension tailleToile) {
 		BufferedImage imageVide = new BufferedImage(Math.max(1, largeur), Math.max(1, hauteur), BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2d = imageVide.createGraphics();
 		g2d.setColor(java.awt.Color.WHITE);
@@ -42,7 +45,6 @@ public class ImageManagerMetier {
 		pileCouches.vider();
 		pileCouches.ajouterCouche(imageVide, tailleToile, true);
 		imageInitialePresente = true;
-		return imageVide;
 	}
 
 	/**
@@ -149,24 +151,46 @@ public class ImageManagerMetier {
 		return renduToile.construireComposite(pileCouches);
 	}
 
+	public boolean imageInitialePresente() {
+		return imageInitialePresente;
+	}
+
 	/**
 	 * Enregistre le composite courant au format PNG dans le fichier donné.
 	 * Lance IOException en cas d'erreur d'écriture.
 	 */
 	public void enregistrerFichier(File fichier) throws IOException {
-		if (fichier == null) throw new IllegalArgumentException("fichier null");
-		BufferedImage composite = construireComposite();
-
-		if (composite == null) throw new IOException("Aucun composite à enregistrer");
-		ImageIO.write(composite, "png", fichier);
+		try {
+			BufferedImage composite = renduToile.construireComposite(pileCouches);
+			ImageIO.write(composite, "png", fichier);
+		} catch (IOException ex) {}
 	}
 
-	public void ouvrirFichier(File fichier) throws IOException {
-		if (fichier == null) throw new IllegalArgumentException("fichier null");
-		BufferedImage image = ImageIO.read(fichier);
+	public BufferedImage ouvrirFichier(File fichier, LoadChoice choix, Dimension tailleToile) throws IOException {
 
-		if (image == null) throw new IOException("Impossible de lire l'image depuis le fichier : " + fichier.getAbsolutePath());
-		definirImageCourante(image, new Dimension(image.getWidth(), image.getHeight()));
+		// Si c'est la première image chargée (image blanche initiale encore présente)
+		// on remplace directement sans demander
+		boolean possedeDejaImages = !pileCouches.estVide() && !imageInitialePresente;
+		
+		if (choix == LoadChoice.REPLACE || imageInitialePresente) {
+			pileCouches.vider();
+			sessionPlacement.annuler();
+		}
+
+		BufferedImage img = null;
+		boolean placementDemande = possedeDejaImages && choix == LoadChoice.SUPERPOSE;
+		try {
+			img = ImageIO.read(fichier);
+			if (img != null) {
+				if (placementDemande) {
+					demarrerPlacement(img, tailleToile);
+				} else {
+					pileCouches.ajouterCouche(img, tailleToile, true);
+				}
+			} 
+		} catch (IOException ex) {}
+
+		return img;
 	}
 
 	/**
@@ -201,6 +225,40 @@ public class ImageManagerMetier {
 		sessionPlacement.annuler();
 		imageInitialePresente = true;
 	}
+
+	/**
+	 * Trouve la couche visible à une position donnée.
+	 * Parcourt les couches du dessus vers le dessous.
+	 * Ignore les pixels transparents pour permettre la sélection des couches inférieures.
+	 *
+	 * @param p Le point à tester.
+	 * @return La couche trouvée, ou null si aucune.
+	 */
+	public CoucheImage coucheAuPoint(Point p) {
+		List<CoucheImage> couches = pileCouches.couches();
+		double zoom = pileCouches.niveauZoom();
+		for (int i = couches.size() - 1; i >= 0; i--) {
+			CoucheImage couche = couches.get(i);
+			int largeur = couche.largeurRedimensionnee(zoom);
+			int hauteur = couche.hauteurRedimensionnee(zoom);
+			if (p.x >= couche.x && p.x <= couche.x + largeur && p.y >= couche.y && p.y <= couche.y + hauteur) {
+				// Vérifier si le pixel à cette position n'est pas transparent
+				int pixelX = (int) ((p.x - couche.x) / zoom);
+				int pixelY = (int) ((p.y - couche.y) / zoom);
+				
+				// S'assurer que les coordonnées sont dans les limites de l'image
+				if (pixelX >= 0 && pixelX < couche.image.getWidth() && 
+				    pixelY >= 0 && pixelY < couche.image.getHeight()) {
+					int alpha = (couche.image.getRGB(pixelX, pixelY) >> 24) & 0xff;
+					// Si le pixel n'est pas transparent (alpha > 0), cette couche est cliquable
+					if (alpha > 0) {
+						return couche;
+					}
+				}
+			}
+		}
+		return null;
+	}	
 
 	/**
 	 * Indique si une session de placement est active.

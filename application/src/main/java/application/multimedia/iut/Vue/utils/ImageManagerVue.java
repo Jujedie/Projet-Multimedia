@@ -17,7 +17,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
@@ -91,6 +94,65 @@ public class ImageManagerVue {
 	 */
 	private Dimension obtenirTailleToile() {
 		return new Dimension(Math.max(1, toile.getWidth()), Math.max(1, toile.getHeight()));
+	}
+	
+	/**
+	 * Ouvre un fichier image et l'ajoute à la pile de couches.
+	 * Gère le choix de remplacement ou de superposition si des images existent déjà.
+	 */
+	public void ouvrirFichier() {
+		File fichierChoisi = ImageDialogs.selectImage(parent);
+		if (fichierChoisi == null) return;
+
+		boolean imageInitialePresente = controleur.imageInitialePresente();
+
+		// Si c'est la première image chargée (image blanche initiale encore présente)
+		// on remplace directement sans demander
+		boolean possedeDejaImages = !controleur.pileCouchesEstVide() && !imageInitialePresente;
+		LoadChoice choix = LoadChoice.REPLACE;
+		if (possedeDejaImages) {
+			choix = ImageDialogs.askLoadChoice(parent);
+			if (choix == LoadChoice.CANCEL) return;
+		}
+
+		if (choix == LoadChoice.REPLACE || imageInitialePresente) {
+			glisserEnCours = false;
+			imageInitialePresente = false; // Marquer que l'image initiale a été remplacée
+		}
+
+		try{
+			controleur.ouvrirFichier(fichierChoisi, choix, obtenirTailleToile());
+		} catch (IOException ex) {
+			messageErreur("Erreur", "Erreur lors du chargement: " + ex.getMessage());
+			return;
+		}
+		
+		if (!controleur.pileCouchesEstVide()) {
+			afficherImage();
+			BufferedImage active = obtenirImageCourante();
+			messageInfo("Succès", "Image(s) chargée(s) !\nActive: " + (active != null ? active.getWidth() + "x" + active.getHeight() : "-"));
+		}
+	}
+
+	/**
+	 * Enregistre l'image composite dans un fichier PNG.
+	 *
+	 * @param nouveauFichier True pour "Enregistrer sous", false pour "Enregistrer".
+	 */
+	public void enregistrerFichier(boolean nouveauFichier) {
+		if (controleur.pileCouchesEstVide()) {
+			messageInfo("Information", "Aucune image à enregistrer.");
+			return;
+		}
+
+		File fichierChoisi = ImageDialogs.selectSavePng(parent);
+		try{
+			controleur.enregistrerFichier(fichierChoisi);
+			messageInfo("Succès", "Image enregistrée avec succès !");
+		} catch (IOException ex) {
+			messageErreur("Erreur", "Erreur lors de l'enregistrement: " + ex.getMessage());
+		}
+		
 	}
 
 	/**
@@ -206,24 +268,10 @@ public class ImageManagerVue {
 	 * @param image L'image à ajouter.
 	 */
 	public void ajouterImageAvecChoix(BufferedImage image) {
-		if (image == null) return;
-		
-		boolean possedeDejaImages = !pileCouches.estVide();
+		boolean possedeDejaImages = !controleur.pileCouchesEstVide();
 		LoadChoice choix = possedeDejaImages ? ImageDialogs.askLoadChoice(parent) : LoadChoice.REPLACE;
 		
-		if (choix == LoadChoice.CANCEL) return;
-		
-		boolean placementDemande = possedeDejaImages && choix == LoadChoice.SUPERPOSE;
-		
-		if (choix == LoadChoice.REPLACE) {
-			pileCouches.vider();
-		}
-		
-		if (placementDemande) {
-			demarrerPlacement(image);
-		} else {
-			pileCouches.ajouterCouche(image, obtenirTailleToile(), true);
-		}
+		controleur.ajouterImageAvecChoix(image, choix, obtenirTailleToile());
 		
 		afficherImage();
 	}
@@ -237,29 +285,7 @@ public class ImageManagerVue {
 	 * @return La couche trouvée, ou null si aucune.
 	 */
 	private CoucheImage coucheAuPoint(Point p) {
-		java.util.List<CoucheImage> couches = pileCouches.couches();
-		double zoom = pileCouches.niveauZoom();
-		for (int i = couches.size() - 1; i >= 0; i--) {
-			CoucheImage couche = couches.get(i);
-			int largeur = couche.largeurRedimensionnee(zoom);
-			int hauteur = couche.hauteurRedimensionnee(zoom);
-			if (p.x >= couche.x && p.x <= couche.x + largeur && p.y >= couche.y && p.y <= couche.y + hauteur) {
-				// Vérifier si le pixel à cette position n'est pas transparent
-				int pixelX = (int) ((p.x - couche.x) / zoom);
-				int pixelY = (int) ((p.y - couche.y) / zoom);
-				
-				// S'assurer que les coordonnées sont dans les limites de l'image
-				if (pixelX >= 0 && pixelX < couche.image.getWidth() && 
-				    pixelY >= 0 && pixelY < couche.image.getHeight()) {
-					int alpha = (couche.image.getRGB(pixelX, pixelY) >> 24) & 0xff;
-					// Si le pixel n'est pas transparent (alpha > 0), cette couche est cliquable
-					if (alpha > 0) {
-						return couche;
-					}
-				}
-			}
-		}
-		return null;
+		return controleur.coucheAuPoint(p);
 	}
 
 	/**
@@ -274,8 +300,8 @@ public class ImageManagerVue {
 				
 				// Gestion des outils de dessin
 				OutilDessin outilActif = controleur.getOutilActif();
-				if (outilActif != OutilDessin.SELECTION && !pileCouches.estVide()) {
-					CoucheImage couche = pileCouches.coucheActive();
+				if (outilActif != OutilDessin.SELECTION && !controleur.pileCouchesEstVide()) {
+					CoucheImage couche = controleur.getPileCouches().coucheActive();
 					if (couche != null) {
 						controleur.commencerDessin(couche.image, e.getX() - couche.x, e.getY() - couche.y);
 						toile.repaint();
@@ -284,8 +310,8 @@ public class ImageManagerVue {
 				}
 				
 				// Gestion du placement
-				if (sessionPlacement.estActive()) {
-					sessionPlacement.deplacerAu(e.getPoint(), pileCouches.niveauZoom());
+				if (controleur.getSessionPlacement().estActive()) {
+					controleur.getSessionPlacement().deplacerAu(e.getPoint(), controleur.getPileCouches().niveauZoom());
 					toile.repaint();
 					dernierePositionSouris = e.getPoint();
 					glisserEnCours = true;
@@ -296,7 +322,7 @@ public class ImageManagerVue {
 				// Autoriser uniquement le déplacement de la première image (index 0)
 				CoucheImage cible = coucheAuPoint(e.getPoint());
 				if (cible != null) {
-					java.util.List<CoucheImage> couches = pileCouches.couches();
+					java.util.List<CoucheImage> couches = controleur.getPileCouches().couches();
 					// Vérifier si c'est la première couche
 					if (!couches.isEmpty() && cible == couches.get(0)) {
 						coucheGlissee = cible;
@@ -322,7 +348,7 @@ public class ImageManagerVue {
 				// Gestion des outils de dessin
 				OutilDessin outilActif = controleur.getOutilActif();
 				if (outilActif != OutilDessin.SELECTION && controleur.estEnDessin()) {
-					CoucheImage couche = pileCouches.coucheActive();
+					CoucheImage couche = controleur.getPileCouches().coucheActive();
 					if (couche != null) {
 						controleur.continuerDessin(couche.image, e.getX() - couche.x, e.getY() - couche.y);
 						toile.repaint();
@@ -334,8 +360,8 @@ public class ImageManagerVue {
 				Point positionActuelle = e.getPoint();
 				int dx = positionActuelle.x - dernierePositionSouris.x;
 				int dy = positionActuelle.y - dernierePositionSouris.y;
-				if (sessionPlacement.estActive()) {
-					sessionPlacement.translater(dx, dy);
+				if (controleur.getSessionPlacement().estActive()) {
+					controleur.getSessionPlacement().translater(dx, dy);
 				} else if (coucheGlissee != null) {
 					// Déplacer uniquement la première couche
 					coucheGlissee.x += dx;
@@ -386,19 +412,8 @@ public class ImageManagerVue {
 	 * @param hauteur Hauteur de l'image.
 	 */
 	private void creerImageVide(int largeur, int hauteur) {
-		BufferedImage imageVide = new BufferedImage(
-			Math.max(1, largeur), 
-			Math.max(1, hauteur), 
-			BufferedImage.TYPE_INT_ARGB
-		);
-		
-		// Remplir en blanc
-		Graphics2D g2d = imageVide.createGraphics();
-		g2d.setColor(Color.WHITE);
-		g2d.fillRect(0, 0, imageVide.getWidth(), imageVide.getHeight());
-		g2d.dispose();
-		
-		pileCouches.ajouterCouche(imageVide, obtenirTailleToile(), true);
+		controleur.creerImageVide(largeur, hauteur, obtenirTailleToile());
+
 		afficherImage();
 	}
 

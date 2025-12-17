@@ -7,9 +7,11 @@
  */
 package application.multimedia.iut.Vue.utils;
 
-import javax.swing.*;
 import java.awt.Component;
 import java.io.File;
+
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 /**
  * Utilitaire pour les dialogues de sélection et gestion d'images.
@@ -27,32 +29,27 @@ public final class ImageDialogs {
      * @param parent Le composant parent pour le dialogue.
      * @return Un tableau de fichiers sélectionnés, ou null si annulé.
      */
-    public static File[] selectImages(Component parent) {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Ouvrir une image");
-        fileChooser.setMultiSelectionEnabled(true);
-        fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
-            public boolean accept(File f) {
-                if (f.isDirectory()) return true;
-                String name = f.getName().toLowerCase();
-                return name.endsWith(".jpg") || name.endsWith(".jpeg") ||
-                       name.endsWith(".png") || name.endsWith(".gif") ||
-                       name.endsWith(".bmp");
-            }
-            public String getDescription() {
-                return "Images (*.jpg, *.png, *.gif, *.bmp)";
-            }
-        });
+    public static File selectImage(Component parent) {
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setDialogTitle("Ouvrir une image");
+		fileChooser.setMultiSelectionEnabled(false);
+		fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
+			public boolean accept(File f) {
+				if (f.isDirectory()) return true;
+				String name = f.getName().toLowerCase();
+				return name.endsWith(".jpg") || name.endsWith(".jpeg") ||
+					   name.endsWith(".png") || name.endsWith(".gif") ||
+					   name.endsWith(".bmp");
+			}
+			public String getDescription() {
+				return "Images (*.jpg, *.jpeg, *.png, *.gif, *.bmp)";
+			}
+		});
 
-        int result = fileChooser.showOpenDialog(parent);
-        if (result != JFileChooser.APPROVE_OPTION) return null;
+		int result = fileChooser.showOpenDialog(parent);
+		if (result != JFileChooser.APPROVE_OPTION) return null;
 
-        File[] files = fileChooser.getSelectedFiles();
-        if (files == null || files.length == 0) {
-            File single = fileChooser.getSelectedFile();
-            if (single != null) return new File[] { single };
-        }
-        return files;
+		return fileChooser.getSelectedFile();
     }
 
     /**
