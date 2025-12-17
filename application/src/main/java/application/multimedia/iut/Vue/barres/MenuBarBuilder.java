@@ -10,6 +10,7 @@ package application.multimedia.iut.Vue.barres;
 import application.multimedia.iut.Vue.PaintPanel;
 
 import javax.swing.*;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.Toolkit;
 
@@ -56,6 +57,7 @@ public class MenuBarBuilder {
 	 */
 	private JMenu creerMenuFichier() {
 		JMenu fichierMenu = new JMenu("Fichier");
+		fichierMenu.setMnemonic(KeyEvent.VK_F);
 
 		JMenuItem nouveauItem = new JMenuItem("Nouveau");
 		JMenuItem ouvrirItem = new JMenuItem("Ouvrir");
@@ -66,8 +68,15 @@ public class MenuBarBuilder {
 		nouveauItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcut));
 		ouvrirItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcut));
 		enregistrerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcut));
-		enregistrerSousItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcut | KeyEvent.SHIFT_DOWN_MASK));
+		enregistrerSousItem
+				.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcut | KeyEvent.SHIFT_DOWN_MASK));
 		quitterItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, menuShortcut));
+
+		nouveauItem.setMnemonic(KeyEvent.VK_N);
+		ouvrirItem.setMnemonic(KeyEvent.VK_O);
+		enregistrerItem.setMnemonic(KeyEvent.VK_E);
+		enregistrerSousItem.setMnemonic(KeyEvent.VK_A);
+		quitterItem.setMnemonic(KeyEvent.VK_Q);
 
 		ouvrirItem.addActionListener(e -> panneau.ouvrirFichier());
 		enregistrerItem.addActionListener(e -> panneau.enregistrerFichier(false));
@@ -92,23 +101,22 @@ public class MenuBarBuilder {
 	 */
 	private JMenu creerMenuEdition() {
 		JMenu editionMenu = new JMenu("Édition");
+		editionMenu.setMnemonic(KeyEvent.VK_E);
 
 		JMenuItem annulerItem = new JMenuItem("Annuler");
 		JMenuItem refaireItem = new JMenuItem("Refaire");
 		JMenuItem effacerItem = new JMenuItem("Effacer tout");
-		JMenuItem texteImageItem = new JMenuItem("Texte avec image...");
-		
-		texteImageItem.addActionListener(e -> panneau.ouvrirEditeurTexteImage());
 
 		annulerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, menuShortcut));
 		refaireItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, menuShortcut));
 		effacerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, menuShortcut | KeyEvent.SHIFT_DOWN_MASK));
-		texteImageItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, menuShortcut));
+
+		annulerItem.setMnemonic(KeyEvent.VK_A);
+		refaireItem.setMnemonic(KeyEvent.VK_R);
+		effacerItem.setMnemonic(KeyEvent.VK_E);
 
 		editionMenu.add(annulerItem);
 		editionMenu.add(refaireItem);
-		editionMenu.addSeparator();
-		editionMenu.add(texteImageItem);
 		editionMenu.addSeparator();
 		editionMenu.add(effacerItem);
 
@@ -137,6 +145,12 @@ public class MenuBarBuilder {
 		flipVItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, menuShortcut));
 		rotationItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, menuShortcut));
 		redimensionnerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, menuShortcut));
+
+		fusionnerItem.setMnemonic(KeyEvent.VK_F);
+		flipHItem.setMnemonic(KeyEvent.VK_H);
+		flipVItem.setMnemonic(KeyEvent.VK_V);
+		rotationItem.setMnemonic(KeyEvent.VK_R);
+		redimensionnerItem.setMnemonic(KeyEvent.VK_D);
 
 		imageMenu.add(fusionnerItem);
 		imageMenu.addSeparator();
