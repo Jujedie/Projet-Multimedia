@@ -7,6 +7,26 @@
  */
 package application.multimedia.iut.Vue.utils;
 
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+
 import application.multimedia.iut.MainControlleur;
 import application.multimedia.iut.Metier.image.CoucheImage;
 import application.multimedia.iut.Metier.image.PileCouches;
@@ -14,49 +34,32 @@ import application.multimedia.iut.Metier.image.RenduToile;
 import application.multimedia.iut.Metier.image.SessionPlacement;
 import application.multimedia.iut.Metier.outils.OutilDessin;
 import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
 
 /**
  * Gestionnaire centralisé pour toutes les opérations sur images.
  * Coordonne le chargement, l'enregistrement, le zoom, et le placement d'images.
  */
-public class ImageManager {
+public class ImageManagerVue {
 	private final MainControlleur.Controleur controleur;
-	private final PileCouches pileCouches;
-	private final SessionPlacement sessionPlacement;
-	private final RenduToile renduToile;
 	private final JLabel toile;
 	private final JComponent parent;
 
 	private Point dernierePositionSouris;
 	private boolean glisserEnCours = false;
 	private CoucheImage coucheGlissee;
-	private boolean imageInitialePresente = true; // Flag pour la première ouverture d'image
 
 	/**
 	 * Constructeur du gestionnaire d'images.
-	 * Initialise le gestionnaire avec une toile, un composant parent et le contrôleur.
+	 * Initialise le gestionnaire avec les composants nécessaires.
 	 *
 	 * @param toile Le label servant de zone de dessin.
 	 * @param parent Le composant parent pour les dialogues.
 	 * @param controleur Le contrôleur central de l'application.
 	 */
-	public ImageManager(JLabel toile, JComponent parent, MainControlleur.Controleur controleur) {
+	public ImageManagerVue(JLabel toile, JComponent parent, MainControlleur.Controleur controleur) {
 		this.toile = toile;
 		this.parent = parent;
 		this.controleur = controleur;
-		
-		// Récupérer les références du modèle depuis le contrôleur
-		this.pileCouches = controleur.getPileCouches();
-		this.sessionPlacement = controleur.getSessionPlacement();
-		this.renduToile = controleur.getRenduToile();
 		
 		// Créer une image blanche vide au démarrage pour permettre le dessin
 		creerImageVide(800, 600);
@@ -65,83 +68,10 @@ public class ImageManager {
 	}
 
 	/**
-	 * Ouvre une boîte de dialogue pour sélectionner et charger des images.
-	 * Gère le remplacement ou la superposition d'images existantes.
-	 */
-	public void ouvrirFichier() {
-		File[] fichiersChoisis = ImageDialogs.selectImages(parent);
-		if (fichiersChoisis == null || fichiersChoisis.length == 0) return;
-
-		// Si c'est la première image chargée (image blanche initiale encore présente)
-		// on remplace directement sans demander
-		boolean possedeDejaImages = !pileCouches.estVide() && !imageInitialePresente;
-		LoadChoice choix = LoadChoice.REPLACE;
-		if (possedeDejaImages) {
-			choix = ImageDialogs.askLoadChoice(parent);
-			if (choix == LoadChoice.CANCEL) return;
-		}
-
-		if (choix == LoadChoice.REPLACE || imageInitialePresente) {
-			pileCouches.vider();
-			sessionPlacement.annuler();
-			glisserEnCours = false;
-			imageInitialePresente = false; // Marquer que l'image initiale a été remplacée
-		}
-
-		boolean placementDemande = possedeDejaImages && choix == LoadChoice.SUPERPOSE;
-		boolean premierePlacee = false;
-		for (File fichier : fichiersChoisis) {
-			try {
-				BufferedImage img = ImageIO.read(fichier);
-				if (img != null) {
-					if (placementDemande && !premierePlacee) {
-						demarrerPlacement(img);
-						premierePlacee = true;
-					} else {
-						pileCouches.ajouterCouche(img, obtenirTailleToile(), true);
-					}
-				} else {
-					messageErreur("Erreur", "Impossible de charger " + fichier.getName());
-				}
-			} catch (Exception ex) {
-				messageErreur("Erreur", "Erreur lors du chargement: " + ex.getMessage());
-			}
-		}
-		if (!pileCouches.estVide()) {
-			afficherImage();
-			BufferedImage active = obtenirImageCourante();
-			messageInfo("Succès", "Image(s) chargée(s) !\nActive: " + (active != null ? active.getWidth() + "x" + active.getHeight() : "-"));
-		}
-	}
-
-	/**
-	 * Enregistre l'image composite dans un fichier PNG.
-	 *
-	 * @param nouveauFichier True pour "Enregistrer sous", false pour "Enregistrer".
-	 */
-	public void enregistrerFichier(boolean nouveauFichier) {
-		if (pileCouches.estVide()) {
-			messageInfo("Information", "Aucune image à enregistrer.");
-			return;
-		}
-
-		File fichierChoisi = ImageDialogs.selectSavePng(parent);
-		if (fichierChoisi == null) return;
-
-		try {
-			BufferedImage composite = renduToile.construireComposite(pileCouches);
-			ImageIO.write(composite, "png", fichierChoisi);
-			messageInfo("Succès", "Image enregistrée avec succès !");
-		} catch (Exception ex) {
-			messageErreur("Erreur", "Erreur lors de l'enregistrement: " + ex.getMessage());
-		}
-	}
-
-	/**
 	 * Rafraîchit l'affichage de l'image sur la toile.
 	 */
 	private void afficherImage() {
-		if (pileCouches.estVide()) return;
+		if (controleur.pileCouchesEstVide()) return;
 		toile.setIcon(null);
 		toile.repaint();
 	}
@@ -170,7 +100,7 @@ public class ImageManager {
 	 * @param img L'image à placer.
 	 */
 	private void demarrerPlacement(BufferedImage img) {
-		sessionPlacement.demarrer(img, obtenirTailleToile(), pileCouches.niveauZoom(), pileCouches.limitesBase());
+		controleur.demarrerPlacement(img, obtenirTailleToile());
 		toile.requestFocusInWindow();
 		JOptionPane.showMessageDialog(parent,
 			"Clique sur la zone où placer l'image, puis appuie sur Entrée pour valider.",
@@ -184,30 +114,11 @@ public class ImageManager {
 	 * Fusionne toutes les couches en une seule image composite.
 	 */
 	private void validerPlacement() {
-		if (!sessionPlacement.estActive()) return;
-		if (!sessionPlacement.intersecteBase(pileCouches.niveauZoom())) {
-			JOptionPane.showMessageDialog(parent, "L'image est totalement hors de la première et sera ignorée.", "Placement refusé", JOptionPane.WARNING_MESSAGE);
+		if (!controleur.sessionPlacementValide()) {
+			JOptionPane.showMessageDialog(parent, "L'image est totalement hors de la première et sera ignorée. ou n'est pas active", "Placement refusé", JOptionPane.WARNING_MESSAGE);
 			return;
 		}
-		CoucheImage placee = sessionPlacement.valider();
-		if (placee != null) {
-			pileCouches.ajouterCouche(placee);
-			// Sauvegarder le niveau de zoom actuel
-			double zoomActuel = pileCouches.niveauZoom();
-			// Réinitialiser le zoom pour la fusion
-			pileCouches.reinitialiserZoom();
-			// Fusionner toutes les couches en une seule image composite
-			BufferedImage imageComposite = renduToile.construireComposite(pileCouches);
-			if (imageComposite != null) {
-				// Remplacer toutes les couches par l'image fusionnée
-				pileCouches.vider();
-				pileCouches.ajouterCouche(imageComposite, obtenirTailleToile(), true);
-				// Restaurer le zoom si nécessaire
-				if (zoomActuel != 1.0) {
-					pileCouches.zoomer(zoomActuel);
-				}
-			}
-		}
+		
 		glisserEnCours = false;
 		toile.repaint();
 	}
@@ -234,7 +145,7 @@ public class ImageManager {
 	 * @param g Le contexte graphique pour le rendu.
 	 */
 	public void dessinerImage(Graphics g) {
-		renduToile.peindre(g, pileCouches, sessionPlacement);
+		controleur.peindre(g);
 	}
 
 	/**
@@ -243,8 +154,7 @@ public class ImageManager {
 	 * @param facteur Le multiplicateur de zoom (&gt;1 pour agrandir, &lt;1 pour réduire).
 	 */
 	public void zoomer(double facteur) {
-		if (pileCouches.estVide()) return;
-		pileCouches.zoomer(facteur);
+		controleur.zoomer(facteur);
 		afficherImage();
 	}
 
@@ -252,8 +162,7 @@ public class ImageManager {
 	 * Réinitialise le zoom à 100% (facteur 1.0).
 	 */
 	public void reinitialiserZoom() {
-		if (pileCouches.estVide()) return;
-		pileCouches.reinitialiserZoom();
+		controleur.reinitialiserZoom();
 		afficherImage();
 	}
 
@@ -263,8 +172,7 @@ public class ImageManager {
 	 * @return L'image de la couche active, ou null si aucune.
 	 */
 	public BufferedImage obtenirImageCourante() {
-		CoucheImage active = pileCouches.coucheActive();
-		return active != null ? active.image : null;
+		return controleur.obtenirImageCourante();
 	}
 
 	/**
@@ -274,13 +182,9 @@ public class ImageManager {
 	 * @param image La nouvelle image à définir comme base.
 	 */
 	public void definirImageCourante(BufferedImage image) {
-		pileCouches.vider();
-		sessionPlacement.annuler();
+		controleur.definirImageCourante(image, obtenirTailleToile());
 		glisserEnCours = false;
 		coucheGlissee = null;
-		if (image != null) {
-			pileCouches.ajouterCouche(image, obtenirTailleToile(), true);
-		}
 		afficherImage();
 	}
 	
@@ -291,13 +195,7 @@ public class ImageManager {
 	 * @param image L'image à ajouter.
 	 */
 	public void ajouterImageCommeNouvelleCouche(BufferedImage image) {
-		if (image == null) return;
-		
-		if (pileCouches.estVide()) {
-			pileCouches.ajouterCouche(image, obtenirTailleToile(), true);
-		} else {
-			demarrerPlacement(image);
-		}
+		controleur.ajouterImageCommeNouvelleCouche(image, obtenirTailleToile());
 		afficherImage();
 	}
 	

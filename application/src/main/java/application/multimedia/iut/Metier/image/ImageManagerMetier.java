@@ -14,7 +14,7 @@ import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
  * Version métier du gestionnaire d'images : encapsule les opérations sur la PileCouches,
  * la SessionPlacement et le RenduToile sans aucune interaction UI.
  */
-public class ImageManager {
+public class ImageManagerMetier {
 	private final PileCouches pileCouches;
 	private final SessionPlacement sessionPlacement;
 	private final RenduToile renduToile;
@@ -23,7 +23,7 @@ public class ImageManager {
 	/**
 	 * Constructeur métier : reçoit les composants métier existants.
 	 */
-	public ImageManager(PileCouches pileCouches, SessionPlacement sessionPlacement, RenduToile renduToile) {
+	public ImageManagerMetier(PileCouches pileCouches, SessionPlacement sessionPlacement, RenduToile renduToile) {
 		this.pileCouches = pileCouches;
 		this.sessionPlacement = sessionPlacement;
 		this.renduToile = renduToile;
@@ -110,9 +110,8 @@ public class ImageManager {
 	 * Renvoie true si le placement a été validé et fusion (si applicable) réussie.
 	 * Si l'image placée est complètement hors-base, le placement est annulé et la méthode retourne false.
 	 */
-	public boolean validerPlacementEtFusionner(boolean fusionner) {
+	public boolean validerPlacement() {
 		if (!sessionPlacement.estActive()) return false;
-
 		if (!sessionPlacement.intersecteBase(pileCouches.niveauZoom())) {
 			sessionPlacement.annuler();
 			return false;
@@ -121,17 +120,15 @@ public class ImageManager {
 		CoucheImage placee = sessionPlacement.valider();
 		if (placee != null) {
 			pileCouches.ajouterCouche(placee);
-			if (fusionner) {
-				double zoomActuel = pileCouches.niveauZoom();
-				pileCouches.reinitialiserZoom();
-				BufferedImage imageComposite = renduToile.construireComposite(pileCouches);
-				if (imageComposite != null) {
-					pileCouches.vider();
-					// tailleToile inconnue ici : la couche sera ajoutée en tant que base ; caller peut re-ajuster si besoin
-					pileCouches.ajouterCouche(imageComposite, new Dimension(imageComposite.getWidth(), imageComposite.getHeight()), true);
-					if (zoomActuel != 1.0) {
-						pileCouches.zoomer(zoomActuel);
-					}
+			double zoomActuel = pileCouches.niveauZoom();
+			pileCouches.reinitialiserZoom();
+			BufferedImage imageComposite = renduToile.construireComposite(pileCouches);
+			if (imageComposite != null) {
+				pileCouches.vider();
+				// tailleToile inconnue ici : la couche sera ajoutée en tant que base ; caller peut re-ajuster si besoin
+				pileCouches.ajouterCouche(imageComposite, new Dimension(imageComposite.getWidth(), imageComposite.getHeight()), true);
+				if (zoomActuel != 1.0) {
+					pileCouches.zoomer(zoomActuel);
 				}
 			}
 		}
@@ -156,11 +153,20 @@ public class ImageManager {
 	 * Enregistre le composite courant au format PNG dans le fichier donné.
 	 * Lance IOException en cas d'erreur d'écriture.
 	 */
-	public void enregistrerComposite(File fichier) throws IOException {
+	public void enregistrerFichier(File fichier) throws IOException {
 		if (fichier == null) throw new IllegalArgumentException("fichier null");
 		BufferedImage composite = construireComposite();
+
 		if (composite == null) throw new IOException("Aucun composite à enregistrer");
 		ImageIO.write(composite, "png", fichier);
+	}
+
+	public void ouvrirFichier(File fichier) throws IOException {
+		if (fichier == null) throw new IllegalArgumentException("fichier null");
+		BufferedImage image = ImageIO.read(fichier);
+
+		if (image == null) throw new IOException("Impossible de lire l'image depuis le fichier : " + fichier.getAbsolutePath());
+		definirImageCourante(image, new Dimension(image.getWidth(), image.getHeight()));
 	}
 
 	/**
