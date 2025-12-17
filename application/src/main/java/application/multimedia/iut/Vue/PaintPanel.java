@@ -12,7 +12,7 @@ import application.multimedia.iut.Metier.GestionnaireOutils;
 import application.multimedia.iut.Vue.barres.MenuBarBuilder;
 import application.multimedia.iut.Vue.barres.ToolBarBuilder;
 import application.multimedia.iut.Vue.dialogs.TexteImageEditorDialog;
-import application.multimedia.iut.Vue.utils.ImageManager;
+import application.multimedia.iut.Vue.utils.ImageManagerVue;
 import application.multimedia.iut.Vue.utils.LucideIconLoader;
 import java.awt.*;
 import javax.swing.*;
@@ -26,7 +26,7 @@ public class PaintPanel extends JPanel {
 
 	private JLabel toile;
 	private JScrollPane panneauDeroulement;
-	private ImageManager gestionnaireImages;
+	private ImageManagerVue gestionnaireImages;
 	private MainControlleur.Controleur controleur;
 	
 	/**
@@ -96,7 +96,7 @@ public class PaintPanel extends JPanel {
 		panneauDeroulement = new JScrollPane(toile);
 		panneauDeroulement.setBackground(Color.DARK_GRAY);
 		
-		gestionnaireImages = new ImageManager(toile, this, controleur);
+		gestionnaireImages = new ImageManagerVue(toile, this, controleur);
 		gestionnaireImages.activerDeplacementImage();
 	}
 	
