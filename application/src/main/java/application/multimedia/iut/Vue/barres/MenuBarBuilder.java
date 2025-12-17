@@ -8,7 +8,10 @@
 package application.multimedia.iut.Vue.barres;
 
 import application.multimedia.iut.Vue.PaintPanel;
+
 import javax.swing.*;
+import java.awt.event.KeyEvent;
+import java.awt.Toolkit;
 
 /**
  * Constructeur de la barre de menu de l'application.
@@ -17,6 +20,7 @@ import javax.swing.*;
 public class MenuBarBuilder {
 
 	private PaintPanel panneau;
+	private final int menuShortcut = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
 	/**
 	 * Constructeur du constructeur de barre de menu.
