@@ -7,7 +7,7 @@
  */
 package application.multimedia.iut.Vue.utils;
 
-import application.multimedia.iut.Main;
+import application.multimedia.iut.MainControlleur;
 import application.multimedia.iut.Metier.image.CoucheImage;
 import application.multimedia.iut.Metier.image.PileCouches;
 import application.multimedia.iut.Metier.image.RenduToile;
@@ -28,7 +28,7 @@ import java.io.File;
  * Coordonne le chargement, l'enregistrement, le zoom, et le placement d'images.
  */
 public class ImageManager {
-	private final Main.Controleur controleur;
+	private final MainControlleur.Controleur controleur;
 	private final PileCouches pileCouches;
 	private final SessionPlacement sessionPlacement;
 	private final RenduToile renduToile;
@@ -48,7 +48,7 @@ public class ImageManager {
 	 * @param parent Le composant parent pour les dialogues.
 	 * @param controleur Le contrôleur central de l'application.
 	 */
-	public ImageManager(JLabel toile, JComponent parent, Main.Controleur controleur) {
+	public ImageManager(JLabel toile, JComponent parent, MainControlleur.Controleur controleur) {
 		this.toile = toile;
 		this.parent = parent;
 		this.controleur = controleur;
@@ -477,7 +477,7 @@ public class ImageManager {
 	 *
 	 * @return Le contrôleur principal.
 	 */
-	public Main.Controleur getControleur() {
+	public MainControlleur.Controleur getControleur() {
 		return controleur;
 	}
 	

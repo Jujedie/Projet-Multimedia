@@ -24,7 +24,7 @@ import java.awt.image.BufferedImage;
  * Point d'entrée de l'application de retouche d'images.
  * Contient le contrôleur central et initialise l'interface graphique Swing.
  */
-public class Main {
+public class MainControlleur {
 	/**
 	 * Point d'entrée de l'application.
 	 * Crée le contrôleur central qui gère le modèle,
