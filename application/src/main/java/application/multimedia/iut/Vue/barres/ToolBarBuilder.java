@@ -91,6 +91,7 @@ public class ToolBarBuilder {
 		pinceauBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.PINCEAU));
 		gommeBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.GOMME));
 		pipetteBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.PIPETTE));
+		remplissageBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.REMPLISSAGE));
 		texteBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.TEXTE));
 		texteImageBtn.addActionListener(e -> panneau.ouvrirEditeurTexteImage());
 		
@@ -153,13 +154,87 @@ public class ToolBarBuilder {
 	
 	/**
 	 * Ajoute les outils de filtres d'images à la barre d'outils.
-	 * Contient : Contraste.
+	 * Contient : Contraste, Luminosité, Teinture.
 	 *
 	 * @param barre La barre d'outils à modifier.
 	 */
 	private void ajouterOutilsFiltres(JToolBar barre) {
 		JButton contrasteBtn = creerBouton("contrast", "Contraste");
+		JButton luminositeBtn = creerBouton("sun", "Luminosité");
+		JButton teintureBtn = creerBouton("palette", "Teinture");
+		
+		contrasteBtn.addActionListener(e -> ouvrirDialogueContraste());
+		luminositeBtn.addActionListener(e -> ouvrirDialogueLuminosite());
+		teintureBtn.addActionListener(e -> ouvrirDialogueTeinture());
+		
 		barre.add(contrasteBtn);
+		barre.add(luminositeBtn);
+		barre.add(teintureBtn);
+	}
+	
+	/**
+	 * Ouvre une boîte de dialogue pour ajuster le contraste.
+	 */
+	private void ouvrirDialogueContraste() {
+		JSlider slider = new JSlider(-100, 100, 0);
+		slider.setMajorTickSpacing(50);
+		slider.setMinorTickSpacing(10);
+		slider.setPaintTicks(true);
+		slider.setPaintLabels(true);
+		
+		int resultat = JOptionPane.showConfirmDialog(panneau, slider, "Ajuster le contraste", 
+			JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		
+		if (resultat == JOptionPane.OK_OPTION) {
+			panneau.appliquerContraste(slider.getValue());
+		}
+	}
+	
+	/**
+	 * Ouvre une boîte de dialogue pour ajuster la luminosité.
+	 */
+	private void ouvrirDialogueLuminosite() {
+		JSlider slider = new JSlider(-255, 255, 0);
+		slider.setMajorTickSpacing(100);
+		slider.setMinorTickSpacing(25);
+		slider.setPaintTicks(true);
+		slider.setPaintLabels(true);
+		
+		int resultat = JOptionPane.showConfirmDialog(panneau, slider, "Ajuster la luminosité", 
+			JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		
+		if (resultat == JOptionPane.OK_OPTION) {
+			panneau.appliquerLuminosite(slider.getValue());
+		}
+	}
+	
+	/**
+	 * Ouvre une boîte de dialogue pour appliquer une teinture.
+	 */
+	private void ouvrirDialogueTeinture() {
+		JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
+		
+		JSlider redSlider = new JSlider(0, 255, 255);
+		JSlider greenSlider = new JSlider(0, 255, 0);
+		JSlider blueSlider = new JSlider(0, 255, 0);
+		JSlider alphaSlider = new JSlider(0, 255, 128);
+		
+		panel.add(new JLabel("Rouge:"));
+		panel.add(redSlider);
+		panel.add(new JLabel("Vert:"));
+		panel.add(greenSlider);
+		panel.add(new JLabel("Bleu:"));
+		panel.add(blueSlider);
+		panel.add(new JLabel("Intensité:"));
+		panel.add(alphaSlider);
+		
+		int resultat = JOptionPane.showConfirmDialog(panneau, panel, "Appliquer une teinture", 
+			JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		
+		if (resultat == JOptionPane.OK_OPTION) {
+			panneau.appliquerTeinte(redSlider.getValue(), greenSlider.getValue(), 
+				blueSlider.getValue(), alphaSlider.getValue());
+		}
 	}
 	
 	/**
