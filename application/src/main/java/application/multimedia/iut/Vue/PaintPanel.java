@@ -1,7 +1,7 @@
 /**
  * Classe représentant le panel de dessin principal.
  * Gère l'affichage et l'interaction avec les images.
- * 
+ *
  * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
  * @version 1.0
  */

@@ -1,7 +1,7 @@
 /**
  * Classe construisant la barre de menu de l'application.
  * Gère les menus Fichier, Édition, Image, etc.
- * 
+ *
  * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
  * @version 1.0
  */
@@ -59,6 +59,12 @@ public class MenuBarBuilder {
 		JMenuItem enregistrerSousItem = new JMenuItem("Enregistrer sous...");
 		JMenuItem quitterItem = new JMenuItem("Quitter");
 
+		nouveauItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcut));
+		ouvrirItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcut));
+		enregistrerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcut));
+		enregistrerSousItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcut | KeyEvent.SHIFT_DOWN_MASK));
+		quitterItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, menuShortcut));
+
 		ouvrirItem.addActionListener(e -> panneau.ouvrirFichier());
 		enregistrerItem.addActionListener(e -> panneau.enregistrerFichier(false));
 		enregistrerSousItem.addActionListener(e -> panneau.enregistrerFichier(true));
@@ -90,6 +96,11 @@ public class MenuBarBuilder {
 		
 		texteImageItem.addActionListener(e -> panneau.ouvrirEditeurTexteImage());
 
+		annulerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, menuShortcut));
+		refaireItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, menuShortcut));
+		effacerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, menuShortcut | KeyEvent.SHIFT_DOWN_MASK));
+		texteImageItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, menuShortcut));
+
 		editionMenu.add(annulerItem);
 		editionMenu.add(refaireItem);
 		editionMenu.addSeparator();
@@ -109,11 +120,19 @@ public class MenuBarBuilder {
 	private JMenu creerMenuImage() {
 		JMenu imageMenu = new JMenu("Image");
 
-		JMenuItem fusionnerItem = new JMenuItem("Fusionner");
+		JMenuItem fusionnerItem = new JMenuItem("Fusion Horizontale");
+		JMenuItem fusionVerticale = new JMenuItem("Fusion Verticale");
 		JMenuItem flipHItem = new JMenuItem("Retourner horizontalement");
 		JMenuItem flipVItem = new JMenuItem("Retourner verticalement");
 		JMenuItem rotationItem = new JMenuItem("Rotation");
 		JMenuItem redimensionnerItem = new JMenuItem("Redimensionner");
+
+		fusionnerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, menuShortcut));
+		fusionVerticale.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, menuShortcut | KeyEvent.SHIFT_DOWN_MASK));
+		flipHItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, menuShortcut));
+		flipVItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, menuShortcut));
+		rotationItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, menuShortcut));
+		redimensionnerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, menuShortcut));
 
 		imageMenu.add(fusionnerItem);
 		imageMenu.addSeparator();
