@@ -19,7 +19,7 @@ public enum ActionTypeEnum {
 	FUSION(-1),
 	AJOUT_TEXTE_IMAGE(-1);
 
-	private int    nbParametres;
+	private int nbParametres;
 
 	private ActionTypeEnum(int nbParametres) {
 		this.nbParametres = nbParametres;

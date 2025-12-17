@@ -9,16 +9,20 @@
 
 package application.multimedia.iut;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.image.BufferedImage;
+
+import javax.swing.SwingUtilities;
+
+import application.multimedia.iut.Metier.ActionHistorique;
 import application.multimedia.iut.Metier.GestionnaireOutils;
+import application.multimedia.iut.Metier.Journaux;
 import application.multimedia.iut.Metier.image.PileCouches;
 import application.multimedia.iut.Metier.image.RenduToile;
 import application.multimedia.iut.Metier.image.SessionPlacement;
 import application.multimedia.iut.Metier.outils.OutilDessin;
 import application.multimedia.iut.Vue.PaintFrame;
-import javax.swing.SwingUtilities;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.image.BufferedImage;
 
 /**
  * Point d'entrée de l'application de retouche d'images.
@@ -48,7 +52,9 @@ public class MainControlleur {
 	 * Délègue la logique métier aux classes appropriées.
 	 */
 	public static class Controleur {
-		
+		// ========== Journaux ==========
+		private Journaux historiqueModification;
+
 		// ========== MODÈLE - Gestion des images ==========
 		private final PileCouches pileCouches;
 		private final SessionPlacement sessionPlacement;
@@ -70,6 +76,8 @@ public class MainControlleur {
 			// Initialisation du gestionnaire d'outils
 			this.gestionnaireOutils = new GestionnaireOutils();
 		}
+
+		public void updateJournal(BufferedImage image){ this.historiqueModification = new Journaux(image);}
 		
 		// ========================================
 		// ACCÈS AU MODÈLE - Gestion des images
@@ -98,23 +106,35 @@ public class MainControlleur {
 		// ========================================
 		
 		public void commencerDessin(BufferedImage image, int x, int y) {
-			gestionnaireOutils.commencerDessin(image, x, y);
+			if (this.historiqueModification != null){ 
+				gestionnaireOutils.commencerDessin(image, x, y); 
+			}
 		}
 		
 		public void continuerDessin(BufferedImage image, int x, int y) {
-			gestionnaireOutils.continuerDessin(image, x, y);
+			if (this.historiqueModification != null){ 
+				gestionnaireOutils.continuerDessin(image, x, y); 
+			}
 		}
 		
 		public void terminerDessin() {
-			gestionnaireOutils.terminerDessin();
+			if (this.historiqueModification != null){  
+				gestionnaireOutils.terminerDessin(); 
+			}
 		}
 		
 		public void dessinerTexte(BufferedImage image, String texte, int x, int y) {
-			gestionnaireOutils.dessinerTexte(image, texte, x, y);
+			if (this.historiqueModification != null){ 
+				gestionnaireOutils.dessinerTexte(image, texte, x, y);
+				var actionHistorique = new ActionHistorique(null, new Object[]{texte,x,y});
+				this.historiqueModification.ajouterActionHistorique(actionHistorique);
+			}
 		}
 		
 		public void setOutilActif(OutilDessin outil) {
-			gestionnaireOutils.setOutilActif(outil);
+			if (this.historiqueModification != null){ 
+				gestionnaireOutils.setOutilActif(outil);
+			}
 		}
 		
 		public OutilDessin getOutilActif() {
@@ -126,7 +146,9 @@ public class MainControlleur {
 		// ========================================
 		
 		public void definirCouleurActive(Color couleur) {
-			gestionnaireOutils.definirCouleurActive(couleur);
+			if (this.historiqueModification != null){ 
+				gestionnaireOutils.definirCouleurActive(couleur);
+			}
 		}
 		
 		public Color getCouleurActive() {
@@ -138,7 +160,9 @@ public class MainControlleur {
 		// ========================================
 		
 		public void setEpaisseurPinceau(int epaisseur) {
-			gestionnaireOutils.setEpaisseurPinceau(epaisseur);
+			if (this.historiqueModification != null){ 
+				gestionnaireOutils.setEpaisseurPinceau(epaisseur);
+			}
 		}
 		
 		public int getEpaisseurPinceau() {
@@ -146,7 +170,9 @@ public class MainControlleur {
 		}
 		
 		public void setTailleGomme(int taille) {
-			gestionnaireOutils.setTailleGomme(taille);
+			if (this.historiqueModification != null){ 
+				gestionnaireOutils.setTailleGomme(taille);
+			}
 		}
 		
 		public int getTailleGomme() {
@@ -154,7 +180,9 @@ public class MainControlleur {
 		}
 		
 		public void setPoliceTexte(Font police) {
-			gestionnaireOutils.setPoliceTexte(police);
+			if (this.historiqueModification != null){ 
+				gestionnaireOutils.setPoliceTexte(police);
+			}
 		}
 		
 		public Font getPoliceTexte() {
@@ -166,7 +194,9 @@ public class MainControlleur {
 		// ========================================
 		
 		public void ajouterEcouteurCouleur(GestionnaireOutils.EcouteurCouleur ecouteur) {
-			gestionnaireOutils.ajouterEcouteurCouleur(ecouteur);
+			if (this.historiqueModification != null){ 
+				gestionnaireOutils.ajouterEcouteurCouleur(ecouteur);
+			}
 		}
 		
 		public boolean estEnDessin() {
