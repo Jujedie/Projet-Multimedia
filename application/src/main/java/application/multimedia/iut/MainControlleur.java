@@ -277,5 +277,64 @@ public class MainControlleur {
 		public boolean estEnDessin() {
 			return gestionnaireOutils.estEnDessin();
 		}
+		
+		// ========================================
+		// DÉLÉGATION - Colorisation
+		// ========================================
+		
+		/**
+		 * Applique une teinte de couleur sur l'image.
+		 * 
+		 * @param image L'image à teinter.
+		 * @param red La composante rouge de la teinte (0-255).
+		 * @param green La composante verte de la teinte (0-255).
+		 * @param blue La composante bleue de la teinte (0-255).
+		 * @param alpha L'intensité de la teinte (0-255).
+		 */
+		public void appliquerTeinte(BufferedImage image, int red, int green, int blue, int alpha) {
+			if (this.historiqueModification != null && image != null) {
+				application.multimedia.iut.Metier.Colorisation.teinter(image, red, green, blue, alpha);
+			}
+		}
+		
+		/**
+		 * Ajuste le contraste de l'image.
+		 * 
+		 * @param image L'image à modifier.
+		 * @param contraste Le niveau de contraste (-100 à +100).
+		 */
+		public void appliquerContraste(BufferedImage image, int contraste) {
+			if (this.historiqueModification != null && image != null) {
+				application.multimedia.iut.Metier.Colorisation.contraste(image, contraste);
+			}
+		}
+		
+		/**
+		 * Ajuste la luminosité de l'image.
+		 * 
+		 * @param image L'image à modifier.
+		 * @param luminosite Le niveau de luminosité (-255 à +255).
+		 */
+		public void appliquerLuminosite(BufferedImage image, int luminosite) {
+			if (this.historiqueModification != null && image != null) {
+				application.multimedia.iut.Metier.Colorisation.luminosite(image, luminosite);
+			}
+		}
+		
+		/**
+		 * Applique l'outil pot de peinture sur l'image.
+		 * 
+		 * @param image L'image à modifier.
+		 * @param couleurDest La couleur de remplissage (RGB).
+		 * @param distance La tolérance de couleur (0-441).
+		 * @param estContinue true pour remplissage continu, false pour global.
+		 * @param xOrig La coordonnée X du point de départ.
+		 * @param yOrig La coordonnée Y du point de départ.
+		 */
+		public void appliquerPotDePeinture(BufferedImage image, int couleurDest, int distance, boolean estContinue, int xOrig, int yOrig) {
+			if (this.historiqueModification != null && image != null) {
+				application.multimedia.iut.Metier.Colorisation.potDePeinture(image, couleurDest, distance, estContinue, xOrig, yOrig);
+			}
+		}
 	}
 }
