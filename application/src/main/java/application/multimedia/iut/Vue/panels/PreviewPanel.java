@@ -1,7 +1,7 @@
 /**
  * Panneau d'aperçu en temps réel.
  * Affiche le résultat généré du texte avec image.
- * 
+ *
  * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
  * @version 1.0
  */
