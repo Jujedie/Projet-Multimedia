@@ -222,6 +222,10 @@ public class ImageManager {
 		}
 		afficherImage();
 	}
+	
+	public void rafraichirAffichage() {
+		toile.repaint();
+	}
 
 	private CoucheImage coucheAuPoint(Point p) {
 		java.util.List<CoucheImage> couches = pileCouches.couches();

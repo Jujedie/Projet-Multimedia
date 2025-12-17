@@ -217,11 +217,8 @@ public class PaintPanel extends JPanel {
 	 * @param alpha L'intensité de la teinte (0-255).
 	 */
 	public void appliquerTeinte(int red, int green, int blue, int alpha) {
-		BufferedImage imageCourante = gestionnaireImages.obtenirImageCourante();
-		if (imageCourante != null) {
-			controleur.appliquerTeinte(imageCourante, red, green, blue, alpha);
-			gestionnaireImages.rafraichirAffichage();
-		}
+		controleur.appliquerTeinte(red, green, blue, alpha);
+		gestionnaireImages.rafraichirAffichage();
 	}
 	
 	/**
@@ -230,11 +227,8 @@ public class PaintPanel extends JPanel {
 	 * @param contraste Le niveau de contraste (-100 à +100).
 	 */
 	public void appliquerContraste(int contraste) {
-		BufferedImage imageCourante = gestionnaireImages.obtenirImageCourante();
-		if (imageCourante != null) {
-			controleur.appliquerContraste(imageCourante, contraste);
-			gestionnaireImages.rafraichirAffichage();
-		}
+		controleur.appliquerContraste(contraste);
+		gestionnaireImages.rafraichirAffichage();
 	}
 	
 	/**
@@ -243,11 +237,8 @@ public class PaintPanel extends JPanel {
 	 * @param luminosite Le niveau de luminosité (-255 à +255).
 	 */
 	public void appliquerLuminosite(int luminosite) {
-		BufferedImage imageCourante = gestionnaireImages.obtenirImageCourante();
-		if (imageCourante != null) {
-			controleur.appliquerLuminosite(imageCourante, luminosite);
-			gestionnaireImages.rafraichirAffichage();
-		}
+		controleur.appliquerLuminosite(luminosite);
+		gestionnaireImages.rafraichirAffichage();
 	}
 	
 	/**
@@ -260,10 +251,7 @@ public class PaintPanel extends JPanel {
 	 * @param yOrig La coordonnée Y du point de départ.
 	 */
 	public void appliquerPotDePeinture(int couleurDest, int distance, boolean estContinue, int xOrig, int yOrig) {
-		BufferedImage imageCourante = gestionnaireImages.obtenirImageCourante();
-		if (imageCourante != null) {
-			controleur.appliquerPotDePeinture(imageCourante, couleurDest, distance, estContinue, xOrig, yOrig);
-			gestionnaireImages.rafraichirAffichage();
-		}
+		controleur.appliquerPotDePeinture(couleurDest, distance, estContinue, xOrig, yOrig);
+		gestionnaireImages.rafraichirAffichage();
 	}
 }
