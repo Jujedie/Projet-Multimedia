@@ -264,9 +264,7 @@ public class MainControlleur {
 		// ========================================
 		
 		public void ajouterEcouteurCouleur(GestionnaireOutils.EcouteurCouleur ecouteur) {
-			if (this.historiqueModification != null){ 
-				gestionnaireOutils.ajouterEcouteurCouleur(ecouteur);
-			}
+		gestionnaireOutils.ajouterEcouteurCouleur(ecouteur);
 		}
 		
 		public boolean estEnDessin() {

@@ -66,11 +66,19 @@ public class GestionnaireOutils {
      */
     public void commencerDessin(BufferedImage image, int x, int y) {
         if (image == null) {
-            System.out.println("GestionnaireOutils.commencerDessin: image est null!");
             return;
         }
         
-        System.out.println("GestionnaireOutils.commencerDessin avec outil: " + outilActif + " à (" + x + ", " + y + ")");
+        // Gérer la pipette séparément car elle n'active pas le mode dessin continu
+        if (outilActif == OutilDessin.PIPETTE) {
+            Color couleur = pipette.preleverCouleur(image, x, y);
+            if (couleur != null) {
+                System.out.println("GestionnaireOutils - Pipette a prélevé: " + couleur);
+                definirCouleurActive(couleur);
+                System.out.println("GestionnaireOutils - definirCouleurActive appelé");
+            }
+            return;
+        }
         
         dernierPoint = new Point(x, y);
         dessinEnCours = true;
@@ -79,20 +87,11 @@ public class GestionnaireOutils {
             case PINCEAU:
                 pinceau.setCouleur(couleurActive);
                 pinceau.dessinerPoint(image, x, y);
-                System.out.println("Pinceau: point dessiné en " + couleurActive);
                 break;
             case GOMME:
                 // Forcer le blanc pur pour la gomme
                 gomme.setCouleurEffacement(new Color(255, 255, 255));
                 gomme.effacerPoint(image, x, y);
-                System.out.println("Gomme: point effacé");
-                break;
-            case PIPETTE:
-                Color couleur = pipette.preleverCouleur(image, x, y);
-                if (couleur != null) {
-                    System.out.println("Pipette - Couleur prélevée: " + couleur);
-                    definirCouleurActive(couleur);
-                }
                 break;
             default:
                 break;
@@ -101,9 +100,7 @@ public class GestionnaireOutils {
     
     /**
      * Continue une action de dessin vers une nouvelle position.
-     * @System.out.println("GestionnaireOutils.continuerDessin: " + outilActif + " de (" + dernierPoint.x + ", " + dernierPoint.y + ") à (" + x + ", " + y + ")");
-        
-        param image L'image sur laquelle dessiner.
+     * @param image L'image sur laquelle dessiner.
      * @param x Coordonnée X.
      * @param y Coordonnée Y.
      */
@@ -256,7 +253,7 @@ public class GestionnaireOutils {
      * @param nouvelleCouleur La nouvelle couleur choisie par la personne.
      */
     private void notifierChangementCouleur(Color nouvelleCouleur) {
-        System.out.println("Notification changement couleur: " + nouvelleCouleur + " vers " + ecouteursCouleur.size() + " écouteurs");
+        System.out.println("GestionnaireOutils - Notification de " + ecouteursCouleur.size() + " écouteur(s) avec couleur: " + nouvelleCouleur);
         for (EcouteurCouleur ecouteur : ecouteursCouleur) {
             ecouteur.couleurChangee(nouvelleCouleur);
         }
