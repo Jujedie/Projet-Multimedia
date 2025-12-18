@@ -65,16 +65,6 @@ public class ImageManagerVue {
 		this.parent = parent;
 		this.controleur = controleur;
 		
-		// Créer une image blanche vide au démarrage pour permettre le dessin
-		// Utiliser une taille plus grande (1920x1080 ou la taille préférée de la toile)
-		int largeur = Math.max(1920, toile.getPreferredSize().width);
-		int hauteur = Math.max(1080, toile.getPreferredSize().height);
-		creerImageVide(largeur, hauteur);
-		// Utiliser une taille plus grande (1920x1080 ou la taille préférée de la toile)
-		int largeur = Math.max(1920, toile.getPreferredSize().width);
-		int hauteur = Math.max(1080, toile.getPreferredSize().height);
-		creerImageVide(largeur, hauteur);
-		
 		installerRaccourcisClavier();
 	}
 
@@ -348,12 +338,30 @@ public class ImageManagerVue {
 					}
 				}
 				
-				if (outilActif != OutilDessin.SELECTION && outilActif != OutilDessin.REMPLISSAGE && outilActif != OutilDessin.TEXTE && !controleur.pileCouchesEstVide()) {
-					CoucheImage couche = controleur.getPileCouches().coucheActive();
-					if (couche != null) {
-						controleur.commencerDessin(couche.image, e.getX() - couche.x, e.getY() - couche.y);
-						toile.repaint();
-						return;
+				if (outilActif != OutilDessin.SELECTION && outilActif != OutilDessin.REMPLISSAGE) {
+					// Si aucune image n'existe, créer une image vide pour permettre le dessin
+					if (controleur.pileCouchesEstVide()) {
+						System.out.println("Création d'une image vide pour le dessin...");
+						creerImageVide(800, 600);
+					}
+					
+					if (!controleur.pileCouchesEstVide()) {
+						CoucheImage couche = controleur.getPileCouches().coucheActive();
+						if (couche != null) {
+							int xImage = e.getX() - couche.x;
+							int yImage = e.getY() - couche.y;
+							System.out.println("Clic souris: (" + e.getX() + ", " + e.getY() + "), Couche pos: (" + couche.x + ", " + couche.y + "), Coord image: (" + xImage + ", " + yImage + ")");
+							System.out.println("Taille image: " + couche.image.getWidth() + "x" + couche.image.getHeight());
+							
+							// Vérifier que les coordonnées sont dans l'image
+							if (xImage >= 0 && xImage < couche.image.getWidth() && yImage >= 0 && yImage < couche.image.getHeight()) {
+								controleur.commencerDessin(couche.image, xImage, yImage);
+								toile.repaint();
+							} else {
+								System.out.println("Coordonnées hors de l'image!");
+							}
+							return;
+						}
 					}
 				}
 				
@@ -406,6 +414,7 @@ public class ImageManagerVue {
 							controleur.continuerDessin(couche.image, xImage, yImage);
 							toile.repaint();
 						}
+						return;
 					}
 					return;
 				}
@@ -466,11 +475,11 @@ public class ImageManagerVue {
 	 * @param hauteur Hauteur de l'image.
 	 */
 	private void creerImageVide(int largeur, int hauteur) {
-		Dimension tailleToile = new Dimension(largeur, hauteur);
-		controleur.creerImageVide(largeur, hauteur, tailleToile);
-
+		System.out.println("Création d'une image vide " + largeur + "x" + hauteur);
+		controleur.creerImageVide(largeur, hauteur, obtenirTailleToile());
 		afficherImage();
 		toile.repaint();
+		System.out.println("Image vide créée, pile vide: " + controleur.pileCouchesEstVide());
 	}
 
 	/**

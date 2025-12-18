@@ -92,11 +92,13 @@ public class GestionnaireOutils {
             case PINCEAU:
                 pinceau.setCouleur(couleurActive);
                 pinceau.dessinerPoint(image, x, y);
+                System.out.println("Pinceau: point dessiné en " + couleurActive);
                 break;
             case GOMME:
                 // Forcer le blanc pur pour la gomme
                 gomme.setCouleurEffacement(new Color(255, 255, 255));
                 gomme.effacerPoint(image, x, y);
+                System.out.println("Gomme: point effacé");
                 break;
             default:
                 break;
@@ -105,7 +107,9 @@ public class GestionnaireOutils {
     
     /**
      * Continue une action de dessin vers une nouvelle position.
-     * @param image L'image sur laquelle dessiner.
+     * @System.out.println("GestionnaireOutils.continuerDessin: " + outilActif + " de (" + dernierPoint.x + ", " + dernierPoint.y + ") à (" + x + ", " + y + ")");
+        
+        param image L'image sur laquelle dessiner.
      * @param x Coordonnée X.
      * @param y Coordonnée Y.
      */
