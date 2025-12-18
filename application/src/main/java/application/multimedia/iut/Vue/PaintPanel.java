@@ -108,14 +108,14 @@ public class PaintPanel extends JPanel {
 		toile.setBackground(Color.WHITE);
 		toile.setOpaque(true);
 		toile.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-		
+
 		// Définir une taille préférée pour que la toile prenne tout l'espace
 		toile.setPreferredSize(new Dimension(2000, 2000));
-		
+
 		panneauDeroulement = new JScrollPane(toile);
 		panneauDeroulement.setBackground(Color.DARK_GRAY);
 		panneauDeroulement.getViewport().setBackground(Color.DARK_GRAY);
-		
+
 		gestionnaireImages = new ImageManagerVue(toile, this, controleur);
 		gestionnaireImages.activerDeplacementImage();
 	}

@@ -10,9 +10,13 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import application.multimedia.iut.Metier.AjoutContenu;
+import application.multimedia.iut.Vue.utils.ImageDialogs;
 import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
 
 /**
+ * Version métier du gestionnaire d'images : encapsule les opérations sur la
+ * PileCouches,
  * Version métier du gestionnaire d'images : encapsule les opérations sur la
  * PileCouches,
  * la SessionPlacement et le RenduToile sans aucune interaction UI.
@@ -36,6 +40,8 @@ public class ImageManagerMetier {
 	 * Crée une image vide blanche et l'ajoute comme couche de base.
 	 */
 	public void creerImageVide(int largeur, int hauteur, Dimension tailleToile) {
+		BufferedImage imageVide = new BufferedImage(Math.max(1, largeur), Math.max(1, hauteur),
+				BufferedImage.TYPE_INT_ARGB);
 		BufferedImage imageVide = new BufferedImage(Math.max(1, largeur), Math.max(1, hauteur),
 				BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2d = imageVide.createGraphics();
@@ -66,8 +72,14 @@ public class ImageManagerMetier {
 	 * placement.
 	 * Retourne true si le placement a été démarré, false si l'image a été ajoutée
 	 * directement.
+	 * Ajoute une image : si la pile est vide l'ajoute comme base, sinon démarre le
+	 * placement.
+	 * Retourne true si le placement a été démarré, false si l'image a été ajoutée
+	 * directement.
 	 */
 	public boolean ajouterImageCommeNouvelleCouche(BufferedImage image, Dimension tailleToile) {
+		if (image == null)
+			return false;
 		if (image == null)
 			return false;
 		if (pileCouches.estVide()) {
