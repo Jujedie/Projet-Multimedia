@@ -324,6 +324,28 @@ public class ImageManagerVue {
 					}
 				}
 				
+				// Gestion de l'outil texte
+				if (outilActif == OutilDessin.TEXTE && !controleur.pileCouchesEstVide()) {
+					CoucheImage couche = controleur.getPileCouches().coucheActive();
+					if (couche != null) {
+						int x = e.getX() - couche.x;
+						int y = e.getY() - couche.y;
+						// Vérifier que les coordonnées sont dans l'image
+						if (x >= 0 && x < couche.image.getWidth() && y >= 0 && y < couche.image.getHeight()) {
+							// Ouvrir une boîte de dialogue pour saisir le texte
+							String texte = JOptionPane.showInputDialog(parent, 
+								"Entrez le texte à écrire :", 
+								"Saisie de texte", 
+								JOptionPane.PLAIN_MESSAGE);
+							if (texte != null && !texte.trim().isEmpty()) {
+								controleur.dessinerTexte(couche.image, texte, x, y);
+								toile.repaint();
+							}
+						}
+						return;
+					}
+				}
+				
 				// Gestion du pot de peinture
 				if (outilActif == OutilDessin.REMPLISSAGE && !controleur.pileCouchesEstVide()) {
 					CoucheImage couche = controleur.getPileCouches().coucheActive();
