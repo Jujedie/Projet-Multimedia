@@ -15,8 +15,14 @@ import application.multimedia.iut.Vue.dialogs.TexteImageEditorDialog;
 import application.multimedia.iut.Vue.utils.ImageManagerVue;
 import application.multimedia.iut.Vue.utils.LucideIconLoader;
 import java.awt.*;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Panneau de dessin principal affichant et gérant les images.
@@ -28,10 +34,11 @@ public class PaintPanel extends JPanel {
 	private JScrollPane panneauDeroulement;
 	private ImageManagerVue gestionnaireImages;
 	private MainControlleur.Controleur controleur;
-	
+
 	/**
 	 * Constructeur du panneau de peinture.
 	 * Initialise l'interface et précharge les icônes.
+	 * 
 	 * @param controleur Le contrôleur central de l'application.
 	 */
 	private ToolBarBuilder toolBarBuilder;
@@ -39,27 +46,28 @@ public class PaintPanel extends JPanel {
 	public PaintPanel(MainControlleur.Controleur controleur) {
 		this.controleur = controleur;
 		setLayout(new BorderLayout());
-		
+
 		System.out.println("=== CONSTRUCTION DE PAINTPANEL ===");
 		new Thread(() -> LucideIconLoader.preloadCommonIcons()).start();
 		JPanel panneauHaut = creerPanneauSuperieur();
 		System.out.println("Panneau supérieur créé, toolBarBuilder = " + toolBarBuilder);
-		
+
 		creerToile();
 		System.out.println("Toile créée, gestionnaireImages = " + gestionnaireImages);
-		
-		// Connecter l'écouteur de couleur maintenant que gestionnaireImages est initialisé
+
+		// Connecter l'écouteur de couleur maintenant que gestionnaireImages est
+		// initialisé
 		if (toolBarBuilder != null) {
 			System.out.println("Appel de connecterEcouteurCouleur()...");
 			toolBarBuilder.connecterEcouteurCouleur();
 		} else {
 			System.out.println("ERREUR: toolBarBuilder est null!");
 		}
-		
+
 		add(panneauHaut, BorderLayout.NORTH);
 		add(panneauDeroulement, BorderLayout.CENTER);
 	}
-	
+
 	/**
 	 * Crée le panneau supérieur contenant la barre de menu et la barre d'outils.
 	 *
@@ -67,19 +75,19 @@ public class PaintPanel extends JPanel {
 	 */
 	private JPanel creerPanneauSuperieur() {
 		JPanel panneauHaut = new JPanel(new BorderLayout());
-		
+
 		MenuBarBuilder menuBuilder = new MenuBarBuilder(this);
 		JMenuBar menuBar = menuBuilder.creerMenuBar();
-		
+
 		toolBarBuilder = new ToolBarBuilder(this);
 		JToolBar barreOutils = toolBarBuilder.creerToolBar();
-		
+
 		panneauHaut.add(menuBar, BorderLayout.NORTH);
 		panneauHaut.add(barreOutils, BorderLayout.SOUTH);
-		
+
 		return panneauHaut;
 	}
-	
+
 	/**
 	 * Crée et configure la zone de dessin (toile) avec son gestionnaire d'images.
 	 */
@@ -98,26 +106,25 @@ public class PaintPanel extends JPanel {
 		toile.setBackground(Color.WHITE);
 		toile.setOpaque(true);
 		toile.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-		
+
 		// Définir une taille préférée pour que la toile prenne tout l'espace
 		toile.setPreferredSize(new Dimension(2000, 2000));
-		
+
 		panneauDeroulement = new JScrollPane(toile);
 		panneauDeroulement.setBackground(Color.DARK_GRAY);
 		panneauDeroulement.getViewport().setBackground(Color.DARK_GRAY);
-		
+
 		gestionnaireImages = new ImageManagerVue(toile, this, controleur);
 		gestionnaireImages.activerDeplacementImage();
 	}
-	
-	
+
 	/**
 	 * Ouvre une boîte de dialogue pour charger une ou plusieurs images.
 	 */
 	public void ouvrirFichier() {
 		gestionnaireImages.ouvrirFichier();
 	}
-	
+
 	/**
 	 * Enregistre l'image composite actuelle.
 	 *
@@ -126,7 +133,7 @@ public class PaintPanel extends JPanel {
 	public void enregistrerFichier(boolean nouveauFichier) {
 		gestionnaireImages.enregistrerFichier(nouveauFichier);
 	}
-	
+
 	/**
 	 * Applique un facteur de zoom sur l'image courante.
 	 *
@@ -135,14 +142,14 @@ public class PaintPanel extends JPanel {
 	public void zoomer(double facteur) {
 		gestionnaireImages.zoomer(facteur);
 	}
-	
+
 	/**
 	 * Réinitialise le niveau de zoom à 100%.
 	 */
 	public void reinitialiserZoom() {
 		gestionnaireImages.reinitialiserZoom();
 	}
-	
+
 	/**
 	 * Obtient l'image de la couche actuellement active.
 	 *
@@ -151,7 +158,7 @@ public class PaintPanel extends JPanel {
 	public BufferedImage obtenirImageCourante() {
 		return gestionnaireImages.obtenirImageCourante();
 	}
-	
+
 	/**
 	 * Définit une nouvelle image comme couche active.
 	 * Remplace toutes les couches existantes.
@@ -161,7 +168,7 @@ public class PaintPanel extends JPanel {
 	public void definirImageCourante(BufferedImage image) {
 		gestionnaireImages.definirImageCourante(image);
 	}
-	
+
 	/**
 	 * Ouvre la boîte de dialogue de création de texte avec image de fond.
 	 * Ajoute l'image générée si l'utilisateur valide.
@@ -170,7 +177,7 @@ public class PaintPanel extends JPanel {
 		Frame frame = (Frame) SwingUtilities.getWindowAncestor(this);
 		TexteImageEditorDialog dialogue = new TexteImageEditorDialog(frame);
 		dialogue.setVisible(true);
-		
+
 		if (dialogue.estValide()) {
 			BufferedImage imageGeneree = dialogue.getImageGeneree();
 			if (imageGeneree != null) {
@@ -178,7 +185,7 @@ public class PaintPanel extends JPanel {
 			}
 		}
 	}
-	
+
 	/**
 	 * Active un outil de dessin.
 	 *
@@ -191,7 +198,7 @@ public class PaintPanel extends JPanel {
 			toolBarBuilder.synchroniserSelectionOutil(outil);
 		}
 	}
-	
+
 	/**
 	 * Définit la couleur de dessin active.
 	 *
@@ -200,7 +207,7 @@ public class PaintPanel extends JPanel {
 	public void definirCouleurDessin(java.awt.Color couleur) {
 		gestionnaireImages.definirCouleur(couleur);
 	}
-	
+
 	/**
 	 * Supprime tout le contenu de l'affichage.
 	 */
@@ -208,7 +215,7 @@ public class PaintPanel extends JPanel {
 		controleur.suppressionTotale();
 		gestionnaireImages.rafraichirAffichage();
 	}
-	
+
 	/**
 	 * Enregistre un écouteur pour les changements de couleur (pipette).
 	 *
@@ -217,11 +224,11 @@ public class PaintPanel extends JPanel {
 	public void enregistrerEcouteurCouleur(GestionnaireOutils.EcouteurCouleur ecouteur) {
 		controleur.ajouterEcouteurCouleur(ecouteur);
 	}
-	
+
 	// ========================================
 	// MÉTHODES D'ÉDITION
 	// ========================================
-	
+
 	/**
 	 * Annule la dernière action effectuée.
 	 */
@@ -229,7 +236,7 @@ public class PaintPanel extends JPanel {
 		controleur.annuler();
 		gestionnaireImages.rafraichirAffichage();
 	}
-	
+
 	/**
 	 * Refait la dernière action annulée.
 	 */
@@ -237,7 +244,7 @@ public class PaintPanel extends JPanel {
 		controleur.refaire();
 		gestionnaireImages.rafraichirAffichage();
 	}
-	
+
 	/**
 	 * Efface tout le contenu de l'image courante.
 	 */
@@ -251,14 +258,14 @@ public class PaintPanel extends JPanel {
 			gestionnaireImages.rafraichirAffichage();
 		}
 	}
-	
+
 	/**
 	 * Ouvre le dialogue pour créer du texte avec une image.
 	 */
 	public void ouvrirDialogueTexteImage() {
 		TexteImageEditorDialog dialog = new TexteImageEditorDialog((Frame) SwingUtilities.getWindowAncestor(this));
 		dialog.setVisible(true);
-		
+
 		if (dialog.estValide()) {
 			BufferedImage imageTexte = dialog.getImageGeneree();
 			if (imageTexte != null) {
@@ -268,11 +275,11 @@ public class PaintPanel extends JPanel {
 			}
 		}
 	}
-	
+
 	// ========================================
 	// MÉTHODES DE FORMAT
 	// ========================================
-	
+
 	/**
 	 * Effectue un retournement horizontal de l'image courante.
 	 */
@@ -286,7 +293,7 @@ public class PaintPanel extends JPanel {
 			}
 		}
 	}
-	
+
 	/**
 	 * Effectue un retournement vertical de l'image courante.
 	 */
@@ -300,22 +307,24 @@ public class PaintPanel extends JPanel {
 			}
 		}
 	}
-	
+
 	/**
 	 * Ouvre un dialogue pour effectuer une rotation de l'image courante.
 	 */
 	public void rotation() {
-		String input = JOptionPane.showInputDialog(this, "Angle de rotation (degrés):", "Rotation", JOptionPane.QUESTION_MESSAGE);
+		String input = JOptionPane.showInputDialog(this, "Angle de rotation (degrés):", "Rotation",
+				JOptionPane.QUESTION_MESSAGE);
 		if (input != null && !input.trim().isEmpty()) {
 			try {
 				double angle = Double.parseDouble(input.trim());
 				rotation(angle);
 			} catch (NumberFormatException e) {
-				JOptionPane.showMessageDialog(this, "Veuillez entrer un nombre valide.", "Erreur", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, "Veuillez entrer un nombre valide.", "Erreur",
+						JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
-	
+
 	/**
 	 * Effectue une rotation de l'image courante.
 	 * 
@@ -331,7 +340,7 @@ public class PaintPanel extends JPanel {
 			}
 		}
 	}
-	
+
 	/**
 	 * Ouvre un dialogue pour redimensionner l'image courante.
 	 */
@@ -341,69 +350,170 @@ public class PaintPanel extends JPanel {
 			JOptionPane.showMessageDialog(this, "Aucune image à redimensionner.", "Erreur", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		
+
 		JPanel panel = new JPanel(new GridLayout(2, 2, 5, 5));
 		JTextField largeurField = new JTextField(String.valueOf(imageCourante.getWidth()));
 		JTextField hauteurField = new JTextField(String.valueOf(imageCourante.getHeight()));
-		
+
 		panel.add(new JLabel("Largeur:"));
 		panel.add(largeurField);
 		panel.add(new JLabel("Hauteur:"));
 		panel.add(hauteurField);
-		
-		int result = JOptionPane.showConfirmDialog(this, panel, "Redimensionner l'image", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		
+
+		int result = JOptionPane.showConfirmDialog(this, panel, "Redimensionner l'image", JOptionPane.OK_CANCEL_OPTION,
+				JOptionPane.PLAIN_MESSAGE);
+
 		if (result == JOptionPane.OK_OPTION) {
 			try {
 				int nouvelleLargeur = Integer.parseInt(largeurField.getText().trim());
 				int nouvelleHauteur = Integer.parseInt(hauteurField.getText().trim());
-				
+
 				if (nouvelleLargeur > 0 && nouvelleHauteur > 0) {
-					BufferedImage nouvelleImage = controleur.redimensionner(imageCourante, nouvelleLargeur, nouvelleHauteur);
+					BufferedImage nouvelleImage = controleur.redimensionner(imageCourante, nouvelleLargeur,
+							nouvelleHauteur);
 					if (nouvelleImage != null) {
 						gestionnaireImages.definirImageCourante(nouvelleImage);
 						gestionnaireImages.rafraichirAffichage();
 					}
 				} else {
-					JOptionPane.showMessageDialog(this, "Les dimensions doivent être positives.", "Erreur", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(this, "Les dimensions doivent être positives.", "Erreur",
+							JOptionPane.ERROR_MESSAGE);
 				}
 			} catch (NumberFormatException e) {
-				JOptionPane.showMessageDialog(this, "Veuillez entrer des nombres valides.", "Erreur", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, "Veuillez entrer des nombres valides.", "Erreur",
+						JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
-	
+
 	/**
-	 * Ouvre un dialogue pour fusionner deux images horizontalement.
+	 * Ouvre un dialogue pour choisir une deuxième image, puis demande le nombre
+	 * de pixels de fondu avant de fusionner horizontalement avec l'image courante.
 	 */
 	public void fusionHorizontale() {
-		JOptionPane.showMessageDialog(this, "Fonctionnalité de fusion horizontale à implémenter.", "Info", JOptionPane.INFORMATION_MESSAGE);
+		BufferedImage imageBase = gestionnaireImages.obtenirImageCourante();
+		if (imageBase == null) {
+			JOptionPane.showMessageDialog(this, "Aucune image ouverte.", "Erreur", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setDialogTitle("Choisir l'image à fusionner");
+		fileChooser.setFileFilter(new FileNameExtensionFilter("Images (JPG, PNG)", "jpg", "png", "jpeg"));
+
+		int resultat = fileChooser.showOpenDialog(this);
+
+		if (resultat == JFileChooser.APPROVE_OPTION) {
+			try {
+				File fichierSelectionne = fileChooser.getSelectedFile();
+				BufferedImage imageAFusionner = ImageIO.read(fichierSelectionne);
+
+				if (imageAFusionner == null) {
+					JOptionPane.showMessageDialog(this, "Impossible de lire l'image sélectionnée.", "Erreur",
+							JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+				String input = JOptionPane.showInputDialog(this,
+						"Entrez le nombre de pixels de superposition (overlap) :",
+						"Paramètres de fusion",
+						JOptionPane.QUESTION_MESSAGE);
+
+				if (input != null && !input.trim().isEmpty()) {
+					try {
+						int overlap = Integer.parseInt(input);
+						BufferedImage nouvelleImage = controleur.fusionHorizontale(imageBase, imageAFusionner, overlap);
+						gestionnaireImages.definirImageCourante(nouvelleImage);
+						gestionnaireImages.rafraichirAffichage();
+
+					} catch (NumberFormatException e) {
+						JOptionPane.showMessageDialog(this, "Le nombre de pixels doit être un entier valide.", "Erreur",
+								JOptionPane.ERROR_MESSAGE);
+					} catch (IllegalArgumentException e) {
+						JOptionPane.showMessageDialog(this, "Erreur de fusion : " + e.getMessage(), "Erreur",
+								JOptionPane.ERROR_MESSAGE);
+					}
+				}
+
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(this, "Erreur lors de l'ouverture du fichier : " + e.getMessage(),
+						"Erreur E/S", JOptionPane.ERROR_MESSAGE);
+			}
+		}
 	}
-	
+
 	/**
 	 * Ouvre un dialogue pour fusionner deux images verticalement.
 	 */
-	public void fusionVerticale() {
-		JOptionPane.showMessageDialog(this, "Fonctionnalité de fusion verticale à implémenter.", "Info", JOptionPane.INFORMATION_MESSAGE);
+	public void fusionVerticale()  {
+		BufferedImage imageBase = gestionnaireImages.obtenirImageCourante();
+		if (imageBase == null) {
+			JOptionPane.showMessageDialog(this, "Aucune image ouverte.", "Erreur", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setDialogTitle("Choisir l'image à fusionner");
+		fileChooser.setFileFilter(new FileNameExtensionFilter("Images (JPG, PNG)", "jpg", "png", "jpeg"));
+
+		int resultat = fileChooser.showOpenDialog(this);
+
+		if (resultat == JFileChooser.APPROVE_OPTION) {
+			try {
+				File fichierSelectionne = fileChooser.getSelectedFile();
+				BufferedImage imageAFusionner = ImageIO.read(fichierSelectionne);
+
+				if (imageAFusionner == null) {
+					JOptionPane.showMessageDialog(this, "Impossible de lire l'image sélectionnée.", "Erreur",
+							JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+				String input = JOptionPane.showInputDialog(this,
+						"Entrez le nombre de pixels de superposition (overlap) :",
+						"Paramètres de fusion",
+						JOptionPane.QUESTION_MESSAGE);
+
+				if (input != null && !input.trim().isEmpty()) {
+					try {
+						int overlap = Integer.parseInt(input);
+						BufferedImage nouvelleImage = controleur.fusionVerticale(imageBase, imageAFusionner, overlap);
+						gestionnaireImages.definirImageCourante(nouvelleImage);
+						gestionnaireImages.rafraichirAffichage();
+
+					} catch (NumberFormatException e) {
+						JOptionPane.showMessageDialog(this, "Le nombre de pixels doit être un entier valide.", "Erreur",
+								JOptionPane.ERROR_MESSAGE);
+					} catch (IllegalArgumentException e) {
+						JOptionPane.showMessageDialog(this, "Erreur de fusion : " + e.getMessage(), "Erreur",
+								JOptionPane.ERROR_MESSAGE);
+					}
+				}
+
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(this, "Erreur lors de l'ouverture du fichier : " + e.getMessage(),
+						"Erreur E/S", JOptionPane.ERROR_MESSAGE);
+			}
+		}
 	}
-	
+
 	// ========================================
 	// MÉTHODES DE COLORISATION
 	// ========================================
-	
+
 	/**
 	 * Applique une teinte de couleur sur l'image courante.
 	 * 
-	 * @param red La composante rouge de la teinte (0-255).
+	 * @param red   La composante rouge de la teinte (0-255).
 	 * @param green La composante verte de la teinte (0-255).
-	 * @param blue La composante bleue de la teinte (0-255).
+	 * @param blue  La composante bleue de la teinte (0-255).
 	 * @param alpha L'intensité de la teinte (0-255).
 	 */
 	public void appliquerTeinte(int red, int green, int blue, int alpha) {
 		controleur.appliquerTeinte(red, green, blue, alpha);
 		gestionnaireImages.rafraichirAffichage();
 	}
-	
+
 	/**
 	 * Ajuste le contraste de l'image courante.
 	 * 
@@ -413,7 +523,7 @@ public class PaintPanel extends JPanel {
 		controleur.appliquerContraste(contraste);
 		gestionnaireImages.rafraichirAffichage();
 	}
-	
+
 	/**
 	 * Ajuste la luminosité de l'image courante.
 	 * 
@@ -423,15 +533,15 @@ public class PaintPanel extends JPanel {
 		controleur.appliquerLuminosite(luminosite);
 		gestionnaireImages.rafraichirAffichage();
 	}
-	
+
 	/**
 	 * Applique l'outil pot de peinture sur l'image courante.
 	 * 
 	 * @param couleurDest La couleur de remplissage (RGB).
-	 * @param distance La tolérance de couleur (0-441).
+	 * @param distance    La tolérance de couleur (0-441).
 	 * @param estContinue true pour remplissage continu, false pour global.
-	 * @param xOrig La coordonnée X du point de départ.
-	 * @param yOrig La coordonnée Y du point de départ.
+	 * @param xOrig       La coordonnée X du point de départ.
+	 * @param yOrig       La coordonnée Y du point de départ.
 	 */
 	public void appliquerPotDePeinture(int couleurDest, int distance, boolean estContinue, int xOrig, int yOrig) {
 		controleur.appliquerPotDePeinture(couleurDest, distance, estContinue, xOrig, yOrig);

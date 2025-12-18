@@ -60,16 +60,13 @@ public class MainControlleur {
 	 * Délègue la logique métier aux classes appropriées.
 	 */
 	public static class Controleur {
-		// ========== Journaux ==========
 		private Journaux historiqueModification;
 
-		// ========== MODÈLE - Gestion des images ==========
 		private final PileCouches pileCouches;
 		private final SessionPlacement sessionPlacement;
 		private final RenduToile renduToile;
 		private final ImageManagerMetier imageManagerMetier;
-		
-		// ========== MODÈLE - Gestion des outils ==========
+
 		private final GestionnaireOutils gestionnaireOutils;
 		
 		/**
@@ -170,6 +167,14 @@ public class MainControlleur {
 			if (image != null) {
 				updateJournal(image);
 			}
+		}
+
+		public BufferedImage fusionHorizontale(BufferedImage imgGauche, BufferedImage imgDroite, int nbPixels) {
+			return imageManagerMetier.fusionHorizontale(imgGauche, imgDroite, nbPixels);
+		}
+
+		public BufferedImage fusionVerticale(BufferedImage imgHaut, BufferedImage imgBas, int nbPixels) {
+			return imageManagerMetier.fusionVerticale(imgHaut, imgBas, nbPixels);
 		}
 		
 		public void enregistrerFichier(File fichier) throws IOException {
