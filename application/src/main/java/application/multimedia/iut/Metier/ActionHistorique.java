@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.awt.Font;
 
 import application.multimedia.iut.Controleur;
 import application.multimedia.iut.Metier.outils.OutilDessin;
@@ -109,7 +110,33 @@ public class ActionHistorique {
 				controleur.definirCouleurActive((Color) this.parametres[0]);
 			}
 
-			
+			case CHANGER_EPAISSEUR -> {
+					controleur.setEpaisseurPinceau((int) this.parametres[0]);
+				}
+
+			case CHANGER_GOMME -> {
+					controleur.setTailleGomme((int) this.parametres[0]);
+				}
+
+			case CHANGER_POLICE_TEXTE -> {
+					controleur.setPoliceTexte((Font) this.parametres[0]);
+				}
+
+			case AJOUTER_ECOUTEUR -> {
+					controleur.ajouterEcouteurCouleur((GestionnaireOutils.EcouteurCouleur) this.parametres[0]);
+				}
+
+			case APPLIQUER_TEINTE -> {
+					controleur.appliquerTeinte((int) this.parametres[0],(int) this.parametres[1],(int) this.parametres[2],(int) this.parametres[3]);
+				}
+
+			case APPLIQUER_CONTRASTE -> {
+					controleur.appliquerContraste((int) this.parametres[0]);
+				}
+
+			case APPLIQUER_LUMINOSITE -> {
+					controleur.appliquerLuminosite((int) this.parametres[0]);
+				}
 			
 			default -> throw new UnsupportedOperationException("Action non prise en charge : " + this.actionType);
 		}
