@@ -20,8 +20,6 @@ import java.io.IOException;
 
 import javax.swing.SwingUtilities;
 
-import application.multimedia.iut.Metier.ActionHistorique;
-import application.multimedia.iut.Metier.ActionTypeEnum;
 import application.multimedia.iut.Metier.Colorisation;
 import application.multimedia.iut.Metier.GestionnaireOutils;
 import application.multimedia.iut.Metier.Journaux;
@@ -63,32 +61,21 @@ public class Controleur {
 		this.gestionnaireOutils = new GestionnaireOutils();
 	}
 
-	public void ReinitialisationControlleur(){
-		// Initialisation du modèle de gestion d'images
-		this.pileCouches = new PileCouches();
-		this.sessionPlacement = new SessionPlacement();
-		this.renduToile = new RenduToile();
-		this.imageManagerMetier = new ImageManagerMetier(pileCouches, sessionPlacement, renduToile);
-
-		// Initialisation du gestionnaire d'outils
-		this.gestionnaireOutils = new GestionnaireOutils();
-	}
-
 	// ========================================
 	// GESTION DU JOURNAL D'UNDO/REDO
 	// ========================================
-
-	public void updateJournal(BufferedImage image){ this.historiqueModification = new Journaux(image,this);}
 	
 	public void retourEnArriere(){
 		if (this.historiqueModification != null){
-			this.historiqueModification.retourEnArriere();
+			BufferedImage image = this.historiqueModification.retourEnArriere();
+			imageManagerMetier.definirImageCourante(image, new Dimension(image.getWidth(), image.getHeight()));
 		}
 	}
 
 	public void retourEnAvant(){
 		if (this.historiqueModification != null){
-			this.historiqueModification.retourEnAvant();
+			BufferedImage image = this.historiqueModification.retourEnAvant();
+			imageManagerMetier.definirImageCourante(image, new Dimension(image.getWidth(), image.getHeight()));
 		}
 	}
 
@@ -114,11 +101,12 @@ public class Controleur {
 		return renduToile;
 	}
 
+	public ImageManagerMetier getImageManagerMetier() {
+		return imageManagerMetier;
+	}
+
 	public void peindre(Graphics g) {
 		renduToile.peindre(g, pileCouches, sessionPlacement);
-
-		ActionHistorique actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.PEINDRE, new Object[]{g});
-		historiqueModification.ajouterActionHistorique(actionHistorique);
 	}
 
 	
@@ -126,44 +114,31 @@ public class Controleur {
 		pileCouches.vider();
 		sessionPlacement.annuler();
 		gestionnaireOutils.terminerDessin();
-
-		ActionHistorique actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.SUPPRESSION_TOTALE, new Object[]{});
-		historiqueModification.ajouterActionHistorique(actionHistorique);
 	}
 
 
 	public void definirImageCourante(BufferedImage image, Dimension tailleToile) {
 		imageManagerMetier.definirImageCourante(image, tailleToile);
 
-		updateJournal(image);
+		historiqueModification.ajouterImage(obtenirImageCourante());
 	}
 
 	public void demarrerPlacement(BufferedImage img, Dimension tailleToile) {
 		imageManagerMetier.demarrerPlacement(img, tailleToile);
 
-		ActionHistorique actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.DEBUT_PLACEMENT, new Object[]{img,tailleToile});
-		historiqueModification.ajouterActionHistorique(actionHistorique);
+		historiqueModification.ajouterImage(obtenirImageCourante());
 	}
 
 	public boolean sessionPlacementValide() {
-		ActionHistorique actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.SESSION_PLACEMENT_VALIDE, new Object[]{});
-		historiqueModification.ajouterActionHistorique(actionHistorique);
-
 		return imageManagerMetier.validerPlacement();		
 	}
 
 	public void zoomer(double facteur) {
 		imageManagerMetier.zoomer(facteur);
-
-		ActionHistorique actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.ZOOMER, new Object[]{facteur});
-		historiqueModification.ajouterActionHistorique(actionHistorique);
 	}
 
 	public void reinitialiserZoom() {
 		imageManagerMetier.reinitialiserZoom();
-
-		ActionHistorique actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.REINITIALISER_ZOOM, new Object[]{});
-		historiqueModification.ajouterActionHistorique(actionHistorique);
 	}
 
 	public BufferedImage obtenirImageCourante() {
@@ -173,15 +148,13 @@ public class Controleur {
 	public void ajouterImageCommeNouvelleCouche(BufferedImage image, Dimension tailleToile) {
 		imageManagerMetier.ajouterImageCommeNouvelleCouche(image, tailleToile);
 
-		ActionHistorique actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.AJOUTER_IMAGE_NOUV_COUCHE, new Object[]{image,tailleToile});
-		historiqueModification.ajouterActionHistorique(actionHistorique);
+		historiqueModification.ajouterImage(obtenirImageCourante());
 	}
 	
 	public void ajouterImageAvecChoix(BufferedImage image, LoadChoice choix, Dimension tailleToile) {
 		imageManagerMetier.ajouterImageAvecChoix(image, choix, tailleToile);
 
-		ActionHistorique actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.AJOUTER_IMAGE_AVEC_CHOIX, new Object[]{image,choix,tailleToile});
-		historiqueModification.ajouterActionHistorique(actionHistorique);
+		historiqueModification.ajouterImage(obtenirImageCourante());
 	}
 
 	public CoucheImage coucheAuPoint(Point p) {
@@ -191,7 +164,8 @@ public class Controleur {
 	public void creerImageVide(int largeur, int hauteur, Dimension tailleToile) {
 		imageManagerMetier.creerImageVide(largeur, hauteur, tailleToile);
 
-		updateJournal(obtenirImageCourante());
+		historiqueModification = new Journaux(this);
+		historiqueModification.ajouterImage(obtenirImageCourante());
 	}
 	
 	public void enregistrerFichier(File fichier) throws IOException {
@@ -201,7 +175,8 @@ public class Controleur {
 	public BufferedImage ouvrirFichier(File fichier, LoadChoice choix, Dimension tailleToile) throws IOException {
 		imageManagerMetier.ouvrirFichier(fichier, choix, tailleToile);
 
-		updateJournal(obtenirImageCourante());
+		historiqueModification = new Journaux(this);
+		historiqueModification.ajouterImage(obtenirImageCourante());
 
 		return obtenirImageCourante();
 	}
@@ -215,46 +190,27 @@ public class Controleur {
 	// ========================================
 	
 	public void commencerDessin(BufferedImage image, int x, int y) {
-		if (this.historiqueModification != null){ 
-			gestionnaireOutils.commencerDessin(image, x, y); 
-
-			var actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.DEBUT_DESSIN, new Object[]{image, x, y});
-			this.historiqueModification.ajouterActionHistorique(actionHistorique);
-		}
+		gestionnaireOutils.commencerDessin(image, x, y);
 	}
 	
 	public void continuerDessin(BufferedImage image, int x, int y) {
-		if (this.historiqueModification != null){ 
-			gestionnaireOutils.continuerDessin(image, x, y); 
-
-			var actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.CONTINUER_DESSIN, new Object[]{image, x, y});
-			this.historiqueModification.ajouterActionHistorique(actionHistorique);
-		}
+		gestionnaireOutils.continuerDessin(image, x, y);
 	}
 	
 	public void terminerDessin() {
-		if (this.historiqueModification != null){  
-			gestionnaireOutils.terminerDessin(); 
+		gestionnaireOutils.terminerDessin();
 
-			var actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.TERMINER_DESSIN, new Object[]{});
-			this.historiqueModification.ajouterActionHistorique(actionHistorique);
-		}
+		historiqueModification.ajouterImage(obtenirImageCourante());
 	}
 	
 	public void dessinerTexte(BufferedImage image, String texte, int x, int y) {
-		if (this.historiqueModification != null){ 
-			gestionnaireOutils.dessinerTexte(image, texte, x, y);
+		gestionnaireOutils.dessinerTexte(image, texte, x, y);
 
-			var actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.DESSINER_TEXTE, new Object[]{texte,x,y});
-			this.historiqueModification.ajouterActionHistorique(actionHistorique);
-		}
+		historiqueModification.ajouterImage(obtenirImageCourante());
 	}
 	
 	public void setOutilActif(OutilDessin outil) {
 		gestionnaireOutils.setOutilActif(outil);
-
-		var actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.CHANGER_OUTIL, new Object[]{outil});
-		this.historiqueModification.ajouterActionHistorique(actionHistorique);
 	}
 	
 	public OutilDessin getOutilActif() {
@@ -267,9 +223,6 @@ public class Controleur {
 	
 	public void definirCouleurActive(Color couleur) {
 		gestionnaireOutils.definirCouleurActive(couleur);
-
-		var actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.CHANGER_COULEUR, new Object[]{couleur});
-		this.historiqueModification.ajouterActionHistorique(actionHistorique);
 	}
 	
 	public Color getCouleurActive() {
@@ -281,12 +234,7 @@ public class Controleur {
 	// ========================================
 	
 	public void setEpaisseurPinceau(int epaisseur) {
-		if (this.historiqueModification != null){ 
-			gestionnaireOutils.setEpaisseurPinceau(epaisseur);
-
-			var actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.CHANGER_EPAISSEUR, new Object[]{epaisseur});
-			this.historiqueModification.ajouterActionHistorique(actionHistorique);
-		}
+		gestionnaireOutils.setEpaisseurPinceau(epaisseur);
 	}
 	
 	public int getEpaisseurPinceau() {
@@ -294,25 +242,15 @@ public class Controleur {
 	}
 	
 	public void setTailleGomme(int taille) {
-		if (this.historiqueModification != null){ 
-			gestionnaireOutils.setTailleGomme(taille);
-
-			var actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.CHANGER_GOMME, new Object[]{taille});
-			this.historiqueModification.ajouterActionHistorique(actionHistorique);
-		}
+		gestionnaireOutils.setTailleGomme(taille);
 	}
 	
 	public int getTailleGomme() {
 		return gestionnaireOutils.getTailleGomme();
 	}
 	
-	public void setPoliceTexte(Font police) {
-		if (this.historiqueModification != null){ 
-			gestionnaireOutils.setPoliceTexte(police);
-
-			var actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.CHANGER_POLICE_TEXTE, new Object[]{police});
-			this.historiqueModification.ajouterActionHistorique(actionHistorique);
-		}
+	public void setPoliceTexte(Font police) { 
+		gestionnaireOutils.setPoliceTexte(police);
 	}
 	
 	public Font getPoliceTexte() {
@@ -324,12 +262,7 @@ public class Controleur {
 	// ========================================
 	
 	public void ajouterEcouteurCouleur(GestionnaireOutils.EcouteurCouleur ecouteur) {
-		if (this.historiqueModification != null){ 
-			gestionnaireOutils.ajouterEcouteurCouleur(ecouteur);
-
-			var actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.AJOUTER_ECOUTEUR, new Object[]{ecouteur});
-			this.historiqueModification.ajouterActionHistorique(actionHistorique);
-		}
+		gestionnaireOutils.ajouterEcouteurCouleur(ecouteur);
 	}
 	
 	public boolean estEnDessin() {
@@ -353,8 +286,7 @@ public class Controleur {
 		if (image != null) {
 			Colorisation.teinter(image, red, green, blue, alpha);
 
-			ActionHistorique actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.APPLIQUER_TEINTE, new Object[]{red, green, blue, alpha});
-			this.historiqueModification.ajouterActionHistorique(actionHistorique);
+			historiqueModification.ajouterImage(obtenirImageCourante());
 		}
 	}
 	
@@ -368,8 +300,7 @@ public class Controleur {
 		if (image != null) {
 			Colorisation.contraste(image, contraste);
 
-			ActionHistorique actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.APPLIQUER_CONTRASTE, new Object[]{contraste});
-			this.historiqueModification.ajouterActionHistorique(actionHistorique);
+			historiqueModification.ajouterImage(obtenirImageCourante());
 		}
 	}
 	
@@ -383,8 +314,7 @@ public class Controleur {
 		if (image != null) {
 			Colorisation.luminosite(image, luminosite);
 
-			ActionHistorique actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.APPLIQUER_LUMINOSITE, new Object[]{luminosite});
-			this.historiqueModification.ajouterActionHistorique(actionHistorique);
+			historiqueModification.ajouterImage(obtenirImageCourante());
 		}
 	}
 	
@@ -401,9 +331,6 @@ public class Controleur {
 		BufferedImage image = imageManagerMetier.obtenirImageCourante();
 		if (image != null) {
 			Colorisation.potDePeinture(image, couleurDest, distance, estContinue, xOrig, yOrig);
-
-			ActionHistorique actionHistorique = ActionHistorique.creerActionHistorique(ActionTypeEnum.PEINDRE, new Object[]{couleurDest, distance, estContinue, xOrig, yOrig});
-			this.historiqueModification.ajouterActionHistorique(actionHistorique);
 		}
 	}
 

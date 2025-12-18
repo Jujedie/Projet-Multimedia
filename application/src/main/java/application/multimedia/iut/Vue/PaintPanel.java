@@ -261,9 +261,11 @@ public class PaintPanel extends JPanel {
 
 	public void annulerDerniereAction() {
 		controleur.retourEnArriere();
+		gestionnaireImages.rafraichirAffichage();
 	}
 
 	public void refaireDerniereAction() {
 		controleur.retourEnAvant();
+		gestionnaireImages.rafraichirAffichage();
 	}
 }

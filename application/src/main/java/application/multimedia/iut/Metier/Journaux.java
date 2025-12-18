@@ -8,6 +8,7 @@
 package application.multimedia.iut.Metier;
 
 import java.awt.image.BufferedImage;
+import java.awt.Dimension;
 import java.util.ArrayList;
 
 import application.multimedia.iut.Controleur;
@@ -17,92 +18,65 @@ import application.multimedia.iut.Controleur;
  * Permet d'annuler et de rétablir les modifications d'images.
  */
 public class Journaux {
-	
-	private ArrayList<ActionHistorique> journauxHistorique;
-	private BufferedImage imageInitiale;
-	private int           indexAction;
-	private Controleur    controleur;
+	public  final int MAX_HISTORIQUE = 20;
 
-	public Journaux(BufferedImage imageInitiale, Controleur controleur) {
-		this.journauxHistorique = new ArrayList<ActionHistorique>();
-		this.imageInitiale     = imageInitiale;
-		this.indexAction       = -1;
-		this.controleur        = controleur;
+	private final ArrayList<BufferedImage> historique;
+	private int                            indexImage;
+
+	public Journaux(Controleur controleur) {
+		this.historique = new ArrayList<BufferedImage>();
+		this.indexImage = -1;
 	}
 
-	public ArrayList<ActionHistorique> getJournauxHistorique() { return journauxHistorique;	}
-	public BufferedImage getImageInitiale() { return imageInitiale;	}
-	public int getIndexAction() { return indexAction; }
+	public ArrayList<BufferedImage> getHistorique() { return historique;	}
+	public int getIndexImage() { return indexImage; }
 
-	public void setIndexAction(int indexAction) { 
-		if (indexAction < -1) {	this.indexAction = -1;	} 
+	public void setIndexAction(int indexImage) { 
+		if (indexImage < -1) {	this.indexImage = -1;	} 
 		else {
-			if (indexAction >= journauxHistorique.size()) {
-				this.indexAction = journauxHistorique.size() - 1;
+			if (indexImage >= historique.size()) {
+				this.indexImage = historique.size() - 1;
 			}
 			else {
-				this.indexAction = indexAction; 
+				this.indexImage = indexImage; 
 			}
 		}
 	}
 
-	public void ajouterActionHistorique(ActionHistorique actionHistorique) {
-		// Supprimer les actions futures si on ajoute une nouvelle action
-		while (journauxHistorique.size() > indexAction + 1) {
-			journauxHistorique.remove(journauxHistorique.size() - 1);
+	public void ajouterImage(BufferedImage image) {
+		image = copierImage(image);
+		if (indexImage < historique.size() - 1) {
+			historique.subList(indexImage + 1, historique.size()).clear();
 		}
-		journauxHistorique.add(actionHistorique);
-		indexAction++;
-	}
-	public void retirerActionHistorique() {
-		if (indexAction >= 0 && indexAction < journauxHistorique.size()) {
-			journauxHistorique.remove(indexAction);
-			indexAction--;
+
+		if ( historique.size() >= MAX_HISTORIQUE ) {
+			historique.remove(0);
+			if (indexImage > 0) {
+				indexImage--;
+			}
 		}
+		historique.add(image);
+		indexImage++;
 	}
 	public void clearJournaux() {
-		journauxHistorique.clear();
-		indexAction = -1;
+		historique.clear();
+		indexImage = -1;
 	}
 
 	public BufferedImage retourEnArriere() {
-		controleur.ReinitialisationControlleur();
-		
-		BufferedImage imageTemporaire = copierImage(imageInitiale);
-
-		for (int i = 0; i < indexAction; i++) {
-			journauxHistorique.get(i).faireAction(imageTemporaire, controleur);
-			journauxHistorique.remove(journauxHistorique.size() - 1);
+		if (indexImage > 0) {
+			indexImage--;
+			return copierImage(historique.get(indexImage));
 		}
-
-		if (indexAction >= 0) {
-			indexAction--;
-			while (indexAction >= 0 && journauxHistorique.get(indexAction + 1).getActionType().isAutoRetour()) {
-				indexAction--;
-			}
-		}
-
-		return imageTemporaire;
+		return null;
 	}
 
 	public BufferedImage retourEnAvant() {
-		controleur.ReinitialisationControlleur();
-
-		BufferedImage imageTemporaire = copierImage(imageInitiale);
-
-		if (indexAction + 1 < journauxHistorique.size()) {
-			indexAction++;
-			while (indexAction + 1 < journauxHistorique.size() && journauxHistorique.get(indexAction).getActionType().isAutoRetour()) {
-				indexAction++;
-			}
+		if (indexImage < historique.size() - 1) {
+			indexImage++;
+			return copierImage(historique.get(indexImage));
 		}
-
-		for (int i = 0; i <= indexAction; i++) {
-			journauxHistorique.get(i).faireAction(imageTemporaire, controleur);
-			journauxHistorique.remove(journauxHistorique.size() - 1);
-		}
-
-		return imageTemporaire;
+		return null;
 	}
 
 	private BufferedImage copierImage(BufferedImage image) {
