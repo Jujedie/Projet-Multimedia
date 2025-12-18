@@ -29,6 +29,9 @@ import application.multimedia.iut.Metier.image.PileCouches;
 import application.multimedia.iut.Metier.image.RenduToile;
 import application.multimedia.iut.Metier.image.SessionPlacement;
 import application.multimedia.iut.Metier.outils.OutilDessin;
+import application.multimedia.iut.Metier.Format;
+import application.multimedia.iut.Metier.AjoutContenu;
+
 import application.multimedia.iut.Vue.PaintFrame;
 import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
 
@@ -36,42 +39,40 @@ import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
  * Point d'entrée de l'application de retouche d'images.
  * Contient le contrôleur central et initialise l'interface graphique Swing.
  */
-public class MainControlleur {
+public class MainControleur {
 	/**
 	 * Point d'entrée de l'application.
 	 * Crée le contrôleur central qui gère le modèle,
-	 * puis lance l'interface graphique dans le thread de l'EDT en lui passant le contrôleur.
+	 * puis lance l'interface graphique dans le thread de l'EDT en lui passant le
+	 * contrôleur.
 	 *
 	 * @param args Arguments de la ligne de commande (non utilisés).
 	 */
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(() -> {
-			// Création du contrôleur central qui fait le lien Modèle-Vue
 			Controleur controleur = new Controleur();
-			
+
 			// Création de la vue en lui passant le contrôleur
 			PaintFrame view = new PaintFrame(controleur);
 			view.setVisible(true);
 		});
 	}
-	
+
 	/**
 	 * Contrôleur central - Connecteur simple entre le modèle et la vue.
 	 * Délègue la logique métier aux classes appropriées.
 	 */
 	public static class Controleur {
-		// ========== Journaux ==========
+
 		private Journaux historiqueModification;
 
-		// ========== MODÈLE - Gestion des images ==========
 		private final PileCouches pileCouches;
 		private final SessionPlacement sessionPlacement;
 		private final RenduToile renduToile;
 		private final ImageManagerMetier imageManagerMetier;
-		
-		// ========== MODÈLE - Gestion des outils ==========
+
 		private final GestionnaireOutils gestionnaireOutils;
-		
+
 		/**
 		 * Constructeur du contrôleur.
 		 * Initialise les composants du modèle.
@@ -82,31 +83,31 @@ public class MainControlleur {
 			this.sessionPlacement = new SessionPlacement();
 			this.renduToile = new RenduToile();
 			this.imageManagerMetier = new ImageManagerMetier(pileCouches, sessionPlacement, renduToile);
-			
+
 			// Initialisation du gestionnaire d'outils
 			this.gestionnaireOutils = new GestionnaireOutils();
 		}
 
-		public void updateJournal(BufferedImage image){ this.historiqueModification = new Journaux(image);}
-		
+		public void updateJournal(BufferedImage image) {
+			this.historiqueModification = new Journaux(image);
+		}
+
 		// ========================================
 		// ACCÈS AU MODÈLE - Gestion des images
 		// ========================================
-		
+
 		public PileCouches getPileCouches() {
 			return pileCouches;
 		}
-		
+
 		public boolean pileCouchesEstVide() {
 			return pileCouches.estVide();
 		}
-		
-		
+
 		public SessionPlacement getSessionPlacement() {
 			return sessionPlacement;
 		}
 
-		
 		public RenduToile getRenduToile() {
 			return renduToile;
 		}
@@ -115,13 +116,11 @@ public class MainControlleur {
 			renduToile.peindre(g, pileCouches, sessionPlacement);
 		}
 
-		
 		public void suppressionTotale() {
 			pileCouches.vider();
 			sessionPlacement.annuler();
 			gestionnaireOutils.terminerDessin();
 		}
-
 
 		public void definirImageCourante(BufferedImage image, Dimension tailleToile) {
 			imageManagerMetier.definirImageCourante(image, tailleToile);
@@ -150,7 +149,7 @@ public class MainControlleur {
 		public void ajouterImageCommeNouvelleCouche(BufferedImage image, Dimension tailleToile) {
 			imageManagerMetier.ajouterImageCommeNouvelleCouche(image, tailleToile);
 		}
-		
+
 		public void ajouterImageAvecChoix(BufferedImage image, LoadChoice choix, Dimension tailleToile) {
 			imageManagerMetier.ajouterImageAvecChoix(image, choix, tailleToile);
 		}
@@ -162,7 +161,7 @@ public class MainControlleur {
 		public void creerImageVide(int largeur, int hauteur, Dimension tailleToile) {
 			imageManagerMetier.creerImageVide(largeur, hauteur, tailleToile);
 		}
-		
+
 		public void enregistrerFichier(File fichier) throws IOException {
 			imageManagerMetier.enregistrerFichier(fichier);
 		}
@@ -176,119 +175,172 @@ public class MainControlleur {
 			return imageManagerMetier.imageInitialePresente();
 		}
 
+		public BufferedImage fusionH(BufferedImage imgGauche, BufferedImage imgDroite, int fondu) {
+			if (this.historiqueModification != null && imgGauche != null && imgDroite != null) {
+				return AjoutContenu.fusionHorizontale(imgGauche, imgDroite, fondu);
+			}
+			return null;
+		}
+
+		public BufferedImage fusionV(BufferedImage imgGauche, BufferedImage imgDroite, int fondu) {
+			if (this.historiqueModification != null && imgGauche != null && imgDroite != null) {
+				return AjoutContenu.fusionVerticale(imgGauche, imgDroite, fondu);
+			}
+			return null;
+		}
+
 		// ========================================
 		// DÉLÉGATION - Gestion des outils
 		// ========================================
-		
+
 		public void commencerDessin(BufferedImage image, int x, int y) {
-			if (this.historiqueModification != null){ 
-				gestionnaireOutils.commencerDessin(image, x, y); 
+			if (this.historiqueModification != null) {
+				gestionnaireOutils.commencerDessin(image, x, y);
 			}
 		}
-		
+
 		public void continuerDessin(BufferedImage image, int x, int y) {
-			if (this.historiqueModification != null){ 
-				gestionnaireOutils.continuerDessin(image, x, y); 
+			if (this.historiqueModification != null) {
+				gestionnaireOutils.continuerDessin(image, x, y);
 			}
 		}
-		
+
 		public void terminerDessin() {
-			if (this.historiqueModification != null){  
-				gestionnaireOutils.terminerDessin(); 
+			if (this.historiqueModification != null) {
+				gestionnaireOutils.terminerDessin();
 			}
 		}
-		
+
 		public void dessinerTexte(BufferedImage image, String texte, int x, int y) {
-			if (this.historiqueModification != null){ 
+			if (this.historiqueModification != null) {
 				gestionnaireOutils.dessinerTexte(image, texte, x, y);
-				var actionHistorique = new ActionHistorique(null, new Object[]{texte,x,y});
+				var actionHistorique = new ActionHistorique(null, new Object[] { texte, x, y });
 				this.historiqueModification.ajouterActionHistorique(actionHistorique);
 			}
 		}
-		
+
 		public void setOutilActif(OutilDessin outil) {
-			if (this.historiqueModification != null){ 
+			if (this.historiqueModification != null) {
 				gestionnaireOutils.setOutilActif(outil);
 			}
 		}
-		
+
 		public OutilDessin getOutilActif() {
 			return gestionnaireOutils.getOutilActif();
 		}
-		
+
 		// ========================================
 		// DÉLÉGATION - Gestion de la couleur
 		// ========================================
-		
+
 		public void definirCouleurActive(Color couleur) {
-			if (this.historiqueModification != null){ 
+			if (this.historiqueModification != null) {
 				gestionnaireOutils.definirCouleurActive(couleur);
 			}
 		}
-		
+
 		public Color getCouleurActive() {
 			return gestionnaireOutils.getCouleurActive();
 		}
-		
+
 		// ========================================
 		// DÉLÉGATION - Configuration des outils
 		// ========================================
-		
+
 		public void setEpaisseurPinceau(int epaisseur) {
-			if (this.historiqueModification != null){ 
+			if (this.historiqueModification != null) {
 				gestionnaireOutils.setEpaisseurPinceau(epaisseur);
 			}
 		}
-		
+
 		public int getEpaisseurPinceau() {
 			return gestionnaireOutils.getEpaisseurPinceau();
 		}
-		
+
 		public void setTailleGomme(int taille) {
-			if (this.historiqueModification != null){ 
+			if (this.historiqueModification != null) {
 				gestionnaireOutils.setTailleGomme(taille);
 			}
 		}
-		
+
 		public int getTailleGomme() {
 			return gestionnaireOutils.getTailleGomme();
 		}
-		
+
 		public void setPoliceTexte(Font police) {
-			if (this.historiqueModification != null){ 
+			if (this.historiqueModification != null) {
 				gestionnaireOutils.setPoliceTexte(police);
 			}
 		}
-		
+
 		public Font getPoliceTexte() {
 			return gestionnaireOutils.getPoliceTexte();
 		}
-		
+
 		// ========================================
 		// DÉLÉGATION - Gestion des écouteurs
 		// ========================================
-		
+
 		public void ajouterEcouteurCouleur(GestionnaireOutils.EcouteurCouleur ecouteur) {
-			if (this.historiqueModification != null){ 
+			if (this.historiqueModification != null) {
 				gestionnaireOutils.ajouterEcouteurCouleur(ecouteur);
 			}
 		}
-		
+
 		public boolean estEnDessin() {
 			return gestionnaireOutils.estEnDessin();
 		}
-		
+
+		// ========================================
+		// DÉLÉGATION - Gestion du format
+		// ========================================
+
+		public BufferedImage redimensionner(BufferedImage image, int nouvelleLargeur, int nouvelleHauteur) {
+			if (this.historiqueModification != null && image != null) {
+				Format.redimensionner(image, nouvelleLargeur, nouvelleHauteur);
+			}
+			return null;
+		}
+
+		public BufferedImage couper(BufferedImage image, int x1, int y1, int x2, int y2) {
+			if (this.historiqueModification != null && image != null) {
+				Format.couper(image, x1, y1, x2, y2);
+			}
+			return null;
+		}
+
+		public BufferedImage flipH(BufferedImage image) {
+			if (this.historiqueModification != null && image != null) {
+				Format.symetrieHorizontale(image);
+			}
+			return null;
+		}
+
+		public BufferedImage flipV(BufferedImage image) {
+			if (this.historiqueModification != null && image != null) {
+				Format.symetrieVerticale(image);
+			}
+			return null;
+		}
+
+		public BufferedImage rotation(BufferedImage image, double angle) {
+			if (this.historiqueModification != null && image != null) {
+				Format.rotation(image, angle);
+			}
+			return null;
+		}
+
 		// ========================================
 		// DÉLÉGATION - Colorisation
 		// ========================================
-		
+
 		/**
 		 * Applique une teinte de couleur sur l'image.
 		 * 
 		 * @param image L'image à teinter.
-		 * @param red La composante rouge de la teinte (0-255).
+		 * @param red   La composante rouge de la teinte (0-255).
 		 * @param green La composante verte de la teinte (0-255).
-		 * @param blue La composante bleue de la teinte (0-255).
+		 * @param blue  La composante bleue de la teinte (0-255).
 		 * @param alpha L'intensité de la teinte (0-255).
 		 */
 		public void appliquerTeinte(BufferedImage image, int red, int green, int blue, int alpha) {
@@ -296,11 +348,11 @@ public class MainControlleur {
 				application.multimedia.iut.Metier.Colorisation.teinter(image, red, green, blue, alpha);
 			}
 		}
-		
+
 		/**
 		 * Ajuste le contraste de l'image.
 		 * 
-		 * @param image L'image à modifier.
+		 * @param image     L'image à modifier.
 		 * @param contraste Le niveau de contraste (-100 à +100).
 		 */
 		public void appliquerContraste(BufferedImage image, int contraste) {
@@ -308,11 +360,11 @@ public class MainControlleur {
 				application.multimedia.iut.Metier.Colorisation.contraste(image, contraste);
 			}
 		}
-		
+
 		/**
 		 * Ajuste la luminosité de l'image.
 		 * 
-		 * @param image L'image à modifier.
+		 * @param image      L'image à modifier.
 		 * @param luminosite Le niveau de luminosité (-255 à +255).
 		 */
 		public void appliquerLuminosite(BufferedImage image, int luminosite) {
@@ -320,20 +372,22 @@ public class MainControlleur {
 				application.multimedia.iut.Metier.Colorisation.luminosite(image, luminosite);
 			}
 		}
-		
+
 		/**
 		 * Applique l'outil pot de peinture sur l'image.
 		 * 
-		 * @param image L'image à modifier.
+		 * @param image       L'image à modifier.
 		 * @param couleurDest La couleur de remplissage (RGB).
-		 * @param distance La tolérance de couleur (0-441).
+		 * @param distance    La tolérance de couleur (0-441).
 		 * @param estContinue true pour remplissage continu, false pour global.
-		 * @param xOrig La coordonnée X du point de départ.
-		 * @param yOrig La coordonnée Y du point de départ.
+		 * @param xOrig       La coordonnée X du point de départ.
+		 * @param yOrig       La coordonnée Y du point de départ.
 		 */
-		public void appliquerPotDePeinture(BufferedImage image, int couleurDest, int distance, boolean estContinue, int xOrig, int yOrig) {
+		public void appliquerPotDePeinture(BufferedImage image, int couleurDest, int distance, boolean estContinue,
+				int xOrig, int yOrig) {
 			if (this.historiqueModification != null && image != null) {
-				application.multimedia.iut.Metier.Colorisation.potDePeinture(image, couleurDest, distance, estContinue, xOrig, yOrig);
+				application.multimedia.iut.Metier.Colorisation.potDePeinture(image, couleurDest, distance, estContinue,
+						xOrig, yOrig);
 			}
 		}
 	}

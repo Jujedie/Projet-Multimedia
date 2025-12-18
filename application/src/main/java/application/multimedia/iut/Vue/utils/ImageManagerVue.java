@@ -30,7 +30,7 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
-import application.multimedia.iut.MainControlleur;
+import application.multimedia.iut.MainControleur;
 import application.multimedia.iut.Metier.image.CoucheImage;
 import application.multimedia.iut.Metier.image.PileCouches;
 import application.multimedia.iut.Metier.image.RenduToile;
@@ -43,7 +43,7 @@ import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
  * Coordonne le chargement, l'enregistrement, le zoom, et le placement d'images.
  */
 public class ImageManagerVue {
-	private final MainControlleur.Controleur controleur;
+	private final MainControleur.Controleur controleur;
 	private final JLabel toile;
 	private final JComponent parent;
 
@@ -59,7 +59,7 @@ public class ImageManagerVue {
 	 * @param parent Le composant parent pour les dialogues.
 	 * @param controleur Le contrôleur central de l'application.
 	 */
-	public ImageManagerVue(JLabel toile, JComponent parent, MainControlleur.Controleur controleur) {
+	public ImageManagerVue(JLabel toile, JComponent parent, MainControleur.Controleur controleur) {
 		this.toile = toile;
 		this.parent = parent;
 		this.controleur = controleur;
@@ -401,7 +401,7 @@ public class ImageManagerVue {
 	 *
 	 * @return Le contrôleur principal.
 	 */
-	public MainControlleur.Controleur getControleur() {
+	public MainControleur.Controleur getControleur() {
 		return controleur;
 	}
 	

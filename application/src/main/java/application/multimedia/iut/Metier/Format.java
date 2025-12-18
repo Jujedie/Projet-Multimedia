@@ -165,7 +165,7 @@ public class Format {
 		}
 	}
 
-	public static BufferedImage rotationRSamp(BufferedImage src, double angleDeg) {
+	private static BufferedImage rotationRSamp(BufferedImage src, double angleDeg) {
 		int srcWidth = src.getWidth();
 		int srcHeight = src.getHeight();
 

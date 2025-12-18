@@ -70,7 +70,7 @@ public class MenuBarBuilder {
 		enregistrerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcut));
 		enregistrerSousItem
 				.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, menuShortcut | KeyEvent.SHIFT_DOWN_MASK));
-		quitterItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, menuShortcut));
+		quitterItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, menuShortcut | InputEvent.ALT_DOWN_MASK));
 
 		nouveauItem.setMnemonic(KeyEvent.VK_N);
 		ouvrirItem.setMnemonic(KeyEvent.VK_O);
@@ -115,6 +115,10 @@ public class MenuBarBuilder {
 		refaireItem.setMnemonic(KeyEvent.VK_R);
 		effacerItem.setMnemonic(KeyEvent.VK_E);
 
+		annulerItem.addActionListener(e -> panneau.annulerAction());
+		refaireItem.addActionListener(e -> panneau.refaireAction());
+		effacerItem.addActionListener(e -> panneau.effacerTout());
+
 		editionMenu.add(annulerItem);
 		editionMenu.add(refaireItem);
 		editionMenu.addSeparator();
@@ -132,27 +136,35 @@ public class MenuBarBuilder {
 	private JMenu creerMenuImage() {
 		JMenu imageMenu = new JMenu("Image");
 
-		JMenuItem fusionnerItem = new JMenuItem("Fusion Horizontale");
-		JMenuItem fusionVerticale = new JMenuItem("Fusion Verticale");
+		JMenuItem fusionH = new JMenuItem("Fusion Horizontale");
+		JMenuItem fusionV = new JMenuItem("Fusion Verticale");
 		JMenuItem flipHItem = new JMenuItem("Retourner horizontalement");
 		JMenuItem flipVItem = new JMenuItem("Retourner verticalement");
 		JMenuItem rotationItem = new JMenuItem("Rotation");
 		JMenuItem redimensionnerItem = new JMenuItem("Redimensionner");
 
-		fusionnerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, menuShortcut));
-		fusionVerticale.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, menuShortcut | KeyEvent.SHIFT_DOWN_MASK));
+		fusionH.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, menuShortcut));
+		fusionV.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, menuShortcut | KeyEvent.SHIFT_DOWN_MASK));
 		flipHItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, menuShortcut));
 		flipVItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, menuShortcut));
 		rotationItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, menuShortcut));
 		redimensionnerItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, menuShortcut));
 
-		fusionnerItem.setMnemonic(KeyEvent.VK_F);
+		fusionH.setMnemonic(KeyEvent.VK_F);
+		fusionV.setMnemonic(KeyEvent.VK_H);
 		flipHItem.setMnemonic(KeyEvent.VK_H);
 		flipVItem.setMnemonic(KeyEvent.VK_V);
 		rotationItem.setMnemonic(KeyEvent.VK_R);
 		redimensionnerItem.setMnemonic(KeyEvent.VK_D);
 
-		imageMenu.add(fusionnerItem);
+		fusionH.addActionListener(e -> panneau.fusionH(true));
+		fusionV.addActionListener(e -> panneau.fusionV(false));
+		flipHItem.addActionListener(e -> panneau.flipH());
+		flipVItem.addActionListener(e -> panneau.flipV());
+		rotationItem.addActionListener(e -> panneau.rotation());
+		redimensionnerItem.addActionListener(e -> panneau.redimensionner());
+
+		imageMenu.add(fusionH);
 		imageMenu.addSeparator();
 		imageMenu.add(flipHItem);
 		imageMenu.add(flipVItem);
@@ -171,6 +183,21 @@ public class MenuBarBuilder {
 		JMenu filtresMenu = new JMenu("Filtres");
 
 		JMenuItem contrasteItem = new JMenuItem("Contraste");
+		JMenuItem luminositeItem = new JMenuItem("Luminosité");
+		JMenuItem teintureItem = new JMenuItem("Teinture");
+
+		contrasteItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, menuShortcut));
+		luminositeItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, menuShortcut));
+		teintureItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, menuShortcut));
+
+		contrasteItem.setMnemonic(KeyEvent.VK_C);
+		luminositeItem.setMnemonic(KeyEvent.VK_L);
+		teintureItem.setMnemonic(KeyEvent.VK_T);
+
+		teintureItem.addActionListener(e -> panneau.appliquerTeinture());
+		luminositeItem.addActionListener(e -> panneau.appliquerLuminosite());
+		contrasteItem.addActionListener(e -> panneau.appliquerContraste());
+
 		filtresMenu.add(contrasteItem);
 
 		return filtresMenu;

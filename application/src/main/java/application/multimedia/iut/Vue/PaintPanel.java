@@ -7,7 +7,7 @@
  */
 package application.multimedia.iut.Vue;
 
-import application.multimedia.iut.MainControlleur;
+import application.multimedia.iut.MainControleur;
 import application.multimedia.iut.Metier.GestionnaireOutils;
 import application.multimedia.iut.Vue.barres.MenuBarBuilder;
 import application.multimedia.iut.Vue.barres.ToolBarBuilder;
@@ -27,7 +27,7 @@ public class PaintPanel extends JPanel {
 	private JLabel toile;
 	private JScrollPane panneauDeroulement;
 	private ImageManagerVue gestionnaireImages;
-	private MainControlleur.Controleur controleur;
+	private MainControleur.Controleur controleur;
 	
 	/**
 	 * Constructeur du panneau de peinture.
@@ -36,7 +36,7 @@ public class PaintPanel extends JPanel {
 	 */
 	private ToolBarBuilder toolBarBuilder;
 
-	public PaintPanel(MainControlleur.Controleur controleur) {
+	public PaintPanel(MainControleur.Controleur controleur) {
 		this.controleur = controleur;
 		setLayout(new BorderLayout());
 		
@@ -44,8 +44,7 @@ public class PaintPanel extends JPanel {
 		JPanel panneauHaut = creerPanneauSuperieur();
 		
 		creerToile();
-		
-		// Connecter l'écouteur de couleur maintenant que gestionnaireImages est initialisé
+
 		if (toolBarBuilder != null) {
 			toolBarBuilder.connecterEcouteurCouleur();
 		}
@@ -202,6 +201,23 @@ public class PaintPanel extends JPanel {
 	 */
 	public void enregistrerEcouteurCouleur(GestionnaireOutils.EcouteurCouleur ecouteur) {
 		controleur.ajouterEcouteurCouleur(ecouteur);
+	}
+
+	// ========================================
+	// MÉTHODES DE FORMAT
+	// ========================================
+
+	/**
+	 * Effectue une rotation de l'image courante.
+	 * 
+	 * @param angle L'angle de rotation en degrés (sens horaire).
+	 */
+	public void rotation(double angle) {
+		BufferedImage imageCourante = gestionnaireImages.obtenirImageCourante();
+		if (imageCourante != null) {
+			controleur.rotation(imageCourante, angle);
+			gestionnaireImages.rafraichirAffichage();
+		}
 	}
 	
 	// ========================================
