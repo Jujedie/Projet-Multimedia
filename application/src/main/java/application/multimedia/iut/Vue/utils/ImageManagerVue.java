@@ -343,7 +343,7 @@ public class ImageManagerVue {
 				if (outilActif != OutilDessin.SELECTION && outilActif != OutilDessin.REMPLISSAGE) {
 					// Si aucune image n'existe, créer une image vide pour permettre le dessin
 					if (controleur.pileCouchesEstVide()) {
-						creerImageVide(800, 600);
+						creerImageVide(1920, 1080);
 					}
 					
 					if (!controleur.pileCouchesEstVide()) {
