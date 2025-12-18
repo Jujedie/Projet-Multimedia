@@ -23,9 +23,12 @@ import javax.swing.SwingUtilities;
 import application.multimedia.iut.Metier.Colorisation;
 import application.multimedia.iut.Metier.GestionnaireOutils;
 import application.multimedia.iut.Metier.Journaux;
-import application.multimedia.iut.Metier.image.*;
+import application.multimedia.iut.Metier.image.CoucheImage;
+import application.multimedia.iut.Metier.image.ImageManagerMetier;
+import application.multimedia.iut.Metier.image.PileCouches;
+import application.multimedia.iut.Metier.image.RenduToile;
+import application.multimedia.iut.Metier.image.SessionPlacement;
 import application.multimedia.iut.Metier.outils.OutilDessin;
-
 import application.multimedia.iut.Vue.PaintFrame;
 import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
 
