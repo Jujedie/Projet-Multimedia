@@ -165,6 +165,11 @@ public class MainControlleur {
 
 		public void creerImageVide(int largeur, int hauteur, Dimension tailleToile) {
 			imageManagerMetier.creerImageVide(largeur, hauteur, tailleToile);
+			// Initialiser le journal pour permettre le dessin
+			BufferedImage image = obtenirImageCourante();
+			if (image != null) {
+				updateJournal(image);
+			}
 		}
 		
 		public void enregistrerFichier(File fichier) throws IOException {
@@ -185,21 +190,15 @@ public class MainControlleur {
 		// ========================================
 		
 		public void commencerDessin(BufferedImage image, int x, int y) {
-			if (this.historiqueModification != null){ 
-				gestionnaireOutils.commencerDessin(image, x, y); 
-			}
+			gestionnaireOutils.commencerDessin(image, x, y);
 		}
 		
 		public void continuerDessin(BufferedImage image, int x, int y) {
-			if (this.historiqueModification != null){ 
-				gestionnaireOutils.continuerDessin(image, x, y); 
-			}
+			gestionnaireOutils.continuerDessin(image, x, y);
 		}
 		
 		public void terminerDessin() {
-			if (this.historiqueModification != null){  
-				gestionnaireOutils.terminerDessin(); 
-			}
+			gestionnaireOutils.terminerDessin();
 		}
 		
 		public void dessinerTexte(BufferedImage image, String texte, int x, int y) {
@@ -269,9 +268,7 @@ public class MainControlleur {
 		// ========================================
 		
 		public void ajouterEcouteurCouleur(GestionnaireOutils.EcouteurCouleur ecouteur) {
-			if (this.historiqueModification != null){ 
-				gestionnaireOutils.ajouterEcouteurCouleur(ecouteur);
-			}
+		gestionnaireOutils.ajouterEcouteurCouleur(ecouteur);
 		}
 		
 		public boolean estEnDessin() {

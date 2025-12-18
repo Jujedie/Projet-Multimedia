@@ -65,7 +65,20 @@ public class GestionnaireOutils {
      * @param y Coordonnée Y.
      */
     public void commencerDessin(BufferedImage image, int x, int y) {
-        if (image == null) return;
+        if (image == null) {
+            return;
+        }
+        
+        // Gérer la pipette séparément car elle n'active pas le mode dessin continu
+        if (outilActif == OutilDessin.PIPETTE) {
+            Color couleur = pipette.preleverCouleur(image, x, y);
+            if (couleur != null) {
+                System.out.println("GestionnaireOutils - Pipette a prélevé: " + couleur);
+                definirCouleurActive(couleur);
+                System.out.println("GestionnaireOutils - definirCouleurActive appelé");
+            }
+            return;
+        }
         
         dernierPoint = new Point(x, y);
         dessinEnCours = true;
@@ -76,14 +89,9 @@ public class GestionnaireOutils {
                 pinceau.dessinerPoint(image, x, y);
                 break;
             case GOMME:
-                gomme.setCouleurEffacement(Color.WHITE);
+                // Forcer le blanc pur pour la gomme
+                gomme.setCouleurEffacement(new Color(255, 255, 255));
                 gomme.effacerPoint(image, x, y);
-                break;
-            case PIPETTE:
-                Color couleur = pipette.preleverCouleur(image, x, y);
-                if (couleur != null) {
-                    definirCouleurActive(couleur);
-                }
                 break;
             default:
                 break;
@@ -105,7 +113,8 @@ public class GestionnaireOutils {
                 pinceau.dessinerTrait(image, dernierPoint.x, dernierPoint.y, x, y);
                 break;
             case GOMME:
-                gomme.setCouleurEffacement(Color.WHITE);
+                // Forcer le blanc pur pour la gomme
+                gomme.setCouleurEffacement(new Color(255, 255, 255));
                 gomme.effacer(image, dernierPoint.x, dernierPoint.y, x, y);
                 break;
             default:
@@ -244,6 +253,7 @@ public class GestionnaireOutils {
      * @param nouvelleCouleur La nouvelle couleur choisie par la personne.
      */
     private void notifierChangementCouleur(Color nouvelleCouleur) {
+        System.out.println("GestionnaireOutils - Notification de " + ecouteursCouleur.size() + " écouteur(s) avec couleur: " + nouvelleCouleur);
         for (EcouteurCouleur ecouteur : ecouteursCouleur) {
             ecouteur.couleurChangee(nouvelleCouleur);
         }
