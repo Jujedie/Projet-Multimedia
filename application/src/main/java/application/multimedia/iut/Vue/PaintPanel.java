@@ -93,8 +93,12 @@ public class PaintPanel extends JPanel {
 		toile.setOpaque(true);
 		toile.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 		
+		// Définir une taille préférée pour que la toile prenne tout l'espace
+		toile.setPreferredSize(new Dimension(2000, 2000));
+		
 		panneauDeroulement = new JScrollPane(toile);
 		panneauDeroulement.setBackground(Color.DARK_GRAY);
+		panneauDeroulement.getViewport().setBackground(Color.DARK_GRAY);
 		
 		gestionnaireImages = new ImageManagerVue(toile, this, controleur);
 		gestionnaireImages.activerDeplacementImage();
@@ -176,6 +180,10 @@ public class PaintPanel extends JPanel {
 	 */
 	public void activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin outil) {
 		gestionnaireImages.activerOutil(outil);
+		// Synchroniser la sélection dans la barre d'outils
+		if (toolBarBuilder != null) {
+			toolBarBuilder.synchroniserSelectionOutil(outil);
+		}
 	}
 	
 	/**
@@ -202,6 +210,175 @@ public class PaintPanel extends JPanel {
 	 */
 	public void enregistrerEcouteurCouleur(GestionnaireOutils.EcouteurCouleur ecouteur) {
 		controleur.ajouterEcouteurCouleur(ecouteur);
+	}
+	
+	// ========================================
+	// MÉTHODES D'ÉDITION
+	// ========================================
+	
+	/**
+	 * Annule la dernière action effectuée.
+	 */
+	public void annulerAction() {
+		controleur.annuler();
+		gestionnaireImages.rafraichirAffichage();
+	}
+	
+	/**
+	 * Refait la dernière action annulée.
+	 */
+	public void refaireAction() {
+		controleur.refaire();
+		gestionnaireImages.rafraichirAffichage();
+	}
+	
+	/**
+	 * Efface tout le contenu de l'image courante.
+	 */
+	public void effacerTout() {
+		BufferedImage imageCourante = gestionnaireImages.obtenirImageCourante();
+		if (imageCourante != null) {
+			Graphics2D g2d = imageCourante.createGraphics();
+			g2d.setComposite(AlphaComposite.Clear);
+			g2d.fillRect(0, 0, imageCourante.getWidth(), imageCourante.getHeight());
+			g2d.dispose();
+			gestionnaireImages.rafraichirAffichage();
+		}
+	}
+	
+	/**
+	 * Ouvre le dialogue pour créer du texte avec une image.
+	 */
+	public void ouvrirDialogueTexteImage() {
+		TexteImageEditorDialog dialog = new TexteImageEditorDialog((Frame) SwingUtilities.getWindowAncestor(this));
+		dialog.setVisible(true);
+		
+		if (dialog.estValide()) {
+			BufferedImage imageTexte = dialog.getImageGeneree();
+			if (imageTexte != null) {
+				Dimension tailleToile = toile.getSize();
+				controleur.ajouterImageCommeNouvelleCouche(imageTexte, tailleToile);
+				gestionnaireImages.rafraichirAffichage();
+			}
+		}
+	}
+	
+	// ========================================
+	// MÉTHODES DE FORMAT
+	// ========================================
+	
+	/**
+	 * Effectue un retournement horizontal de l'image courante.
+	 */
+	public void flipH() {
+		BufferedImage imageCourante = gestionnaireImages.obtenirImageCourante();
+		if (imageCourante != null) {
+			BufferedImage nouvelleImage = controleur.flipH(imageCourante);
+			if (nouvelleImage != null) {
+				gestionnaireImages.definirImageCourante(nouvelleImage);
+				gestionnaireImages.rafraichirAffichage();
+			}
+		}
+	}
+	
+	/**
+	 * Effectue un retournement vertical de l'image courante.
+	 */
+	public void flipV() {
+		BufferedImage imageCourante = gestionnaireImages.obtenirImageCourante();
+		if (imageCourante != null) {
+			BufferedImage nouvelleImage = controleur.flipV(imageCourante);
+			if (nouvelleImage != null) {
+				gestionnaireImages.definirImageCourante(nouvelleImage);
+				gestionnaireImages.rafraichirAffichage();
+			}
+		}
+	}
+	
+	/**
+	 * Ouvre un dialogue pour effectuer une rotation de l'image courante.
+	 */
+	public void rotation() {
+		String input = JOptionPane.showInputDialog(this, "Angle de rotation (degrés):", "Rotation", JOptionPane.QUESTION_MESSAGE);
+		if (input != null && !input.trim().isEmpty()) {
+			try {
+				double angle = Double.parseDouble(input.trim());
+				rotation(angle);
+			} catch (NumberFormatException e) {
+				JOptionPane.showMessageDialog(this, "Veuillez entrer un nombre valide.", "Erreur", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+	
+	/**
+	 * Effectue une rotation de l'image courante.
+	 * 
+	 * @param angle L'angle de rotation en degrés (sens horaire).
+	 */
+	public void rotation(double angle) {
+		BufferedImage imageCourante = gestionnaireImages.obtenirImageCourante();
+		if (imageCourante != null) {
+			BufferedImage nouvelleImage = controleur.rotation(imageCourante, angle);
+			if (nouvelleImage != null) {
+				gestionnaireImages.definirImageCourante(nouvelleImage);
+				gestionnaireImages.rafraichirAffichage();
+			}
+		}
+	}
+	
+	/**
+	 * Ouvre un dialogue pour redimensionner l'image courante.
+	 */
+	public void redimensionner() {
+		BufferedImage imageCourante = gestionnaireImages.obtenirImageCourante();
+		if (imageCourante == null) {
+			JOptionPane.showMessageDialog(this, "Aucune image à redimensionner.", "Erreur", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		JPanel panel = new JPanel(new GridLayout(2, 2, 5, 5));
+		JTextField largeurField = new JTextField(String.valueOf(imageCourante.getWidth()));
+		JTextField hauteurField = new JTextField(String.valueOf(imageCourante.getHeight()));
+		
+		panel.add(new JLabel("Largeur:"));
+		panel.add(largeurField);
+		panel.add(new JLabel("Hauteur:"));
+		panel.add(hauteurField);
+		
+		int result = JOptionPane.showConfirmDialog(this, panel, "Redimensionner l'image", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+		
+		if (result == JOptionPane.OK_OPTION) {
+			try {
+				int nouvelleLargeur = Integer.parseInt(largeurField.getText().trim());
+				int nouvelleHauteur = Integer.parseInt(hauteurField.getText().trim());
+				
+				if (nouvelleLargeur > 0 && nouvelleHauteur > 0) {
+					BufferedImage nouvelleImage = controleur.redimensionner(imageCourante, nouvelleLargeur, nouvelleHauteur);
+					if (nouvelleImage != null) {
+						gestionnaireImages.definirImageCourante(nouvelleImage);
+						gestionnaireImages.rafraichirAffichage();
+					}
+				} else {
+					JOptionPane.showMessageDialog(this, "Les dimensions doivent être positives.", "Erreur", JOptionPane.ERROR_MESSAGE);
+				}
+			} catch (NumberFormatException e) {
+				JOptionPane.showMessageDialog(this, "Veuillez entrer des nombres valides.", "Erreur", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+	
+	/**
+	 * Ouvre un dialogue pour fusionner deux images horizontalement.
+	 */
+	public void fusionHorizontale() {
+		JOptionPane.showMessageDialog(this, "Fonctionnalité de fusion horizontale à implémenter.", "Info", JOptionPane.INFORMATION_MESSAGE);
+	}
+	
+	/**
+	 * Ouvre un dialogue pour fusionner deux images verticalement.
+	 */
+	public void fusionVerticale() {
+		JOptionPane.showMessageDialog(this, "Fonctionnalité de fusion verticale à implémenter.", "Info", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	// ========================================

@@ -65,7 +65,10 @@ public class ImageManagerVue {
 		this.controleur = controleur;
 		
 		// Créer une image blanche vide au démarrage pour permettre le dessin
-		creerImageVide(800, 600);
+		// Utiliser une taille plus grande (1920x1080 ou la taille préférée de la toile)
+		int largeur = Math.max(1920, toile.getPreferredSize().width);
+		int hauteur = Math.max(1080, toile.getPreferredSize().height);
+		creerImageVide(largeur, hauteur);
 		
 		installerRaccourcisClavier();
 	}
@@ -301,6 +304,28 @@ public class ImageManagerVue {
 				// Gestion des outils de dessin
 				OutilDessin outilActif = controleur.getOutilActif();
 				
+				// Gestion de l'outil texte
+				if (outilActif == OutilDessin.TEXTE && !controleur.pileCouchesEstVide()) {
+					CoucheImage couche = controleur.getPileCouches().coucheActive();
+					if (couche != null) {
+						int x = e.getX() - couche.x;
+						int y = e.getY() - couche.y;
+						// Vérifier que les coordonnées sont dans l'image
+						if (x >= 0 && x < couche.image.getWidth() && y >= 0 && y < couche.image.getHeight()) {
+							// Ouvrir une boîte de dialogue pour saisir le texte
+							String texte = JOptionPane.showInputDialog(parent, 
+								"Entrez le texte à écrire :", 
+								"Saisie de texte", 
+								JOptionPane.PLAIN_MESSAGE);
+							if (texte != null && !texte.trim().isEmpty()) {
+								controleur.dessinerTexte(couche.image, texte, x, y);
+								toile.repaint();
+							}
+						}
+						return;
+					}
+				}
+				
 				// Gestion du pot de peinture
 				if (outilActif == OutilDessin.REMPLISSAGE && !controleur.pileCouchesEstVide()) {
 					CoucheImage couche = controleur.getPileCouches().coucheActive();
@@ -318,7 +343,7 @@ public class ImageManagerVue {
 					}
 				}
 				
-				if (outilActif != OutilDessin.SELECTION && outilActif != OutilDessin.REMPLISSAGE && !controleur.pileCouchesEstVide()) {
+				if (outilActif != OutilDessin.SELECTION && outilActif != OutilDessin.REMPLISSAGE && outilActif != OutilDessin.TEXTE && !controleur.pileCouchesEstVide()) {
 					CoucheImage couche = controleur.getPileCouches().coucheActive();
 					if (couche != null) {
 						controleur.commencerDessin(couche.image, e.getX() - couche.x, e.getY() - couche.y);
@@ -430,7 +455,8 @@ public class ImageManagerVue {
 	 * @param hauteur Hauteur de l'image.
 	 */
 	private void creerImageVide(int largeur, int hauteur) {
-		controleur.creerImageVide(largeur, hauteur, obtenirTailleToile());
+		Dimension tailleToile = new Dimension(largeur, hauteur);
+		controleur.creerImageVide(largeur, hauteur, tailleToile);
 
 		afficherImage();
 	}
