@@ -255,7 +255,6 @@ public class Colorisation {
 	 * @return La distance euclidienne (0-441, √(255²+255²+255²)).
 	 */
 	public static double distance(int c1, int c2) {
-		// retirer l'alpha
 		c1 &= 0xFFFFFF;
 		c2 &= 0xFFFFFF;
 
