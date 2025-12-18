@@ -338,7 +338,9 @@ public class ToolBarBuilder {
 		// Créer l'écouteur de changement de couleur depuis la pipette
 		// Il sera enregistré plus tard quand le gestionnaire d'images sera initialisé
 		ecouteurCouleurPipette = couleur -> {
+			System.out.println("ToolBarBuilder - Écouteur reçu: " + couleur);
 			couleurPrincipale.setBackground(couleur);
+			couleurPrincipale.repaint();
 		};
 	}
 	

@@ -11,7 +11,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -20,7 +19,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
@@ -32,9 +30,6 @@ import javax.swing.SwingUtilities;
 
 import application.multimedia.iut.Controleur;
 import application.multimedia.iut.Metier.image.CoucheImage;
-import application.multimedia.iut.Metier.image.PileCouches;
-import application.multimedia.iut.Metier.image.RenduToile;
-import application.multimedia.iut.Metier.image.SessionPlacement;
 import application.multimedia.iut.Metier.outils.OutilDessin;
 import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
 
@@ -343,6 +338,30 @@ public class ImageManagerVue {
 					}
 				}
 				
+				if (outilActif != OutilDessin.SELECTION && outilActif != OutilDessin.REMPLISSAGE) {
+					// Si aucune image n'existe, créer une image vide pour permettre le dessin
+					if (controleur.pileCouchesEstVide()) {
+						System.out.println("Création d'une image vide pour le dessin...");
+						creerImageVide(800, 600);
+					}
+					
+					if (!controleur.pileCouchesEstVide()) {
+						CoucheImage couche = controleur.getPileCouches().coucheActive();
+						if (couche != null) {
+							int xImage = e.getX() - couche.x;
+							int yImage = e.getY() - couche.y;
+							System.out.println("Clic souris: (" + e.getX() + ", " + e.getY() + "), Couche pos: (" + couche.x + ", " + couche.y + "), Coord image: (" + xImage + ", " + yImage + ")");
+							System.out.println("Taille image: " + couche.image.getWidth() + "x" + couche.image.getHeight());
+							
+							// Vérifier que les coordonnées sont dans l'image
+							if (xImage >= 0 && xImage < couche.image.getWidth() && yImage >= 0 && yImage < couche.image.getHeight()) {
+								controleur.commencerDessin(couche.image, xImage, yImage);
+								toile.repaint();
+							} else {
+								System.out.println("Coordonnées hors de l'image!");
+							}
+							return;
+						}
 				if (outilActif != OutilDessin.SELECTION && outilActif != OutilDessin.REMPLISSAGE && outilActif != OutilDessin.TEXTE && !controleur.pileCouchesEstVide()) {
 					CoucheImage couche = controleur.getPileCouches().coucheActive();
 					if (couche != null) {
@@ -393,8 +412,14 @@ public class ImageManagerVue {
 				if (outilActif != OutilDessin.SELECTION && controleur.estEnDessin()) {
 					CoucheImage couche = controleur.getPileCouches().coucheActive();
 					if (couche != null) {
-						controleur.continuerDessin(couche.image, e.getX() - couche.x, e.getY() - couche.y);
-						toile.repaint();
+						int xImage = e.getX() - couche.x;
+						int yImage = e.getY() - couche.y;
+						
+						// Vérifier que les coordonnées sont dans l'image
+						if (xImage >= 0 && xImage < couche.image.getWidth() && yImage >= 0 && yImage < couche.image.getHeight()) {
+							controleur.continuerDessin(couche.image, xImage, yImage);
+							toile.repaint();
+						}
 						return;
 					}
 				}
@@ -455,10 +480,11 @@ public class ImageManagerVue {
 	 * @param hauteur Hauteur de l'image.
 	 */
 	private void creerImageVide(int largeur, int hauteur) {
-		Dimension tailleToile = new Dimension(largeur, hauteur);
-		controleur.creerImageVide(largeur, hauteur, tailleToile);
-
+		System.out.println("Création d'une image vide " + largeur + "x" + hauteur);
+		controleur.creerImageVide(largeur, hauteur, obtenirTailleToile());
 		afficherImage();
+		toile.repaint();
+		System.out.println("Image vide créée, pile vide: " + controleur.pileCouchesEstVide());
 	}
 
 	/**
