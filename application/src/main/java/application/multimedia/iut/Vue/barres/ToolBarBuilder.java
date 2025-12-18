@@ -98,6 +98,15 @@ public class ToolBarBuilder {
 	private JToggleButton remplissageBtn;
 	private JToggleButton texteBtn;
 
+	
+	// Références aux boutons toggle pour la synchronisation
+	private JToggleButton selectionBtn;
+	private JToggleButton pinceauBtn;
+	private JToggleButton gommeBtn;
+	private JToggleButton pipetteBtn;
+	private JToggleButton remplissageBtn;
+	private JToggleButton texteBtn;
+
 	/**
 	 * Constructeur du constructeur de barre d'outils.
 	 *
@@ -151,12 +160,12 @@ public class ToolBarBuilder {
 	private void ajouterOutilsDessin(JToolBar barre) {
 		ButtonGroup groupeOutils = new ButtonGroup();
 		
-		JToggleButton selectionBtn = creerBoutonToggle("square-dashed", "Sélection");
-		JToggleButton pinceauBtn = creerBoutonToggle("pencil", "Pinceau");
-		JToggleButton gommeBtn = creerBoutonToggle("eraser", "Gomme");
-		JToggleButton pipetteBtn = creerBoutonToggle("pipette", "Pipette");
-		JToggleButton remplissageBtn = creerBoutonToggle("paint-bucket", "Remplissage");
-		JToggleButton texteBtn = creerBoutonToggle("type", "Texte");
+		selectionBtn = creerBoutonToggle("square-dashed", "Sélection");
+		pinceauBtn = creerBoutonToggle("pencil", "Pinceau");
+		gommeBtn = creerBoutonToggle("eraser", "Gomme");
+		pipetteBtn = creerBoutonToggle("pipette", "Pipette");
+		remplissageBtn = creerBoutonToggle("paint-bucket", "Remplissage");
+		texteBtn = creerBoutonToggle("type", "Texte");
 		JButton texteImageBtn = creerBouton("image", "Texte avec image");
 		
 		// Connecter les boutons aux outils
@@ -175,6 +184,7 @@ public class ToolBarBuilder {
 		groupeOutils.add(gommeBtn);
 		groupeOutils.add(pipetteBtn);
 		groupeOutils.add(remplissageBtn);
+		groupeOutils.add(texteBtn);
 		groupeOutils.add(texteBtn);
 		
 		barre.add(selectionBtn);
@@ -218,12 +228,6 @@ public class ToolBarBuilder {
 		JButton rotationBtn = creerBouton("rotate-cw", "Rotation");
 		JButton rediBtn = creerBouton("maximize", "Redimensionner");
 		JButton mergerBtn = creerBouton("layers", "Fusionner");
-		
-		flipHBtn.addActionListener(e -> panneau.flipH());
-		flipVBtn.addActionListener(e -> panneau.flipV());
-		rotationBtn.addActionListener(e -> panneau.rotation());
-		rediBtn.addActionListener(e -> panneau.redimensionner());
-		mergerBtn.addActionListener(e -> panneau.fusionHorizontale());
 		
 		flipHBtn.addActionListener(e -> panneau.flipH());
 		flipVBtn.addActionListener(e -> panneau.flipV());
@@ -333,8 +337,8 @@ public class ToolBarBuilder {
 		JButton undoBtn = creerBouton("undo", "Annuler");
 		JButton redoBtn = creerBouton("redo", "Refaire");
 		
-		undoBtn.addActionListener(e -> panneau.annulerDerniereAction());
-		redoBtn.addActionListener(e -> panneau.refaireDerniereAction());
+		undoBtn.addActionListener(e -> panneau.annulerAction());
+		redoBtn.addActionListener(e -> panneau.refaireAction());
 		
 		barre.add(undoBtn);
 		barre.add(redoBtn);
@@ -410,19 +414,16 @@ public class ToolBarBuilder {
 		System.out.println("Connexion de l'écouteur de couleur...");
 		if (ecouteurCouleurPipette != null) {
 			panneau.enregistrerEcouteurCouleur(ecouteurCouleurPipette);
-			System.out.println("Écouteur connecté avec succès!");
-		} else {
-			System.out.println("ERREUR: écouteurCouleurPipette est null!");
 		}
 	}
-		
+	
 	/**
 	 * Synchronise la sélection d'outil dans la barre d'outils.
 	 * Appelé depuis le menu pour refléter la sélection dans la barre d'outils.
 	 * 
 	 * @param outil L'outil à sélectionner visuellement.
 	 */
-	public void synchroniserSelectionOutil(OutilDessin outil) {
+	public void synchroniserSelectionOutil(application.multimedia.iut.Metier.outils.OutilDessin outil) {
 		if (outil == null) return;
 		
 		switch (outil) {
