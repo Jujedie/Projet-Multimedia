@@ -68,14 +68,18 @@ public class Controleur {
 	public void retourEnArriere(){
 		if (this.historiqueModification != null){
 			BufferedImage image = this.historiqueModification.retourEnArriere();
-			imageManagerMetier.definirImageCourante(image, new Dimension(image.getWidth(), image.getHeight()));
+			if (image != null) {
+				imageManagerMetier.definirImageCourante(image, new Dimension(image.getWidth(), image.getHeight()));
+			}
 		}
 	}
 
 	public void retourEnAvant(){
 		if (this.historiqueModification != null){
 			BufferedImage image = this.historiqueModification.retourEnAvant();
-			imageManagerMetier.definirImageCourante(image, new Dimension(image.getWidth(), image.getHeight()));
+			if (image != null) {
+				imageManagerMetier.definirImageCourante(image, new Dimension(image.getWidth(), image.getHeight()));
+			}
 		}
 	}
 
