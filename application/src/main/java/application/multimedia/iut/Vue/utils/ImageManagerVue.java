@@ -419,7 +419,7 @@ public class ImageManagerVue {
 	 *
 	 * @return Le contrôleur principal.
 	 */
-	public MainControlleur.Controleur getControleur() {
+	public Controleur getControleur() {
 		return controleur;
 	}
 	
