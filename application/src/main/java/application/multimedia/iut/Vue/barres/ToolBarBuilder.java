@@ -151,18 +151,12 @@ public class ToolBarBuilder {
 	private void ajouterOutilsDessin(JToolBar barre) {
 		ButtonGroup groupeOutils = new ButtonGroup();
 		
-		selectionBtn = creerBoutonToggle("square-dashed", "Sélection");
-		pinceauBtn = creerBoutonToggle("pencil", "Pinceau");
-		gommeBtn = creerBoutonToggle("eraser", "Gomme");
-		pipetteBtn = creerBoutonToggle("pipette", "Pipette");
-		remplissageBtn = creerBoutonToggle("paint-bucket", "Remplissage");
-		texteBtn = creerBoutonToggle("type", "Texte");
-		selectionBtn = creerBoutonToggle("square-dashed", "Sélection");
-		pinceauBtn = creerBoutonToggle("pencil", "Pinceau");
-		gommeBtn = creerBoutonToggle("eraser", "Gomme");
-		pipetteBtn = creerBoutonToggle("pipette", "Pipette");
-		remplissageBtn = creerBoutonToggle("paint-bucket", "Remplissage");
-		texteBtn = creerBoutonToggle("type", "Texte");
+		JToggleButton selectionBtn = creerBoutonToggle("square-dashed", "Sélection");
+		JToggleButton pinceauBtn = creerBoutonToggle("pencil", "Pinceau");
+		JToggleButton gommeBtn = creerBoutonToggle("eraser", "Gomme");
+		JToggleButton pipetteBtn = creerBoutonToggle("pipette", "Pipette");
+		JToggleButton remplissageBtn = creerBoutonToggle("paint-bucket", "Remplissage");
+		JToggleButton texteBtn = creerBoutonToggle("type", "Texte");
 		JButton texteImageBtn = creerBouton("image", "Texte avec image");
 		
 		// Connecter les boutons aux outils
@@ -181,7 +175,6 @@ public class ToolBarBuilder {
 		groupeOutils.add(gommeBtn);
 		groupeOutils.add(pipetteBtn);
 		groupeOutils.add(remplissageBtn);
-		groupeOutils.add(texteBtn);
 		groupeOutils.add(texteBtn);
 		
 		barre.add(selectionBtn);
