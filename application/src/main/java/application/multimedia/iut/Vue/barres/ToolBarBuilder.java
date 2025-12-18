@@ -79,6 +79,51 @@ class PanneauCouleur extends JComponent {
 }
 
 /**
+ * Composant personnalisé pour afficher une couleur.
+ */
+class PanneauCouleur extends JComponent {
+	private Color couleur;
+	
+	public PanneauCouleur(Color couleurInitiale) {
+		this.couleur = couleurInitiale;
+		setOpaque(true);
+		setPreferredSize(new Dimension(40, 40));
+		setMinimumSize(new Dimension(40, 40));
+		setMaximumSize(new Dimension(40, 40));
+	}
+	
+	public void setCouleur(Color nouvelleCouleur) {
+		System.out.println("PanneauCouleur.setCouleur appelé avec: " + nouvelleCouleur);
+		System.out.println("Ancienne couleur: " + this.couleur);
+		this.couleur = nouvelleCouleur;
+		// Forcer le rafraîchissement complet
+		invalidate();
+		revalidate();
+		repaint();
+		// Forcer aussi le parent
+		if (getParent() != null) {
+			getParent().repaint();
+		}
+		System.out.println("PanneauCouleur rafraîchi, nouvelle couleur: " + this.couleur);
+	}
+	
+	public Color getCouleur() {
+		return couleur;
+	}
+	
+	@Override
+	protected void paintComponent(Graphics g) {
+		// Ne pas appeler super pour avoir un contrôle total
+		Graphics2D g2d = (Graphics2D) g.create();
+		g2d.setColor(couleur);
+		g2d.fillRect(0, 0, getWidth(), getHeight());
+		g2d.setColor(Color.DARK_GRAY);
+		g2d.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+		g2d.dispose();
+	}
+}
+
+/**
  * Constructeur de la barre d'outils de l'application.
  * Fournit les boutons d'accès rapide aux outils de dessin et transformations.
  */
@@ -414,6 +459,9 @@ public class ToolBarBuilder {
 		System.out.println("Connexion de l'écouteur de couleur...");
 		if (ecouteurCouleurPipette != null) {
 			panneau.enregistrerEcouteurCouleur(ecouteurCouleurPipette);
+			System.out.println("Écouteur connecté avec succès!");
+		} else {
+			System.out.println("ERREUR: écouteurCouleurPipette est null!");
 		}
 	}
 	
