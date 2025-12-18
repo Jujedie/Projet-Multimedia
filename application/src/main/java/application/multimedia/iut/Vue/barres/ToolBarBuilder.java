@@ -333,8 +333,8 @@ public class ToolBarBuilder {
 		JButton undoBtn = creerBouton("undo", "Annuler");
 		JButton redoBtn = creerBouton("redo", "Refaire");
 		
-		undoBtn.addActionListener(e -> panneau.annulerAction());
-		redoBtn.addActionListener(e -> panneau.refaireAction());
+		undoBtn.addActionListener(e -> panneau.annulerDerniereAction());
+		redoBtn.addActionListener(e -> panneau.refaireDerniereAction());
 		
 		barre.add(undoBtn);
 		barre.add(redoBtn);

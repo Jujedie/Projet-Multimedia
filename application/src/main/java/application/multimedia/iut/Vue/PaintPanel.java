@@ -35,8 +35,7 @@ public class PaintPanel extends JPanel {
 	private JLabel toile;
 	private JScrollPane panneauDeroulement;
 	private ImageManagerVue gestionnaireImages;
-	private Controleur controleur;
-	
+
 	/**
 	 * Constructeur du panneau de peinture.
 	 * Initialise l'interface et précharge les icônes.
