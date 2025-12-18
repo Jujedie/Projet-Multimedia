@@ -495,6 +495,7 @@ public class ImageManagerVue {
 	 * @param hauteur Hauteur de l'image.
 	 */
 	private void creerImageVide(int largeur, int hauteur) {
+		System.out.println("Création d'une image vide " + largeur + "x" + hauteur);
 		controleur.creerImageVide(largeur, hauteur, obtenirTailleToile());
 		afficherImage();
 		toile.repaint();

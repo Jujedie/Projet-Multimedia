@@ -29,7 +29,7 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
 import application.multimedia.iut.Metier.GestionnaireOutils;
-import application.multimedia.iut.Vue.PaintPanel;
+import application.multimedia.iut.Metier.outils.OutilDessin;
 import application.multimedia.iut.Vue.PaintPanel;
 import application.multimedia.iut.Vue.utils.LucideIconLoader;
 
@@ -89,14 +89,6 @@ public class ToolBarBuilder {
 	private int tailleIcone = 20;
 	private PanneauCouleur couleurPrincipale;
 	private GestionnaireOutils.EcouteurCouleur ecouteurCouleurPipette;
-	
-	// Références aux boutons toggle pour la synchronisation
-	private JToggleButton selectionBtn;
-	private JToggleButton pinceauBtn;
-	private JToggleButton gommeBtn;
-	private JToggleButton pipetteBtn;
-	private JToggleButton remplissageBtn;
-	private JToggleButton texteBtn;
 	
 	// Références aux boutons toggle pour la synchronisation
 	private JToggleButton selectionBtn;
@@ -430,76 +422,14 @@ public class ToolBarBuilder {
 			System.out.println("ERREUR: écouteurCouleurPipette est null!");
 		}
 	}
-	
-	/**
-	 * Synchronise la sélection d'outil dans la barre d'outils.
-	 * Appelé depuis le menu pour refléter la sélection dans la barre d'outils.
-	 * 
-	 * @param outil L'outil à sélectionner visuellement.
-	 */
-	public void synchroniserSelectionOutil(application.multimedia.iut.Metier.outils.OutilDessin outil) {
-		if (outil == null) return;
 		
-		switch (outil) {
-			case SELECTION:
-				if (selectionBtn != null) selectionBtn.setSelected(true);
-				break;
-			case PINCEAU:
-				if (pinceauBtn != null) pinceauBtn.setSelected(true);
-				break;
-			case GOMME:
-				if (gommeBtn != null) gommeBtn.setSelected(true);
-				break;
-			case PIPETTE:
-				if (pipetteBtn != null) pipetteBtn.setSelected(true);
-				break;
-			case REMPLISSAGE:
-				if (remplissageBtn != null) remplissageBtn.setSelected(true);
-				break;
-			case TEXTE:
-				if (texteBtn != null) texteBtn.setSelected(true);
-				break;
-		}
-	}
-	
 	/**
 	 * Synchronise la sélection d'outil dans la barre d'outils.
 	 * Appelé depuis le menu pour refléter la sélection dans la barre d'outils.
 	 * 
 	 * @param outil L'outil à sélectionner visuellement.
 	 */
-	public void synchroniserSelectionOutil(application.multimedia.iut.Metier.outils.OutilDessin outil) {
-		if (outil == null) return;
-		
-		switch (outil) {
-			case SELECTION:
-				if (selectionBtn != null) selectionBtn.setSelected(true);
-				break;
-			case PINCEAU:
-				if (pinceauBtn != null) pinceauBtn.setSelected(true);
-				break;
-			case GOMME:
-				if (gommeBtn != null) gommeBtn.setSelected(true);
-				break;
-			case PIPETTE:
-				if (pipetteBtn != null) pipetteBtn.setSelected(true);
-				break;
-			case REMPLISSAGE:
-				if (remplissageBtn != null) remplissageBtn.setSelected(true);
-				break;
-			case TEXTE:
-				if (texteBtn != null) texteBtn.setSelected(true);
-				break;
-		}
-	}
-	
-	/**
-	 * Synchronise la sélection d'outil dans la barre d'outils.
-	 * Appelé depuis le menu pour refléter la sélection dans la barre d'outils.
-	 * 
-	 * @param outil L'outil à sélectionner visuellement.
-	 */
-	public void synchroniserSelectionOutil(application.multimedia.iut.Metier.outils.OutilDessin outil) {
+	public void synchroniserSelectionOutil(OutilDessin outil) {
 		if (outil == null) return;
 		
 		switch (outil) {
