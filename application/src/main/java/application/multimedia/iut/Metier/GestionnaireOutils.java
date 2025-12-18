@@ -65,7 +65,12 @@ public class GestionnaireOutils {
      * @param y Coordonnée Y.
      */
     public void commencerDessin(BufferedImage image, int x, int y) {
-        if (image == null) return;
+        if (image == null) {
+            System.out.println("GestionnaireOutils.commencerDessin: image est null!");
+            return;
+        }
+        
+        System.out.println("GestionnaireOutils.commencerDessin avec outil: " + outilActif + " à (" + x + ", " + y + ")");
         
         dernierPoint = new Point(x, y);
         dessinEnCours = true;
@@ -74,14 +79,18 @@ public class GestionnaireOutils {
             case PINCEAU:
                 pinceau.setCouleur(couleurActive);
                 pinceau.dessinerPoint(image, x, y);
+                System.out.println("Pinceau: point dessiné en " + couleurActive);
                 break;
             case GOMME:
-                gomme.setCouleurEffacement(Color.WHITE);
+                // Forcer le blanc pur pour la gomme
+                gomme.setCouleurEffacement(new Color(255, 255, 255));
                 gomme.effacerPoint(image, x, y);
+                System.out.println("Gomme: point effacé");
                 break;
             case PIPETTE:
                 Color couleur = pipette.preleverCouleur(image, x, y);
                 if (couleur != null) {
+                    System.out.println("Pipette - Couleur prélevée: " + couleur);
                     definirCouleurActive(couleur);
                 }
                 break;
@@ -92,7 +101,9 @@ public class GestionnaireOutils {
     
     /**
      * Continue une action de dessin vers une nouvelle position.
-     * @param image L'image sur laquelle dessiner.
+     * @System.out.println("GestionnaireOutils.continuerDessin: " + outilActif + " de (" + dernierPoint.x + ", " + dernierPoint.y + ") à (" + x + ", " + y + ")");
+        
+        param image L'image sur laquelle dessiner.
      * @param x Coordonnée X.
      * @param y Coordonnée Y.
      */
@@ -105,7 +116,8 @@ public class GestionnaireOutils {
                 pinceau.dessinerTrait(image, dernierPoint.x, dernierPoint.y, x, y);
                 break;
             case GOMME:
-                gomme.setCouleurEffacement(Color.WHITE);
+                // Forcer le blanc pur pour la gomme
+                gomme.setCouleurEffacement(new Color(255, 255, 255));
                 gomme.effacer(image, dernierPoint.x, dernierPoint.y, x, y);
                 break;
             default:
@@ -244,6 +256,7 @@ public class GestionnaireOutils {
      * @param nouvelleCouleur La nouvelle couleur choisie par la personne.
      */
     private void notifierChangementCouleur(Color nouvelleCouleur) {
+        System.out.println("Notification changement couleur: " + nouvelleCouleur + " vers " + ecouteursCouleur.size() + " écouteurs");
         for (EcouteurCouleur ecouteur : ecouteursCouleur) {
             ecouteur.couleurChangee(nouvelleCouleur);
         }

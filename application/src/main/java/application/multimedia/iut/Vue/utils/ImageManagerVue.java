@@ -64,9 +64,6 @@ public class ImageManagerVue {
 		this.parent = parent;
 		this.controleur = controleur;
 		
-		// Créer une image blanche vide au démarrage pour permettre le dessin
-		creerImageVide(800, 600);
-		
 		installerRaccourcisClavier();
 	}
 
@@ -318,12 +315,30 @@ public class ImageManagerVue {
 					}
 				}
 				
-				if (outilActif != OutilDessin.SELECTION && outilActif != OutilDessin.REMPLISSAGE && !controleur.pileCouchesEstVide()) {
-					CoucheImage couche = controleur.getPileCouches().coucheActive();
-					if (couche != null) {
-						controleur.commencerDessin(couche.image, e.getX() - couche.x, e.getY() - couche.y);
-						toile.repaint();
-						return;
+				if (outilActif != OutilDessin.SELECTION && outilActif != OutilDessin.REMPLISSAGE) {
+					// Si aucune image n'existe, créer une image vide pour permettre le dessin
+					if (controleur.pileCouchesEstVide()) {
+						System.out.println("Création d'une image vide pour le dessin...");
+						creerImageVide(800, 600);
+					}
+					
+					if (!controleur.pileCouchesEstVide()) {
+						CoucheImage couche = controleur.getPileCouches().coucheActive();
+						if (couche != null) {
+							int xImage = e.getX() - couche.x;
+							int yImage = e.getY() - couche.y;
+							System.out.println("Clic souris: (" + e.getX() + ", " + e.getY() + "), Couche pos: (" + couche.x + ", " + couche.y + "), Coord image: (" + xImage + ", " + yImage + ")");
+							System.out.println("Taille image: " + couche.image.getWidth() + "x" + couche.image.getHeight());
+							
+							// Vérifier que les coordonnées sont dans l'image
+							if (xImage >= 0 && xImage < couche.image.getWidth() && yImage >= 0 && yImage < couche.image.getHeight()) {
+								controleur.commencerDessin(couche.image, xImage, yImage);
+								toile.repaint();
+							} else {
+								System.out.println("Coordonnées hors de l'image!");
+							}
+							return;
+						}
 					}
 				}
 				
@@ -368,8 +383,14 @@ public class ImageManagerVue {
 				if (outilActif != OutilDessin.SELECTION && controleur.estEnDessin()) {
 					CoucheImage couche = controleur.getPileCouches().coucheActive();
 					if (couche != null) {
-						controleur.continuerDessin(couche.image, e.getX() - couche.x, e.getY() - couche.y);
-						toile.repaint();
+						int xImage = e.getX() - couche.x;
+						int yImage = e.getY() - couche.y;
+						
+						// Vérifier que les coordonnées sont dans l'image
+						if (xImage >= 0 && xImage < couche.image.getWidth() && yImage >= 0 && yImage < couche.image.getHeight()) {
+							controleur.continuerDessin(couche.image, xImage, yImage);
+							toile.repaint();
+						}
 						return;
 					}
 				}
@@ -430,9 +451,11 @@ public class ImageManagerVue {
 	 * @param hauteur Hauteur de l'image.
 	 */
 	private void creerImageVide(int largeur, int hauteur) {
+		System.out.println("Création d'une image vide " + largeur + "x" + hauteur);
 		controleur.creerImageVide(largeur, hauteur, obtenirTailleToile());
-
 		afficherImage();
+		toile.repaint();
+		System.out.println("Image vide créée, pile vide: " + controleur.pileCouchesEstVide());
 	}
 
 	/**
