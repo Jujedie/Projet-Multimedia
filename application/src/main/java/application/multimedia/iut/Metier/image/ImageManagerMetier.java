@@ -13,7 +13,8 @@ import javax.imageio.ImageIO;
 import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
 
 /**
- * Version métier du gestionnaire d'images : encapsule les opérations sur la PileCouches,
+ * Version métier du gestionnaire d'images : encapsule les opérations sur la
+ * PileCouches,
  * la SessionPlacement et le RenduToile sans aucune interaction UI.
  */
 public class ImageManagerMetier {
@@ -35,7 +36,8 @@ public class ImageManagerMetier {
 	 * Crée une image vide blanche et l'ajoute comme couche de base.
 	 */
 	public void creerImageVide(int largeur, int hauteur, Dimension tailleToile) {
-		BufferedImage imageVide = new BufferedImage(Math.max(1, largeur), Math.max(1, hauteur), BufferedImage.TYPE_INT_ARGB);
+		BufferedImage imageVide = new BufferedImage(Math.max(1, largeur), Math.max(1, hauteur),
+				BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2d = imageVide.createGraphics();
 		g2d.setColor(java.awt.Color.WHITE);
 		g2d.fillRect(0, 0, imageVide.getWidth(), imageVide.getHeight());
@@ -60,11 +62,14 @@ public class ImageManagerMetier {
 	}
 
 	/**
-	 * Ajoute une image : si la pile est vide l'ajoute comme base, sinon démarre le placement.
-	 * Retourne true si le placement a été démarré, false si l'image a été ajoutée directement.
+	 * Ajoute une image : si la pile est vide l'ajoute comme base, sinon démarre le
+	 * placement.
+	 * Retourne true si le placement a été démarré, false si l'image a été ajoutée
+	 * directement.
 	 */
 	public boolean ajouterImageCommeNouvelleCouche(BufferedImage image, Dimension tailleToile) {
-		if (image == null) return false;
+		if (image == null)
+			return false;
 		if (pileCouches.estVide()) {
 			pileCouches.ajouterCouche(image, tailleToile, true);
 			return false;
@@ -79,10 +84,12 @@ public class ImageManagerMetier {
 	 * - REPLACE : vide la pile et ajoute l'image.
 	 * - SUPERPOSE : démarre un placement si des couches existent.
 	 * - CANCEL : ne fait rien.
-	 * Retourne true si un placement a été démarré, false si l'image a été ajoutée ou annulée.
+	 * Retourne true si un placement a été démarré, false si l'image a été ajoutée
+	 * ou annulée.
 	 */
 	public boolean ajouterImageAvecChoix(BufferedImage image, LoadChoice choix, Dimension tailleToile) {
-		if (image == null || choix == LoadChoice.CANCEL) return false;
+		if (image == null || choix == LoadChoice.CANCEL)
+			return false;
 
 		boolean placementDemande = !pileCouches.estVide() && choix == LoadChoice.SUPERPOSE;
 
@@ -107,12 +114,15 @@ public class ImageManagerMetier {
 	}
 
 	/**
-	 * Valide le placement et, si demandé, fusionne toutes les couches en une seule image composite.
+	 * Valide le placement et, si demandé, fusionne toutes les couches en une seule
+	 * image composite.
 	 * Renvoie true si le placement a été validé et fusion (si applicable) réussie.
-	 * Si l'image placée est complètement hors-base, le placement est annulé et la méthode retourne false.
+	 * Si l'image placée est complètement hors-base, le placement est annulé et la
+	 * méthode retourne false.
 	 */
 	public boolean validerPlacement() {
-		if (!sessionPlacement.estActive()) return false;
+		if (!sessionPlacement.estActive())
+			return false;
 		if (!sessionPlacement.intersecteBase(pileCouches.niveauZoom())) {
 			sessionPlacement.annuler();
 			return false;
@@ -126,8 +136,10 @@ public class ImageManagerMetier {
 			BufferedImage imageComposite = renduToile.construireComposite(pileCouches);
 			if (imageComposite != null) {
 				pileCouches.vider();
-				// tailleToile inconnue ici : la couche sera ajoutée en tant que base ; caller peut re-ajuster si besoin
-				pileCouches.ajouterCouche(imageComposite, new Dimension(imageComposite.getWidth(), imageComposite.getHeight()), true);
+				// tailleToile inconnue ici : la couche sera ajoutée en tant que base ; caller
+				// peut re-ajuster si besoin
+				pileCouches.ajouterCouche(imageComposite,
+						new Dimension(imageComposite.getWidth(), imageComposite.getHeight()), true);
 				if (zoomActuel != 1.0) {
 					pileCouches.zoomer(zoomActuel);
 				}
@@ -158,7 +170,8 @@ public class ImageManagerMetier {
 		try {
 			BufferedImage composite = renduToile.construireComposite(pileCouches);
 			ImageIO.write(composite, "png", fichier);
-		} catch (IOException ex) {}
+		} catch (IOException ex) {
+		}
 	}
 
 	public BufferedImage ouvrirFichier(File fichier, LoadChoice choix, Dimension tailleToile) throws IOException {
@@ -182,17 +195,41 @@ public class ImageManagerMetier {
 				} else {
 					pileCouches.ajouterCouche(img, tailleToile, true);
 				}
-			} 
-		} catch (IOException ex) {}
+			}
+		} catch (IOException ex) {
+		}
 
 		return img;
+	}
+
+	public BufferedImage fusionHorizontale(BufferedImage imgGauche, BufferedImage imgDroite, int nbPixels) {
+		BufferedImage imageFusionnee = AjoutContenu.fusionHorizontale(imgGauche, imgDroite, nbPixels);
+		if (imageFusionnee != null) {
+			pileCouches.vider();
+			pileCouches.ajouterCouche(imageFusionnee,
+					new Dimension(imageFusionnee.getWidth(), imageFusionnee.getHeight()), true);
+			imageInitialePresente = false;
+		}
+		return imageFusionnee;
+	}
+
+	public BufferedImage fusionVerticale(BufferedImage imgHaut, BufferedImage imgBas, int nbPixels) {
+		BufferedImage imageFusionnee = AjoutContenu.fusionVerticale(imgHaut, imgBas, nbPixels);
+		if (imageFusionnee != null) {
+			pileCouches.vider();
+			pileCouches.ajouterCouche(imageFusionnee,
+					new Dimension(imageFusionnee.getWidth(), imageFusionnee.getHeight()), true);
+			imageInitialePresente = false;
+		}
+		return imageFusionnee;
 	}
 
 	/**
 	 * Zoom métier.
 	 */
 	public void zoomer(double facteur) {
-		if (pileCouches.estVide()) return;
+		if (pileCouches.estVide())
+			return;
 		pileCouches.zoomer(facteur);
 	}
 
@@ -200,7 +237,8 @@ public class ImageManagerMetier {
 	 * Réinitialiser zoom métier.
 	 */
 	public void reinitialiserZoom() {
-		if (pileCouches.estVide()) return;
+		if (pileCouches.estVide())
+			return;
 		pileCouches.reinitialiserZoom();
 	}
 
@@ -224,7 +262,8 @@ public class ImageManagerMetier {
 	/**
 	 * Trouve la couche visible à une position donnée.
 	 * Parcourt les couches du dessus vers le dessous.
-	 * Ignore les pixels transparents pour permettre la sélection des couches inférieures.
+	 * Ignore les pixels transparents pour permettre la sélection des couches
+	 * inférieures.
 	 *
 	 * @param p Le point à tester.
 	 * @return La couche trouvée, ou null si aucune.
@@ -240,10 +279,10 @@ public class ImageManagerMetier {
 				// Vérifier si le pixel à cette position n'est pas transparent
 				int pixelX = (int) ((p.x - couche.x) / zoom);
 				int pixelY = (int) ((p.y - couche.y) / zoom);
-				
+
 				// S'assurer que les coordonnées sont dans les limites de l'image
-				if (pixelX >= 0 && pixelX < couche.image.getWidth() && 
-				    pixelY >= 0 && pixelY < couche.image.getHeight()) {
+				if (pixelX >= 0 && pixelX < couche.image.getWidth() &&
+						pixelY >= 0 && pixelY < couche.image.getHeight()) {
 					int alpha = (couche.image.getRGB(pixelX, pixelY) >> 24) & 0xff;
 					// Si le pixel n'est pas transparent (alpha > 0), cette couche est cliquable
 					if (alpha > 0) {
@@ -253,7 +292,7 @@ public class ImageManagerMetier {
 			}
 		}
 		return null;
-	}	
+	}
 
 	/**
 	 * Indique si une session de placement est active.
