@@ -346,37 +346,11 @@ public class ImageManagerVue {
 					}
 				}
 				
-				if (outilActif != OutilDessin.SELECTION && outilActif != OutilDessin.REMPLISSAGE && outilActif != OutilDessin.TEXTE && !controleur.pileCouchesEstVide()) {
-					CoucheImage couche = controleur.getPileCouches().coucheActive();
-					if (couche != null) {
-						controleur.commencerDessin(couche.image, e.getX() - couche.x, e.getY() - couche.y);
-						toile.repaint();
-					}
-					return;
-				}
-			}
-			
-			// Gestion du pot de peinture
-			if (outilActif == OutilDessin.REMPLISSAGE && !controleur.pileCouchesEstVide()) {
-				CoucheImage couche = controleur.getPileCouches().coucheActive();
-				if (couche != null) {
-					int x = e.getX() - couche.x;
-					int y = e.getY() - couche.y;
-					// Vérifier que les coordonnées sont dans l'image
-					if (x >= 0 && x < couche.image.getWidth() && y >= 0 && y < couche.image.getHeight()) {
-						Color couleur = controleur.getCouleurActive();
-						int couleurRGB = couleur.getRGB();
-						controleur.appliquerPotDePeinture(couleurRGB, 50, true, x, y);
-						toile.repaint();
-					}
-					return;
-				}
-			}
-				
-				if (outilActif != OutilDessin.SELECTION && outilActif != OutilDessin.REMPLISSAGE) {
+				// Gestion des autres outils de dessin (pinceau, gomme)
+				if (outilActif != OutilDessin.SELECTION && outilActif != OutilDessin.REMPLISSAGE && outilActif != OutilDessin.TEXTE) {
 					// Si aucune image n'existe, créer une image vide pour permettre le dessin
 					if (controleur.pileCouchesEstVide()) {
-						creerImageVide(800, 600);
+						creerImageVide(1920, 1080);
 					}
 					
 					if (!controleur.pileCouchesEstVide()) {
