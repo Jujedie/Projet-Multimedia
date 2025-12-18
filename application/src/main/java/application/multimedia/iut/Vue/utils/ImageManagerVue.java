@@ -10,6 +10,8 @@ package application.multimedia.iut.Vue.utils;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
@@ -31,6 +33,7 @@ import javax.swing.SwingUtilities;
 import application.multimedia.iut.Controleur;
 import application.multimedia.iut.Metier.image.CoucheImage;
 import application.multimedia.iut.Metier.outils.OutilDessin;
+import application.multimedia.iut.Vue.dialogs.SimpleTexteDialog;
 import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
 
 /**

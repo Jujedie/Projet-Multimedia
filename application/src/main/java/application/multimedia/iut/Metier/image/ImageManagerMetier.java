@@ -11,7 +11,6 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import application.multimedia.iut.Metier.AjoutContenu;
-import application.multimedia.iut.Vue.utils.ImageDialogs;
 import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
 
 /**
@@ -40,10 +39,7 @@ public class ImageManagerMetier {
 	 * Crée une image vide blanche et l'ajoute comme couche de base.
 	 */
 	public void creerImageVide(int largeur, int hauteur, Dimension tailleToile) {
-		BufferedImage imageVide = new BufferedImage(Math.max(1, largeur), Math.max(1, hauteur),
-				BufferedImage.TYPE_INT_ARGB);
-		BufferedImage imageVide = new BufferedImage(Math.max(1, largeur), Math.max(1, hauteur),
-				BufferedImage.TYPE_INT_ARGB);
+		BufferedImage imageVide = new BufferedImage(Math.max(1, largeur), Math.max(1, hauteur),	BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2d = imageVide.createGraphics();
 		g2d.setColor(java.awt.Color.WHITE);
 		g2d.fillRect(0, 0, imageVide.getWidth(), imageVide.getHeight());
@@ -220,7 +216,7 @@ public class ImageManagerMetier {
 			pileCouches.vider();
 			pileCouches.ajouterCouche(imageFusionnee,
 					new Dimension(imageFusionnee.getWidth(), imageFusionnee.getHeight()), true);
-			imageInitialePresente = false;
+			imageInitialeBlanchePresente = false;
 		}
 		return imageFusionnee;
 	}
@@ -231,7 +227,7 @@ public class ImageManagerMetier {
 			pileCouches.vider();
 			pileCouches.ajouterCouche(imageFusionnee,
 					new Dimension(imageFusionnee.getWidth(), imageFusionnee.getHeight()), true);
-			imageInitialePresente = false;
+			imageInitialeBlanchePresente = false;
 		}
 		return imageFusionnee;
 	}
