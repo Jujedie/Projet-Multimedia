@@ -52,6 +52,7 @@ public class MenuBarBuilder {
 		menuBar.add(creerMenuImage());
 		menuBar.add(creerMenuOutils());
 		menuBar.add(creerMenuFiltres());
+		menuBar.add(creerMenuAffichage());
 
 		return menuBar;
 	}
@@ -279,6 +280,40 @@ public class MenuBarBuilder {
 
 		return filtresMenu;
 	}
+
+	/**
+	 * Crée le menu Fichier avec les opérations de gestion de fichiers.
+	 * Contient : Nouveau, Ouvrir, Enregistrer, Enregistrer sous, Quitter.
+	 *
+	 * @return Le menu Fichier.
+	 */
+	private JMenu creerMenuAffichage() {
+		JMenu affichageMenu = new JMenu("Affichage");
+		affichageMenu.setMnemonic(KeyEvent.VK_N);
+
+		JMenuItem zoomItem = new JMenuItem("Zoomer");
+		JMenuItem dezoomItem = new JMenuItem("Dezoomer");
+		JMenuItem resetItem = new JMenuItem("Réinitialiser le zoom");
+
+		zoomItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, menuShortcut));
+		dezoomItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, menuShortcut));
+		resetItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, menuShortcut));
+
+		zoomItem.setMnemonic(KeyEvent.VK_N);
+		dezoomItem.setMnemonic(KeyEvent.VK_O);
+		resetItem.setMnemonic(KeyEvent.VK_P);
+
+		zoomItem.addActionListener(e -> panneau.zoomer(1.2));
+		dezoomItem.addActionListener(e -> panneau.zoomer(0.8));
+		resetItem.addActionListener(e -> panneau.reinitialiserZoom());
+
+		affichageMenu.add(zoomItem);
+		affichageMenu.add(dezoomItem);
+		affichageMenu.add(resetItem);
+
+		return affichageMenu;
+	}
+
 
 	/**
 	 * Ouvre un dialogue pour ajuster le contraste.
