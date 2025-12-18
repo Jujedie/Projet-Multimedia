@@ -8,7 +8,7 @@
  * <li>La fusion verticale de deux images avec un décalage (offset).</li>
  * </ul>
  * </p>
- * * @author VotreNom
+ * * @author Antoine LECHASLES, Martin RAVENEL, Julien OYER
  * @version 1.0
  */
 
@@ -35,7 +35,7 @@ public class AjoutContenuTest {
 	/**
 	 * Répertoire de destination pour les images résultant des tests de fusion.
 	 */
-	public static final String outputDir = "application/src/test/resources/testAjoutContenuResultats";
+	public static final String outputDir = "application/src/test/resources/testAjoutContenuResultats_";
 
 	/**
 	 * Point d'entrée principal pour l'exécution des tests unitaires manuels.

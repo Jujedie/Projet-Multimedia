@@ -1,14 +1,49 @@
+/**
+ * Classe de test pour les transformations géométriques de la classe {@link Format}.
+ * <p>
+ * Cette classe valide les fonctionnalités de manipulation de structure d'image, notamment :
+ * <ul>
+ * <li>Le redimensionnement libre (largeur et hauteur).</li>
+ * <li>Le découpage (cropping) d'une zone rectangulaire.</li>
+ * <li>La rotation selon un angle arbitraire (ex: 180° et 147°).</li>
+ * <li>Les symétries (miroirs) horizontales et verticales.</li>
+ * </ul>
+ * </p>
+ * * @author VotreNom
+ * @version 1.0
+ */
+
 package application.multimedia.iut.Metier;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
 
 public class FormatTest {
-	public final static File inputFile = new File("application/src/main/resources/chat.png");
+
+	/**
+	 * Fichier image source utilisé pour l'ensemble des tests de format (tortue.png).
+	 */
+	public final static File inputFile = new File("application/src/main/resources/tortue.png");
+
+	/**
+	 * Préfixe du chemin de sortie pour les images générées par les tests.
+	 */
 	public static final String outputDir = "application/src/test/resources/testFormatResultats_";
 
+	/**
+	 * Point d'entrée principal exécutant la suite de tests de transformation.
+	 * <p>
+	 * La méthode charge l'image originale une seule fois, puis applique
+	 * successivement
+	 * les transformations de la classe {@link Format} avant d'exporter chaque
+	 * résultat
+	 * en format PNG.
+	 * </p>
+	 * 
+	 * @param args Arguments de la ligne de commande (non utilisés).
+	 */
 	public static void main(String[] args) {
 
 		BufferedImage imageOriginale = null;
