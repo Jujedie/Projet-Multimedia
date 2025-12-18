@@ -13,6 +13,8 @@ import java.util.ArrayList;
 
 import application.multimedia.iut.Controleur;
 
+import application.multimedia.iut.Controleur;
+
 /**
  * Gère l'historique des actions pour le système Undo/Redo.
  * Permet d'annuler et de rétablir les modifications d'images.
