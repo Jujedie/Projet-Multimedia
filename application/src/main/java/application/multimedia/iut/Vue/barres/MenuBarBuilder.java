@@ -7,11 +7,18 @@
  */
 package application.multimedia.iut.Vue.barres;
 
-import application.multimedia.iut.Vue.PaintPanel;
-
-import javax.swing.*;
-import java.awt.event.KeyEvent;
 import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.KeyStroke;
+
+import application.multimedia.iut.Vue.PaintPanel;
 
 /**
  * Constructeur de la barre de menu de l'application.
@@ -118,8 +125,8 @@ public class MenuBarBuilder {
 		texteImageItem.setMnemonic(KeyEvent.VK_T);
 		effacerItem.setMnemonic(KeyEvent.VK_E);
 
-		annulerItem.addActionListener(e -> panneau.annulerAction());
-		refaireItem.addActionListener(e -> panneau.refaireAction());
+		annulerItem.addActionListener(e -> panneau.annulerDerniereAction());
+		refaireItem.addActionListener(e -> panneau.refaireDerniereAction());
 		texteImageItem.addActionListener(e -> panneau.ouvrirDialogueTexteImage());
 		effacerItem.addActionListener(e -> panneau.effacerTout());
 

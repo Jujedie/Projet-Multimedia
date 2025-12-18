@@ -23,12 +23,12 @@ import java.awt.image.BufferedImage;
  * Coordonne l'affichage du canevas et les interactions utilisateur.
  */
 public class PaintPanel extends JPanel {
+	private final Controleur controleur;
 
 	private JLabel toile;
 	private JScrollPane panneauDeroulement;
 	private ImageManagerVue gestionnaireImages;
-	private Controleur controleur;
-	
+
 	/**
 	 * Constructeur du panneau de peinture.
 	 * Initialise l'interface et précharge les icônes.
@@ -221,22 +221,6 @@ public class PaintPanel extends JPanel {
 	// ========================================
 	// MÉTHODES D'ÉDITION
 	// ========================================
-	
-	/**
-	 * Annule la dernière action effectuée.
-	 */
-	public void annulerAction() {
-		controleur.annuler();
-		gestionnaireImages.rafraichirAffichage();
-	}
-	
-	/**
-	 * Refait la dernière action annulée.
-	 */
-	public void refaireAction() {
-		controleur.refaire();
-		gestionnaireImages.rafraichirAffichage();
-	}
 	
 	/**
 	 * Efface tout le contenu de l'image courante.

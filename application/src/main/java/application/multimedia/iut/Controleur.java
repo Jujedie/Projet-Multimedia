@@ -21,6 +21,7 @@ import java.io.IOException;
 import javax.swing.SwingUtilities;
 
 import application.multimedia.iut.Metier.Colorisation;
+import application.multimedia.iut.Metier.Format;
 import application.multimedia.iut.Metier.GestionnaireOutils;
 import application.multimedia.iut.Metier.Journaux;
 import application.multimedia.iut.Metier.image.CoucheImage;
@@ -339,6 +340,72 @@ public class Controleur {
 		if (image != null) {
 			Colorisation.potDePeinture(image, couleurDest, distance, estContinue, xOrig, yOrig);
 		}
+	}
+
+	// ========================================
+	// DÉLÉGATION - Gestion du format
+	// ========================================
+	
+	/**
+	 * Applique un retournement horizontal à l'image.
+	 * 
+	 * @param image L'image à retourner.
+	 * @return L'image retournée.
+	 */
+	public BufferedImage flipH(BufferedImage image) {
+		if (image != null) {
+			BufferedImage img = Format.symetrieHorizontale(image);
+			return img;
+			
+		}
+		return null;
+	}
+	
+	/**
+	 * Applique un retournement vertical à l'image.
+	 * 
+	 * @param image L'image à retourner.
+	 * @return L'image retournée.
+	 */
+	public BufferedImage flipV(BufferedImage image) {
+		if (image != null) {
+			BufferedImage img = Format.symetrieVerticale(image);
+			historiqueModification.ajouterImage(obtenirImageCourante());
+			return img;
+		}
+		return null;
+	}
+	
+	/**
+	 * Applique une rotation à l'image.
+	 * 
+	 * @param image L'image à pivoter.
+	 * @param angle L'angle de rotation en degrés.
+	 * @return L'image pivotée.
+	 */
+	public BufferedImage rotation(BufferedImage image, double angle) {
+		if (image != null) {
+			BufferedImage img = Format.rotation(image, angle);
+			return img;
+		}
+		return null;
+	}
+	
+	/**
+	 * Redimensionne l'image aux dimensions spécifiées.
+	 * 
+	 * @param image L'image à redimensionner.
+	 * @param largeur La nouvelle largeur.
+	 * @param hauteur La nouvelle hauteur.
+	 * @return L'image redimensionnée.
+	 */
+	public BufferedImage redimensionner(BufferedImage image, int largeur, int hauteur) {
+		if (image != null && largeur > 0 && hauteur > 0) {
+			BufferedImage img = Format.redimensionner(image, largeur, hauteur);
+			historiqueModification.ajouterImage(obtenirImageCourante());
+			return img;
+		}
+		return null;
 	}
 
 	/**

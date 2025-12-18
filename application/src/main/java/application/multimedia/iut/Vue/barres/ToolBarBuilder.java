@@ -10,6 +10,8 @@ package application.multimedia.iut.Vue.barres;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 
 import javax.swing.AbstractButton;
@@ -17,12 +19,14 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 
 import application.multimedia.iut.Metier.GestionnaireOutils;
 import application.multimedia.iut.Vue.PaintPanel;
@@ -323,8 +327,8 @@ public class ToolBarBuilder {
 		JButton undoBtn = creerBouton("undo", "Annuler");
 		JButton redoBtn = creerBouton("redo", "Refaire");
 		
-		undoBtn.addActionListener(e -> panneau.annulerAction());
-		redoBtn.addActionListener(e -> panneau.refaireAction());
+		undoBtn.addActionListener(e -> panneau.annulerDerniereAction());
+		redoBtn.addActionListener(e -> panneau.refaireDerniereAction());
 		
 		barre.add(undoBtn);
 		barre.add(redoBtn);
@@ -483,9 +487,13 @@ public class ToolBarBuilder {
 		
 		btn.addMouseListener(new java.awt.event.MouseAdapter() {
 			Color originalColor = btn.getBackground();
+            
+			@Override
 			public void mouseEntered(java.awt.event.MouseEvent evt) {
 				btn.setBackground(new Color(220, 220, 220));
 			}
+            
+			@Override
 			public void mouseExited(java.awt.event.MouseEvent evt) {
 				btn.setBackground(originalColor);
 			}
