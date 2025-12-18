@@ -28,9 +28,31 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+
+import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
+
 import application.multimedia.iut.Metier.GestionnaireOutils;
 import application.multimedia.iut.Vue.PaintPanel;
+import application.multimedia.iut.Metier.outils.OutilDessin;
+import application.multimedia.iut.Vue.PaintPanel;
 import application.multimedia.iut.Vue.utils.LucideIconLoader;
+import application.multimedia.iut.Vue.PaintPanel;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Composant personnalisé pour afficher une couleur.
@@ -150,12 +172,12 @@ public class ToolBarBuilder {
 	private void ajouterOutilsDessin(JToolBar barre) {
 		ButtonGroup groupeOutils = new ButtonGroup();
 		
-		JToggleButton selectionBtn = creerBoutonToggle("square-dashed", "Sélection");
-		JToggleButton pinceauBtn = creerBoutonToggle("pencil", "Pinceau");
-		JToggleButton gommeBtn = creerBoutonToggle("eraser", "Gomme");
-		JToggleButton pipetteBtn = creerBoutonToggle("pipette", "Pipette");
-		JToggleButton remplissageBtn = creerBoutonToggle("paint-bucket", "Remplissage");
-		JToggleButton texteBtn = creerBoutonToggle("type", "Texte");
+		selectionBtn = creerBoutonToggle("square-dashed", "Sélection");
+		pinceauBtn = creerBoutonToggle("pencil", "Pinceau");
+		gommeBtn = creerBoutonToggle("eraser", "Gomme");
+		pipetteBtn = creerBoutonToggle("pipette", "Pipette");
+		remplissageBtn = creerBoutonToggle("paint-bucket", "Remplissage");
+		texteBtn = creerBoutonToggle("type", "Texte");
 		JButton texteImageBtn = creerBouton("image", "Texte avec image");
 		
 		// Connecter les boutons aux outils
@@ -326,8 +348,8 @@ public class ToolBarBuilder {
 		JButton undoBtn = creerBouton("undo", "Annuler");
 		JButton redoBtn = creerBouton("redo", "Refaire");
 		
-		undoBtn.addActionListener(e -> panneau.annulerDerniereAction());
-		redoBtn.addActionListener(e -> panneau.refaireDerniereAction());
+		undoBtn.addActionListener(e -> panneau.annulerAction());
+		redoBtn.addActionListener(e -> panneau.refaireAction());
 		
 		barre.add(undoBtn);
 		barre.add(redoBtn);
@@ -406,37 +428,6 @@ public class ToolBarBuilder {
 			System.out.println("Écouteur connecté avec succès!");
 		} else {
 			System.out.println("ERREUR: écouteurCouleurPipette est null!");
-		}
-	}
-	
-	/**
-	 * Synchronise la sélection d'outil dans la barre d'outils.
-	 * Appelé depuis le menu pour refléter la sélection dans la barre d'outils.
-	 * 
-	 * @param outil L'outil à sélectionner visuellement.
-	 */
-	public void synchroniserSelectionOutil(application.multimedia.iut.Metier.outils.OutilDessin outil) {
-		if (outil == null) return;
-		
-		switch (outil) {
-			case SELECTION:
-				if (selectionBtn != null) selectionBtn.setSelected(true);
-				break;
-			case PINCEAU:
-				if (pinceauBtn != null) pinceauBtn.setSelected(true);
-				break;
-			case GOMME:
-				if (gommeBtn != null) gommeBtn.setSelected(true);
-				break;
-			case PIPETTE:
-				if (pipetteBtn != null) pipetteBtn.setSelected(true);
-				break;
-			case REMPLISSAGE:
-				if (remplissageBtn != null) remplissageBtn.setSelected(true);
-				break;
-			case TEXTE:
-				if (texteBtn != null) texteBtn.setSelected(true);
-				break;
 		}
 	}
 	
