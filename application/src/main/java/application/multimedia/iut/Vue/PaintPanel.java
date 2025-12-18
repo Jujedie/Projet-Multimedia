@@ -102,8 +102,12 @@ public class PaintPanel extends JPanel {
 		// Définir une taille préférée pour que la toile prenne tout l'espace
 		toile.setPreferredSize(new Dimension(2000, 2000));
 		
+		// Définir une taille préférée pour que la toile prenne tout l'espace
+		toile.setPreferredSize(new Dimension(2000, 2000));
+		
 		panneauDeroulement = new JScrollPane(toile);
 		panneauDeroulement.setBackground(Color.DARK_GRAY);
+		panneauDeroulement.getViewport().setBackground(Color.DARK_GRAY);
 		panneauDeroulement.getViewport().setBackground(Color.DARK_GRAY);
 		
 		gestionnaireImages = new ImageManagerVue(toile, this, controleur);
@@ -186,6 +190,10 @@ public class PaintPanel extends JPanel {
 	 */
 	public void activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin outil) {
 		gestionnaireImages.activerOutil(outil);
+		// Synchroniser la sélection dans la barre d'outils
+		if (toolBarBuilder != null) {
+			toolBarBuilder.synchroniserSelectionOutil(outil);
+		}
 		// Synchroniser la sélection dans la barre d'outils
 		if (toolBarBuilder != null) {
 			toolBarBuilder.synchroniserSelectionOutil(outil);

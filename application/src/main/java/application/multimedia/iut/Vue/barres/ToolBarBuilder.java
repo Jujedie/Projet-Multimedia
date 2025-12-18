@@ -175,7 +175,6 @@ public class ToolBarBuilder {
 		groupeOutils.add(pipetteBtn);
 		groupeOutils.add(remplissageBtn);
 		groupeOutils.add(texteBtn);
-		groupeOutils.add(texteBtn);
 		
 		barre.add(selectionBtn);
 		barre.add(pinceauBtn);
@@ -407,6 +406,37 @@ public class ToolBarBuilder {
 			System.out.println("Écouteur connecté avec succès!");
 		} else {
 			System.out.println("ERREUR: écouteurCouleurPipette est null!");
+		}
+	}
+	
+	/**
+	 * Synchronise la sélection d'outil dans la barre d'outils.
+	 * Appelé depuis le menu pour refléter la sélection dans la barre d'outils.
+	 * 
+	 * @param outil L'outil à sélectionner visuellement.
+	 */
+	public void synchroniserSelectionOutil(application.multimedia.iut.Metier.outils.OutilDessin outil) {
+		if (outil == null) return;
+		
+		switch (outil) {
+			case SELECTION:
+				if (selectionBtn != null) selectionBtn.setSelected(true);
+				break;
+			case PINCEAU:
+				if (pinceauBtn != null) pinceauBtn.setSelected(true);
+				break;
+			case GOMME:
+				if (gommeBtn != null) gommeBtn.setSelected(true);
+				break;
+			case PIPETTE:
+				if (pipetteBtn != null) pipetteBtn.setSelected(true);
+				break;
+			case REMPLISSAGE:
+				if (remplissageBtn != null) remplissageBtn.setSelected(true);
+				break;
+			case TEXTE:
+				if (texteBtn != null) texteBtn.setSelected(true);
+				break;
 		}
 	}
 	
