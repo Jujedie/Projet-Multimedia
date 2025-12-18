@@ -12,13 +12,14 @@ import application.multimedia.iut.Vue.utils.LucideIconLoader;
 import application.multimedia.iut.Vue.PaintPanel;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
 /**
  * Composant personnalisé pour afficher une couleur.
  */
 class PanneauCouleur extends JComponent {
 	private Color couleur;
-	
+
 	public PanneauCouleur(Color couleurInitiale) {
 		this.couleur = couleurInitiale;
 		setOpaque(true);
@@ -26,7 +27,7 @@ class PanneauCouleur extends JComponent {
 		setMinimumSize(new Dimension(40, 40));
 		setMaximumSize(new Dimension(40, 40));
 	}
-	
+
 	public void setCouleur(Color nouvelleCouleur) {
 		System.out.println("PanneauCouleur.setCouleur appelé avec: " + nouvelleCouleur);
 		System.out.println("Ancienne couleur: " + this.couleur);
@@ -41,11 +42,11 @@ class PanneauCouleur extends JComponent {
 		}
 		System.out.println("PanneauCouleur rafraîchi, nouvelle couleur: " + this.couleur);
 	}
-	
+
 	public Color getCouleur() {
 		return couleur;
 	}
-	
+
 	@Override
 	protected void paintComponent(Graphics g) {
 		// Ne pas appeler super pour avoir un contrôle total
@@ -69,7 +70,7 @@ public class ToolBarBuilder {
 	private int tailleIcone = 20;
 	private PanneauCouleur couleurPrincipale;
 	private GestionnaireOutils.EcouteurCouleur ecouteurCouleurPipette;
-	
+
 	// Références aux boutons toggle pour la synchronisation
 	private JToggleButton selectionBtn;
 	private JToggleButton pinceauBtn;
@@ -86,7 +87,7 @@ public class ToolBarBuilder {
 	public ToolBarBuilder(PaintPanel panneau) {
 		this.panneau = panneau;
 	}
-	
+
 	/**
 	 * Crée et assemble la barre d'outils complète.
 	 * Contient tous les outils de dessin, fichiers, transformations, etc.
@@ -98,30 +99,30 @@ public class ToolBarBuilder {
 		barreOutils.setFloatable(false);
 		barreOutils.setBackground(new Color(240, 240, 240));
 		barreOutils.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
-		
+
 		ajouterOutilsDessin(barreOutils);
 		barreOutils.addSeparator();
-		
+
 		ajouterOutilsFichier(barreOutils);
 		barreOutils.addSeparator();
-		
+
 		ajouterOutilsTransformation(barreOutils);
 		barreOutils.addSeparator();
-		
+
 		ajouterOutilsFiltres(barreOutils);
 		barreOutils.addSeparator();
-		
+
 		ajouterOutilsHistorique(barreOutils);
 		barreOutils.addSeparator();
-		
+
 		ajouterOutilsZoom(barreOutils);
 		barreOutils.addSeparator();
-		
+
 		ajouterSelecteurCouleurs(barreOutils);
-		
+
 		return barreOutils;
 	}
-	
+
 	/**
 	 * Ajoute les outils de dessin à la barre d'outils.
 	 * Contient : Sélection, Pinceau, Gomme, Pipette, Remplissage, Texte.
@@ -130,7 +131,7 @@ public class ToolBarBuilder {
 	 */
 	private void ajouterOutilsDessin(JToolBar barre) {
 		ButtonGroup groupeOutils = new ButtonGroup();
-		
+
 		selectionBtn = creerBoutonToggle("square-dashed", "Sélection");
 		pinceauBtn = creerBoutonToggle("pencil", "Pinceau");
 		gommeBtn = creerBoutonToggle("eraser", "Gomme");
@@ -138,25 +139,31 @@ public class ToolBarBuilder {
 		remplissageBtn = creerBoutonToggle("paint-bucket", "Remplissage");
 		texteBtn = creerBoutonToggle("type", "Texte");
 		JButton texteImageBtn = creerBouton("image", "Texte avec image");
-		
+
 		// Connecter les boutons aux outils
-		selectionBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.SELECTION));
-		pinceauBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.PINCEAU));
-		gommeBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.GOMME));
-		pipetteBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.PIPETTE));
-		remplissageBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.REMPLISSAGE));
-		texteBtn.addActionListener(e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.TEXTE));
+		selectionBtn.addActionListener(
+				e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.SELECTION));
+		pinceauBtn.addActionListener(
+				e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.PINCEAU));
+		gommeBtn.addActionListener(
+				e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.GOMME));
+		pipetteBtn.addActionListener(
+				e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.PIPETTE));
+		remplissageBtn.addActionListener(
+				e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.REMPLISSAGE));
+		texteBtn.addActionListener(
+				e -> panneau.activerOutilDessin(application.multimedia.iut.Metier.outils.OutilDessin.TEXTE));
 		texteImageBtn.addActionListener(e -> panneau.ouvrirEditeurTexteImage());
-		
+
 		selectionBtn.setSelected(true);
-		
+
 		groupeOutils.add(selectionBtn);
 		groupeOutils.add(pinceauBtn);
 		groupeOutils.add(gommeBtn);
 		groupeOutils.add(pipetteBtn);
 		groupeOutils.add(remplissageBtn);
 		groupeOutils.add(texteBtn);
-		
+
 		barre.add(selectionBtn);
 		barre.add(pinceauBtn);
 		barre.add(gommeBtn);
@@ -165,7 +172,7 @@ public class ToolBarBuilder {
 		barre.add(texteBtn);
 		barre.add(texteImageBtn);
 	}
-	
+
 	/**
 	 * Ajoute les outils de gestion de fichiers à la barre d'outils.
 	 * Contient : Sauvegarder, Ouvrir, Effacer tout.
@@ -180,12 +187,12 @@ public class ToolBarBuilder {
 		chargerBtn.addActionListener(e -> panneau.ouvrirFichier());
 		sauvegarderBtn.addActionListener(e -> panneau.enregistrerFichier(true));
 		effacerBtn.addActionListener(e -> panneau.supprimerTout());
-		
+
 		barre.add(sauvegarderBtn);
 		barre.add(chargerBtn);
 		barre.add(effacerBtn);
 	}
-	
+
 	/**
 	 * Ajoute les outils de transformation d'images à la barre d'outils.
 	 * Contient : Flip H/V, Rotation, Redimensionner, Fusionner.
@@ -197,21 +204,24 @@ public class ToolBarBuilder {
 		JButton flipVBtn = creerBouton("flip-vertical", "Flip Vertical");
 		JButton rotationBtn = creerBouton("rotate-cw", "Rotation");
 		JButton rediBtn = creerBouton("maximize", "Redimensionner");
-		JButton mergerBtn = creerBouton("layers", "Fusionner");
-		
+		JButton mergerHBtn = creerBouton("gallery-horizontal-end", "Fusionner Horizontalement");
+		JButton mergerVBtn = creerBouton("gallery-vertical-end", "Fusionner Verticalement");
+
 		flipHBtn.addActionListener(e -> panneau.flipH());
 		flipVBtn.addActionListener(e -> panneau.flipV());
 		rotationBtn.addActionListener(e -> panneau.rotation());
 		rediBtn.addActionListener(e -> panneau.redimensionner());
-		mergerBtn.addActionListener(e -> panneau.fusionHorizontale());
-		
+		mergerHBtn.addActionListener(e -> panneau.fusionHorizontale());
+		mergerVBtn.addActionListener(e -> panneau.fusionVerticale());
+
 		barre.add(flipHBtn);
 		barre.add(flipVBtn);
 		barre.add(rotationBtn);
 		barre.add(rediBtn);
-		barre.add(mergerBtn);
+		barre.add(mergerHBtn);
+		barre.add(mergerVBtn);
 	}
-	
+
 	/**
 	 * Ajoute les outils de filtres d'images à la barre d'outils.
 	 * Contient : Contraste, Luminosité, Teinture.
@@ -222,16 +232,16 @@ public class ToolBarBuilder {
 		JButton contrasteBtn = creerBouton("contrast", "Contraste");
 		JButton luminositeBtn = creerBouton("sun", "Luminosité");
 		JButton teintureBtn = creerBouton("palette", "Teinture");
-		
+
 		contrasteBtn.addActionListener(e -> ouvrirDialogueContraste());
 		luminositeBtn.addActionListener(e -> ouvrirDialogueLuminosite());
 		teintureBtn.addActionListener(e -> ouvrirDialogueTeinture());
-		
+
 		barre.add(contrasteBtn);
 		barre.add(luminositeBtn);
 		barre.add(teintureBtn);
 	}
-	
+
 	/**
 	 * Ouvre une boîte de dialogue pour ajuster le contraste.
 	 */
@@ -241,15 +251,15 @@ public class ToolBarBuilder {
 		slider.setMinorTickSpacing(10);
 		slider.setPaintTicks(true);
 		slider.setPaintLabels(true);
-		
-		int resultat = JOptionPane.showConfirmDialog(panneau, slider, "Ajuster le contraste", 
-			JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		
+
+		int resultat = JOptionPane.showConfirmDialog(panneau, slider, "Ajuster le contraste",
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
 		if (resultat == JOptionPane.OK_OPTION) {
 			panneau.appliquerContraste(slider.getValue());
 		}
 	}
-	
+
 	/**
 	 * Ouvre une boîte de dialogue pour ajuster la luminosité.
 	 */
@@ -259,26 +269,26 @@ public class ToolBarBuilder {
 		slider.setMinorTickSpacing(25);
 		slider.setPaintTicks(true);
 		slider.setPaintLabels(true);
-		
-		int resultat = JOptionPane.showConfirmDialog(panneau, slider, "Ajuster la luminosité", 
-			JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		
+
+		int resultat = JOptionPane.showConfirmDialog(panneau, slider, "Ajuster la luminosité",
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
 		if (resultat == JOptionPane.OK_OPTION) {
 			panneau.appliquerLuminosite(slider.getValue());
 		}
 	}
-	
+
 	/**
 	 * Ouvre une boîte de dialogue pour appliquer une teinture.
 	 */
 	private void ouvrirDialogueTeinture() {
 		JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5));
-		
+
 		JSlider redSlider = new JSlider(0, 255, 255);
 		JSlider greenSlider = new JSlider(0, 255, 0);
 		JSlider blueSlider = new JSlider(0, 255, 0);
 		JSlider alphaSlider = new JSlider(0, 255, 128);
-		
+
 		panel.add(new JLabel("Rouge:"));
 		panel.add(redSlider);
 		panel.add(new JLabel("Vert:"));
@@ -287,16 +297,16 @@ public class ToolBarBuilder {
 		panel.add(blueSlider);
 		panel.add(new JLabel("Intensité:"));
 		panel.add(alphaSlider);
-		
-		int resultat = JOptionPane.showConfirmDialog(panneau, panel, "Appliquer une teinture", 
-			JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-		
+
+		int resultat = JOptionPane.showConfirmDialog(panneau, panel, "Appliquer une teinture",
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
 		if (resultat == JOptionPane.OK_OPTION) {
-			panneau.appliquerTeinte(redSlider.getValue(), greenSlider.getValue(), 
-				blueSlider.getValue(), alphaSlider.getValue());
+			panneau.appliquerTeinte(redSlider.getValue(), greenSlider.getValue(),
+					blueSlider.getValue(), alphaSlider.getValue());
 		}
 	}
-	
+
 	/**
 	 * Ajoute les outils d'historique à la barre d'outils.
 	 * Contient : Annuler, Refaire.
@@ -306,14 +316,14 @@ public class ToolBarBuilder {
 	private void ajouterOutilsHistorique(JToolBar barre) {
 		JButton undoBtn = creerBouton("undo", "Annuler");
 		JButton redoBtn = creerBouton("redo", "Refaire");
-		
+
 		undoBtn.addActionListener(e -> panneau.annulerAction());
 		redoBtn.addActionListener(e -> panneau.refaireAction());
-		
+
 		barre.add(undoBtn);
 		barre.add(redoBtn);
 	}
-	
+
 	/**
 	 * Ajoute les contrôles de zoom à la barre d'outils.
 	 * Contient : Zoom+, Zoom-, Réinitialiser.
@@ -324,16 +334,31 @@ public class ToolBarBuilder {
 		JButton zoomInBtn = creerBouton("zoom-in", "Zoom +");
 		JButton zoomOutBtn = creerBouton("zoom-out", "Zoom -");
 		JButton zoomResetBtn = creerBouton("maximize-2", "Zoom 100%");
-		
+
 		zoomInBtn.addActionListener(e -> panneau.zoomer(1.2));
 		zoomOutBtn.addActionListener(e -> panneau.zoomer(0.8));
 		zoomResetBtn.addActionListener(e -> panneau.reinitialiserZoom());
-		
+
+		panneau.addMouseWheelListener(new MouseWheelListener() {
+			@Override
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				if (e.isControlDown()) {
+					if (e.getWheelRotation() < 0) {
+						panneau.zoomer(1.2);
+					} else {
+						panneau.zoomer(0.8);
+					}
+					e.consume();
+					panneau.repaint();
+				}
+			}
+		});
+
 		barre.add(zoomInBtn);
 		barre.add(zoomOutBtn);
 		barre.add(zoomResetBtn);
 	}
-	
+
 	/**
 	 * Ajoute le sélecteur de couleurs à la barre d'outils.
 	 * Affiche deux panneaux pour les couleurs principale et secondaire.
@@ -344,38 +369,39 @@ public class ToolBarBuilder {
 		// Créer le panneau personnalisé pour la couleur
 		couleurPrincipale = new PanneauCouleur(Color.BLACK);
 		couleurPrincipale.setToolTipText("Couleur principale - Cliquez pour changer");
-		
+
 		// Ajouter un listener pour changer la couleur en cliquant
 		couleurPrincipale.addMouseListener(new java.awt.event.MouseAdapter() {
 			@Override
 			public void mouseClicked(java.awt.event.MouseEvent e) {
-				Color nouvelleCouleur = JColorChooser.showDialog(panneau, "Choisir une couleur", couleurPrincipale.getCouleur());
+				Color nouvelleCouleur = JColorChooser.showDialog(panneau, "Choisir une couleur",
+						couleurPrincipale.getCouleur());
 				if (nouvelleCouleur != null) {
 					couleurPrincipale.setCouleur(nouvelleCouleur);
 					panneau.definirCouleurDessin(nouvelleCouleur);
 				}
 			}
 		});
-		
+
 		barre.add(couleurPrincipale);
-		
+
 		// Créer l'écouteur de changement de couleur depuis la pipette
 		ecouteurCouleurPipette = couleur -> {
 			System.out.println("=== PIPETTE: Changement de couleur détecté ===");
 			System.out.println("Nouvelle couleur: " + couleur);
 			System.out.println("RGB: " + couleur.getRed() + ", " + couleur.getGreen() + ", " + couleur.getBlue());
-			
+
 			// Mettre à jour la couleur
 			SwingUtilities.invokeLater(() -> {
 				couleurPrincipale.setCouleur(couleur);
 				panneau.definirCouleurDessin(couleur);
 				System.out.println("Couleur mise à jour: " + couleurPrincipale.getCouleur());
 			});
-			
+
 			System.out.println("=========================================");
 		};
 	}
-	
+
 	/**
 	 * Connecte l'écouteur de couleur au contrôleur de dessin.
 	 * Doit être appelé après l'initialisation du gestionnaire d'images.
@@ -389,7 +415,7 @@ public class ToolBarBuilder {
 			System.out.println("ERREUR: écouteurCouleurPipette est null!");
 		}
 	}
-	
+
 	/**
 	 * Synchronise la sélection d'outil dans la barre d'outils.
 	 * Appelé depuis le menu pour refléter la sélection dans la barre d'outils.
@@ -397,34 +423,41 @@ public class ToolBarBuilder {
 	 * @param outil L'outil à sélectionner visuellement.
 	 */
 	public void synchroniserSelectionOutil(application.multimedia.iut.Metier.outils.OutilDessin outil) {
-		if (outil == null) return;
-		
+		if (outil == null)
+			return;
+
 		switch (outil) {
 			case SELECTION:
-				if (selectionBtn != null) selectionBtn.setSelected(true);
+				if (selectionBtn != null)
+					selectionBtn.setSelected(true);
 				break;
 			case PINCEAU:
-				if (pinceauBtn != null) pinceauBtn.setSelected(true);
+				if (pinceauBtn != null)
+					pinceauBtn.setSelected(true);
 				break;
 			case GOMME:
-				if (gommeBtn != null) gommeBtn.setSelected(true);
+				if (gommeBtn != null)
+					gommeBtn.setSelected(true);
 				break;
 			case PIPETTE:
-				if (pipetteBtn != null) pipetteBtn.setSelected(true);
+				if (pipetteBtn != null)
+					pipetteBtn.setSelected(true);
 				break;
 			case REMPLISSAGE:
-				if (remplissageBtn != null) remplissageBtn.setSelected(true);
+				if (remplissageBtn != null)
+					remplissageBtn.setSelected(true);
 				break;
 			case TEXTE:
-				if (texteBtn != null) texteBtn.setSelected(true);
+				if (texteBtn != null)
+					texteBtn.setSelected(true);
 				break;
 		}
 	}
-	
+
 	/**
 	 * Crée un bouton toggle (sélectionnable) avec une icône.
 	 *
-	 * @param nomIcone Le nom de l'icône Lucide.
+	 * @param nomIcone  Le nom de l'icône Lucide.
 	 * @param infobulle Le texte de l'infobulle.
 	 * @return Le bouton toggle configuré.
 	 */
@@ -437,7 +470,7 @@ public class ToolBarBuilder {
 	/**
 	 * Crée un bouton standard avec une icône.
 	 *
-	 * @param nomIcone Le nom de l'icône Lucide.
+	 * @param nomIcone  Le nom de l'icône Lucide.
 	 * @param infobulle Le texte de l'infobulle.
 	 * @return Le bouton configuré.
 	 */
@@ -446,12 +479,12 @@ public class ToolBarBuilder {
 		configurerBouton(btn, infobulle);
 		return btn;
 	}
-	
+
 	/**
 	 * Configure le style et le comportement d'un bouton.
 	 * Applique les dimensions, couleurs et effets de survol.
 	 *
-	 * @param btn Le bouton à configurer.
+	 * @param btn       Le bouton à configurer.
 	 * @param infobulle Le texte de l'infobulle.
 	 */
 	private void configurerBouton(AbstractButton btn, String infobulle) {
@@ -460,16 +493,17 @@ public class ToolBarBuilder {
 		btn.setFocusPainted(false);
 		btn.setBackground(new Color(240, 240, 240));
 		btn.setBorder(BorderFactory.createCompoundBorder(
-			BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
-			BorderFactory.createEmptyBorder(5, 5, 5, 5)
-		));
+				BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
+				BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 		btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-		
+
 		btn.addMouseListener(new java.awt.event.MouseAdapter() {
 			Color originalColor = btn.getBackground();
+
 			public void mouseEntered(java.awt.event.MouseEvent evt) {
 				btn.setBackground(new Color(220, 220, 220));
 			}
+
 			public void mouseExited(java.awt.event.MouseEvent evt) {
 				btn.setBackground(originalColor);
 			}
