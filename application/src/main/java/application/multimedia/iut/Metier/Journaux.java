@@ -67,12 +67,12 @@ public class Journaux {
 
 	public BufferedImage retourEnArriere() {
 		controleur.ReinitialisationControlleur();
-		controleur.updateJournal(imageInitiale);
 		
 		BufferedImage imageTemporaire = copierImage(imageInitiale);
 
 		for (int i = 0; i < indexAction; i++) {
 			journauxHistorique.get(i).faireAction(imageTemporaire, controleur);
+			journauxHistorique.remove(journauxHistorique.size() - 1);
 		}
 
 		if (indexAction >= 0) {
@@ -87,7 +87,6 @@ public class Journaux {
 
 	public BufferedImage retourEnAvant() {
 		controleur.ReinitialisationControlleur();
-		controleur.updateJournal(imageInitiale);
 
 		BufferedImage imageTemporaire = copierImage(imageInitiale);
 
@@ -100,6 +99,7 @@ public class Journaux {
 
 		for (int i = 0; i <= indexAction; i++) {
 			journauxHistorique.get(i).faireAction(imageTemporaire, controleur);
+			journauxHistorique.remove(journauxHistorique.size() - 1);
 		}
 
 		return imageTemporaire;

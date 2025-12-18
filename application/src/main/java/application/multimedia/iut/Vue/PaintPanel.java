@@ -254,4 +254,16 @@ public class PaintPanel extends JPanel {
 		controleur.appliquerPotDePeinture(couleurDest, distance, estContinue, xOrig, yOrig);
 		gestionnaireImages.rafraichirAffichage();
 	}
+
+	// ========================================
+	// MÉTHODES UNDO/REDO
+	// ========================================
+
+	public void annulerDerniereAction() {
+		controleur.retourEnArriere();
+	}
+
+	public void refaireDerniereAction() {
+		controleur.retourEnAvant();
+	}
 }

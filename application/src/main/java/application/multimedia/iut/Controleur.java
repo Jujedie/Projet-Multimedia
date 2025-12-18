@@ -74,8 +74,24 @@ public class Controleur {
 		this.gestionnaireOutils = new GestionnaireOutils();
 	}
 
+	// ========================================
+	// GESTION DU JOURNAL D'UNDO/REDO
+	// ========================================
+
 	public void updateJournal(BufferedImage image){ this.historiqueModification = new Journaux(image,this);}
 	
+	public void retourEnArriere(){
+		if (this.historiqueModification != null){
+			this.historiqueModification.retourEnArriere();
+		}
+	}
+
+	public void retourEnAvant(){
+		if (this.historiqueModification != null){
+			this.historiqueModification.retourEnAvant();
+		}
+	}
+
 	// ========================================
 	// ACCÈS AU MODÈLE - Gestion des images
 	// ========================================
