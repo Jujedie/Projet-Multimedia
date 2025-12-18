@@ -5,6 +5,8 @@ import java.io.File;
 
 import javax.imageio.ImageIO;
 
+import application.multimedia.iut.Controleur;
+
 public class JournauxTest {
 	public static void main(String[] args) {
 		System.out.println("Test Journaux");
@@ -18,12 +20,12 @@ public class JournauxTest {
 			return;
 		}
 		
-		Journaux journaux = new Journaux(image);
+		Journaux journaux = new Journaux(image, new Controleur());
 		System.out.println("Journaux initialisé avec une image de taille : " + image.getWidth() + "x" + image.getHeight());
 
 		// Ajouter une action fictive
 		ActionHistorique action = ActionHistorique.creerActionHistorique(
-			ActionTypeEnum.LUMIERE,
+			ActionTypeEnum.APPLIQUER_LUMINOSITE,
 			new Object[] { -10 }
 		);
 
@@ -32,7 +34,7 @@ public class JournauxTest {
 
 		// Ajouter une autre action fictive
 		ActionHistorique action2 = ActionHistorique.creerActionHistorique(
-			ActionTypeEnum.CONTRASTE,
+			ActionTypeEnum.APPLIQUER_CONTRASTE,
 			new Object[] { 150 }
 		);
 
