@@ -85,6 +85,10 @@ public class MainControlleur {
 			
 			// Initialisation du gestionnaire d'outils
 			this.gestionnaireOutils = new GestionnaireOutils();
+			
+			// Initialisation des journaux avec une image vide temporaire
+			BufferedImage imageInitiale = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+			this.historiqueModification = new Journaux(imageInitiale);
 		}
 
 		public void updateJournal(BufferedImage image){ this.historiqueModification = new Journaux(image);}
@@ -330,6 +334,103 @@ public class MainControlleur {
 			BufferedImage image = imageManagerMetier.obtenirImageCourante();
 			if (image != null) {
 				application.multimedia.iut.Metier.Colorisation.potDePeinture(image, couleurDest, distance, estContinue, xOrig, yOrig);
+			}
+		}
+		
+		// ========================================
+		// DÉLÉGATION - Gestion du format
+		// ========================================
+		
+		/**
+		 * Applique un retournement horizontal à l'image.
+		 * 
+		 * @param image L'image à retourner.
+		 * @return L'image retournée.
+		 */
+		public BufferedImage flipH(BufferedImage image) {
+			if (image != null) {
+				return application.multimedia.iut.Metier.Format.symetrieHorizontale(image);
+			}
+			return null;
+		}
+		
+		/**
+		 * Applique un retournement vertical à l'image.
+		 * 
+		 * @param image L'image à retourner.
+		 * @return L'image retournée.
+		 */
+		public BufferedImage flipV(BufferedImage image) {
+			if (image != null) {
+				return application.multimedia.iut.Metier.Format.symetrieVerticale(image);
+			}
+			return null;
+		}
+		
+		/**
+		 * Applique une rotation à l'image.
+		 * 
+		 * @param image L'image à pivoter.
+		 * @param angle L'angle de rotation en degrés.
+		 * @return L'image pivotée.
+		 */
+		public BufferedImage rotation(BufferedImage image, double angle) {
+			if (image != null) {
+				return application.multimedia.iut.Metier.Format.rotation(image, angle);
+			}
+			return null;
+		}
+		
+		/**
+		 * Redimensionne l'image aux dimensions spécifiées.
+		 * 
+		 * @param image L'image à redimensionner.
+		 * @param largeur La nouvelle largeur.
+		 * @param hauteur La nouvelle hauteur.
+		 * @return L'image redimensionnée.
+		 */
+		public BufferedImage redimensionner(BufferedImage image, int largeur, int hauteur) {
+			if (image != null && largeur > 0 && hauteur > 0) {
+				return application.multimedia.iut.Metier.Format.redimensionner(image, largeur, hauteur);
+			}
+			return null;
+		}
+		
+		// ========================================
+		// DÉLÉGATION - Historique
+		// ========================================
+		
+		/**
+		 * Annule la dernière action.
+		 */
+		public void annuler() {
+			if (historiqueModification != null) {
+				BufferedImage imageAnnulee = historiqueModification.retourEnArriere();
+				if (imageAnnulee != null) {
+					BufferedImage imageCourante = imageManagerMetier.obtenirImageCourante();
+					if (imageCourante != null) {
+						Graphics g = imageCourante.getGraphics();
+						g.drawImage(imageAnnulee, 0, 0, null);
+						g.dispose();
+					}
+				}
+			}
+		}
+		
+		/**
+		 * Refait la dernière action annulée.
+		 */
+		public void refaire() {
+			if (historiqueModification != null) {
+				BufferedImage imageRefaite = historiqueModification.retourEnAvant();
+				if (imageRefaite != null) {
+					BufferedImage imageCourante = imageManagerMetier.obtenirImageCourante();
+					if (imageCourante != null) {
+						Graphics g = imageCourante.getGraphics();
+						g.drawImage(imageRefaite, 0, 0, null);
+						g.dispose();
+					}
+				}
 			}
 		}
 	}
