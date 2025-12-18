@@ -45,7 +45,6 @@ public class PaintPanel extends JPanel {
 	private ToolBarBuilder toolBarBuilder;
 
 	public PaintPanel(Controleur controleur) {
-	public PaintPanel(Controleur controleur) {
 		this.controleur = controleur;
 		setLayout(new BorderLayout());
 
@@ -230,23 +229,6 @@ public class PaintPanel extends JPanel {
 	// ========================================
 	// MÉTHODES D'ÉDITION
 	// ========================================
-
-	/**
-	 * Annule la dernière action effectuée.
-	 */
-	public void annulerAction() {
-		controleur.annuler();
-		gestionnaireImages.rafraichirAffichage();
-	}
-
-	/**
-	 * Refait la dernière action annulée.
-	 */
-	public void refaireAction() {
-		controleur.refaire();
-		gestionnaireImages.rafraichirAffichage();
-	}
-
 	
 	/**
 	 * Efface tout le contenu de l'image courante.

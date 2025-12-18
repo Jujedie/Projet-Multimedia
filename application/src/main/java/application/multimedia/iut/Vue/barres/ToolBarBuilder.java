@@ -13,7 +13,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
-
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -35,55 +36,14 @@ import application.multimedia.iut.Vue.utils.LucideIconLoader;
 
 /**
  * Composant personnalisé pour afficher une couleur.
- */
-class PanneauCouleur extends JComponent {
-	private Color couleur;
-	
-	public PanneauCouleur(Color couleurInitiale) {
-		this.couleur = couleurInitiale;
-		setOpaque(true);
-		setPreferredSize(new Dimension(40, 40));
-		setMinimumSize(new Dimension(40, 40));
-		setMaximumSize(new Dimension(40, 40));
-	}
-	
-	public void setCouleur(Color nouvelleCouleur) {
-		System.out.println("PanneauCouleur.setCouleur appelé avec: " + nouvelleCouleur);
-		System.out.println("Ancienne couleur: " + this.couleur);
-		this.couleur = nouvelleCouleur;
-		// Forcer le rafraîchissement complet
-		invalidate();
-		revalidate();
-		repaint();
-		// Forcer aussi le parent
-		if (getParent() != null) {
-			getParent().repaint();
-		}
-		System.out.println("PanneauCouleur rafraîchi, nouvelle couleur: " + this.couleur);
-	}
-	
-	public Color getCouleur() {
-		return couleur;
-	}
-	
-	@Override
-	protected void paintComponent(Graphics g) {
-		// Ne pas appeler super pour avoir un contrôle total
-		Graphics2D g2d = (Graphics2D) g.create();
-		g2d.setColor(couleur);
-		g2d.fillRect(0, 0, getWidth(), getHeight());
-		g2d.setColor(Color.DARK_GRAY);
-		g2d.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
-		g2d.dispose();
-	}
-}
-
 /**
  * Composant personnalisé pour afficher une couleur.
  */
+@SuppressWarnings("serial")
 class PanneauCouleur extends JComponent {
+	private static final long serialVersionUID = 1L;
 	private Color couleur;
-
+	
 	public PanneauCouleur(Color couleurInitiale) {
 		this.couleur = couleurInitiale;
 		setOpaque(true);
@@ -91,7 +51,7 @@ class PanneauCouleur extends JComponent {
 		setMinimumSize(new Dimension(40, 40));
 		setMaximumSize(new Dimension(40, 40));
 	}
-
+	
 	public void setCouleur(Color nouvelleCouleur) {
 		System.out.println("PanneauCouleur.setCouleur appelé avec: " + nouvelleCouleur);
 		System.out.println("Ancienne couleur: " + this.couleur);
@@ -106,11 +66,11 @@ class PanneauCouleur extends JComponent {
 		}
 		System.out.println("PanneauCouleur rafraîchi, nouvelle couleur: " + this.couleur);
 	}
-
+	
 	public Color getCouleur() {
 		return couleur;
 	}
-
+	
 	@Override
 	protected void paintComponent(Graphics g) {
 		// Ne pas appeler super pour avoir un contrôle total
@@ -134,15 +94,6 @@ public class ToolBarBuilder {
 	private int tailleIcone = 20;
 	private PanneauCouleur couleurPrincipale;
 	private GestionnaireOutils.EcouteurCouleur ecouteurCouleurPipette;
-	
-	// Références aux boutons toggle pour la synchronisation
-	private JToggleButton selectionBtn;
-	private JToggleButton pinceauBtn;
-	private JToggleButton gommeBtn;
-	private JToggleButton pipetteBtn;
-	private JToggleButton remplissageBtn;
-	private JToggleButton texteBtn;
-
 	
 	// Références aux boutons toggle pour la synchronisation
 	private JToggleButton selectionBtn;
@@ -390,8 +341,8 @@ public class ToolBarBuilder {
 		JButton undoBtn = creerBouton("undo", "Annuler");
 		JButton redoBtn = creerBouton("redo", "Refaire");
 
-		undoBtn.addActionListener(e -> panneau.annulerAction());
-		redoBtn.addActionListener(e -> panneau.refaireAction());
+		undoBtn.addActionListener(e -> panneau.annulerDerniereAction());
+		redoBtn.addActionListener(e -> panneau.refaireDerniereAction());
 
 		barre.add(undoBtn);
 		barre.add(redoBtn);

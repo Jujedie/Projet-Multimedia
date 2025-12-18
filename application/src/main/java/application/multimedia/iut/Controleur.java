@@ -225,6 +225,14 @@ public class Controleur {
 		return gestionnaireOutils.getOutilActif();
 	}
 	
+	public BufferedImage fusionHorizontale(BufferedImage imgGauche, BufferedImage imgDroite, int nbPixels) {
+			return imageManagerMetier.fusionHorizontale(imgGauche, imgDroite, nbPixels);
+		}
+
+		public BufferedImage fusionVerticale(BufferedImage imgHaut, BufferedImage imgBas, int nbPixels) {
+			return imageManagerMetier.fusionVerticale(imgHaut, imgBas, nbPixels);
+		}
+
 	// ========================================
 	// DÉLÉGATION - Gestion de la couleur
 	// ========================================
