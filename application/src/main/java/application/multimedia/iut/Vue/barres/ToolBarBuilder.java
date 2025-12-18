@@ -230,7 +230,6 @@ public class ToolBarBuilder {
 		groupeOutils.add(pipetteBtn);
 		groupeOutils.add(remplissageBtn);
 		groupeOutils.add(texteBtn);
-		groupeOutils.add(texteBtn);
 		
 		barre.add(selectionBtn);
 		barre.add(pinceauBtn);

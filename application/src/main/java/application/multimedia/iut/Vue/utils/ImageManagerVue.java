@@ -10,10 +10,6 @@ package application.multimedia.iut.Vue.utils;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.Font;
-import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
@@ -35,8 +31,6 @@ import javax.swing.SwingUtilities;
 import application.multimedia.iut.Controleur;
 import application.multimedia.iut.Metier.image.CoucheImage;
 import application.multimedia.iut.Metier.outils.OutilDessin;
-import application.multimedia.iut.Vue.dialogs.SimpleTexteDialog;
-import application.multimedia.iut.Vue.dialogs.SimpleTexteDialog;
 import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
 
 /**
@@ -299,44 +293,43 @@ public class ImageManagerVue {
 				// Gestion des outils de dessin
 				OutilDessin outilActif = controleur.getOutilActif();
 				
-				// Gestion de l'outil texte
-				if (outilActif == OutilDessin.TEXTE && !controleur.pileCouchesEstVide()) {
-					CoucheImage couche = controleur.getPileCouches().coucheActive();
-					if (couche != null) {
-						int x = e.getX() - couche.x;
-						int y = e.getY() - couche.y;
-						// Vérifier que les coordonnées sont dans l'image
-						if (x >= 0 && x < couche.image.getWidth() && y >= 0 && y < couche.image.getHeight()) {
-							// Ouvrir une boîte de dialogue pour saisir le texte
-							String texte = JOptionPane.showInputDialog(parent, 
-								"Entrez le texte à écrire :", 
-								"Saisie de texte", 
-								JOptionPane.PLAIN_MESSAGE);
-							if (texte != null && !texte.trim().isEmpty()) {
-								controleur.dessinerTexte(couche.image, texte, x, y);
-								toile.repaint();
-							}
-						}
-						return;
-					}
+				// Gestion de l'outil TEXTE
+			if (outilActif == OutilDessin.TEXTE) {
+				// Si aucune image n'existe, créer une image vide pour permettre l'écriture de texte
+				if (controleur.pileCouchesEstVide()) {
+					creerImageVide(800, 600);
 				}
 				
-				// Gestion du pot de peinture
-				if (outilActif == OutilDessin.REMPLISSAGE && !controleur.pileCouchesEstVide()) {
-					CoucheImage couche = controleur.getPileCouches().coucheActive();
-					if (couche != null) {
-						int x = e.getX() - couche.x;
-						int y = e.getY() - couche.y;
-						// Vérifier que les coordonnées sont dans l'image
-						if (x >= 0 && x < couche.image.getWidth() && y >= 0 && y < couche.image.getHeight()) {
-							Color couleur = controleur.getCouleurActive();
-							int couleurRGB = couleur.getRGB();
-							controleur.appliquerPotDePeinture(couleurRGB, 50, true, x, y);
-							toile.repaint();
-						}
-						return;
+				CoucheImage couche = controleur.getPileCouches().coucheActive();
+				if (couche != null) {
+					int xImage = e.getX() - couche.x;
+					int yImage = e.getY() - couche.y;
+					
+					// Vérifier que les coordonnées sont dans l'image
+					if (xImage >= 0 && xImage < couche.image.getWidth() && yImage >= 0 && yImage < couche.image.getHeight()) {
+						ouvrirDialogueTexte(couche.image, xImage, yImage);
+						toile.repaint();
 					}
+					return;
 				}
+			}
+			
+			// Gestion du pot de peinture
+			if (outilActif == OutilDessin.REMPLISSAGE && !controleur.pileCouchesEstVide()) {
+				CoucheImage couche = controleur.getPileCouches().coucheActive();
+				if (couche != null) {
+					int x = e.getX() - couche.x;
+					int y = e.getY() - couche.y;
+					// Vérifier que les coordonnées sont dans l'image
+					if (x >= 0 && x < couche.image.getWidth() && y >= 0 && y < couche.image.getHeight()) {
+						Color couleur = controleur.getCouleurActive();
+						int couleurRGB = couleur.getRGB();
+						controleur.appliquerPotDePeinture(couleurRGB, 50, true, x, y);
+						toile.repaint();
+					}
+					return;
+				}
+			}
 				
 				if (outilActif != OutilDessin.SELECTION && outilActif != OutilDessin.REMPLISSAGE) {
 					// Si aucune image n'existe, créer une image vide pour permettre le dessin
@@ -490,33 +483,6 @@ public class ImageManagerVue {
 	 */
 	public void definirCouleur(Color couleur) {
 		controleur.definirCouleurActive(couleur);
-	}
-	
-	/**
-	 * Ouvre le dialogue de saisie de texte et dessine le texte sur l'image.
-	 * Utilise le pattern MVC : Vue -> Contrôleur -> Métier.
-	 *
-	 * @param image L'image sur laquelle dessiner le texte.
-	 * @param x La coordonnée X où dessiner le texte.
-	 * @param y La coordonnée Y où dessiner le texte.
-	 */
-	private void ouvrirDialogueTexte(BufferedImage image, int x, int y) {
-		Frame frame = (Frame) SwingUtilities.getWindowAncestor(parent);
-		Color couleurActuelle = controleur.getCouleurActive();
-		
-		SimpleTexteDialog dialogue = new SimpleTexteDialog(frame, couleurActuelle);
-		dialogue.setVisible(true);
-		
-		if (dialogue.estValide()) {
-			String texte = dialogue.getTexte();
-			Font police = dialogue.getPolice();
-			
-			// Mettre à jour la police dans le contrôleur via le gestionnaire d'outils
-			controleur.setPoliceTexte(police);
-			
-			// Dessiner le texte via le contrôleur (pattern MVC)
-			controleur.dessinerTexte(image, texte, x, y);
-		}
 	}
 	
 	/**
