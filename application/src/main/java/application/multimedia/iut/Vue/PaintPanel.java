@@ -8,6 +8,7 @@
 package application.multimedia.iut.Vue;
 
 import application.multimedia.iut.Controleur;
+import application.multimedia.iut.Controleur;
 import application.multimedia.iut.Metier.GestionnaireOutils;
 import application.multimedia.iut.Vue.barres.MenuBarBuilder;
 import application.multimedia.iut.Vue.barres.ToolBarBuilder;
@@ -34,7 +35,8 @@ public class PaintPanel extends JPanel {
 	private JLabel toile;
 	private JScrollPane panneauDeroulement;
 	private ImageManagerVue gestionnaireImages;
-
+	private Controleur controleur;
+	
 	/**
 	 * Constructeur du panneau de peinture.
 	 * Initialise l'interface et précharge les icônes.
@@ -43,6 +45,7 @@ public class PaintPanel extends JPanel {
 	 */
 	private ToolBarBuilder toolBarBuilder;
 
+	public PaintPanel(Controleur controleur) {
 	public PaintPanel(Controleur controleur) {
 		this.controleur = controleur;
 		setLayout(new BorderLayout());
