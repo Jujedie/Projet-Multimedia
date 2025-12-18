@@ -13,7 +13,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -22,7 +21,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
@@ -32,11 +30,8 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
-import application.multimedia.iut.MainControlleur;
+import application.multimedia.iut.Controleur;
 import application.multimedia.iut.Metier.image.CoucheImage;
-import application.multimedia.iut.Metier.image.PileCouches;
-import application.multimedia.iut.Metier.image.RenduToile;
-import application.multimedia.iut.Metier.image.SessionPlacement;
 import application.multimedia.iut.Metier.outils.OutilDessin;
 import application.multimedia.iut.Vue.dialogs.SimpleTexteDialog;
 import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
@@ -46,7 +41,7 @@ import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
  * Coordonne le chargement, l'enregistrement, le zoom, et le placement d'images.
  */
 public class ImageManagerVue {
-	private final MainControlleur.Controleur controleur;
+	private final Controleur controleur;
 	private final JLabel toile;
 	private final JComponent parent;
 
@@ -62,7 +57,7 @@ public class ImageManagerVue {
 	 * @param parent Le composant parent pour les dialogues.
 	 * @param controleur Le contrôleur central de l'application.
 	 */
-	public ImageManagerVue(JLabel toile, JComponent parent, MainControlleur.Controleur controleur) {
+	public ImageManagerVue(JLabel toile, JComponent parent, Controleur controleur) {
 		this.toile = toile;
 		this.parent = parent;
 		this.controleur = controleur;
@@ -110,20 +105,20 @@ public class ImageManagerVue {
 		File fichierChoisi = ImageDialogs.selectImage(parent);
 		if (fichierChoisi == null) return;
 
-		boolean imageInitialePresente = controleur.imageInitialePresente();
+		boolean imageInitialeBlanchePresente = controleur.isImageInitialeBlanchePresente();
 
 		// Si c'est la première image chargée (image blanche initiale encore présente)
 		// on remplace directement sans demander
-		boolean possedeDejaImages = !controleur.pileCouchesEstVide() && !imageInitialePresente;
+		boolean possedeDejaImages = !controleur.pileCouchesEstVide() && !imageInitialeBlanchePresente;
 		LoadChoice choix = LoadChoice.REPLACE;
 		if (possedeDejaImages) {
 			choix = ImageDialogs.askLoadChoice(parent);
 			if (choix == LoadChoice.CANCEL) return;
 		}
 
-		if (choix == LoadChoice.REPLACE || imageInitialePresente) {
+		if (choix == LoadChoice.REPLACE || imageInitialeBlanchePresente) {
 			glisserEnCours = false;
-			imageInitialePresente = false; // Marquer que l'image initiale a été remplacée
+			imageInitialeBlanchePresente = false; // Marquer que l'image initiale a été remplacée
 		}
 
 		try{
@@ -467,7 +462,7 @@ public class ImageManagerVue {
 	 *
 	 * @return Le contrôleur principal.
 	 */
-	public MainControlleur.Controleur getControleur() {
+	public Controleur getControleur() {
 		return controleur;
 	}
 	

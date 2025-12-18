@@ -7,22 +7,38 @@
  */
 package application.multimedia.iut.Vue;
 
-import application.multimedia.iut.MainControlleur;
+import java.awt.AlphaComposite;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridLayout;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import application.multimedia.iut.Controleur;
 import application.multimedia.iut.Metier.GestionnaireOutils;
 import application.multimedia.iut.Vue.barres.MenuBarBuilder;
 import application.multimedia.iut.Vue.barres.ToolBarBuilder;
 import application.multimedia.iut.Vue.dialogs.TexteImageEditorDialog;
 import application.multimedia.iut.Vue.utils.ImageManagerVue;
 import application.multimedia.iut.Vue.utils.LucideIconLoader;
-import java.awt.*;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 /**
  * Panneau de dessin principal affichant et gérant les images.
@@ -33,7 +49,7 @@ public class PaintPanel extends JPanel {
 	private JLabel toile;
 	private JScrollPane panneauDeroulement;
 	private ImageManagerVue gestionnaireImages;
-	private MainControlleur.Controleur controleur;
+	private Controleur controleur;
 
 	/**
 	 * Constructeur du panneau de peinture.
@@ -43,7 +59,7 @@ public class PaintPanel extends JPanel {
 	 */
 	private ToolBarBuilder toolBarBuilder;
 
-	public PaintPanel(MainControlleur.Controleur controleur) {
+	public PaintPanel(Controleur controleur) {
 		this.controleur = controleur;
 		setLayout(new BorderLayout());
 
@@ -233,7 +249,7 @@ public class PaintPanel extends JPanel {
 	 * Annule la dernière action effectuée.
 	 */
 	public void annulerAction() {
-		controleur.annuler();
+		controleur.retourEnArriere();
 		gestionnaireImages.rafraichirAffichage();
 	}
 
@@ -241,7 +257,7 @@ public class PaintPanel extends JPanel {
 	 * Refait la dernière action annulée.
 	 */
 	public void refaireAction() {
-		controleur.refaire();
+		controleur.retourEnAvant();
 		gestionnaireImages.rafraichirAffichage();
 	}
 

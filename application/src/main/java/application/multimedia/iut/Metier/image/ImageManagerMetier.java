@@ -11,7 +11,6 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import application.multimedia.iut.Metier.AjoutContenu;
-import application.multimedia.iut.Vue.utils.ImageDialogs;
 import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
 
 /**
@@ -23,7 +22,7 @@ public class ImageManagerMetier {
 	private final PileCouches pileCouches;
 	private final SessionPlacement sessionPlacement;
 	private final RenduToile renduToile;
-	private boolean imageInitialePresente = true;
+	private boolean imageInitialeBlanchePresente = true;
 
 	/**
 	 * Constructeur métier : reçoit les composants métier existants.
@@ -47,7 +46,7 @@ public class ImageManagerMetier {
 
 		pileCouches.vider();
 		pileCouches.ajouterCouche(imageVide, tailleToile, true);
-		imageInitialePresente = true;
+		imageInitialeBlanchePresente = true;
 	}
 
 	/**
@@ -56,10 +55,10 @@ public class ImageManagerMetier {
 	public void definirImageCourante(BufferedImage image, Dimension tailleToile) {
 		pileCouches.vider();
 		sessionPlacement.annuler();
-		imageInitialePresente = (image == null);
+		imageInitialeBlanchePresente = (image == null);
 		if (image != null) {
 			pileCouches.ajouterCouche(image, tailleToile, true);
-			imageInitialePresente = false;
+			imageInitialeBlanchePresente = false;
 		}
 	}
 
@@ -164,10 +163,6 @@ public class ImageManagerMetier {
 		return renduToile.construireComposite(pileCouches);
 	}
 
-	public boolean imageInitialePresente() {
-		return imageInitialePresente;
-	}
-
 	/**
 	 * Enregistre le composite courant au format PNG dans le fichier donné.
 	 * Lance IOException en cas d'erreur d'écriture.
@@ -184,9 +179,9 @@ public class ImageManagerMetier {
 
 		// Si c'est la première image chargée (image blanche initiale encore présente)
 		// on remplace directement sans demander
-		boolean possedeDejaImages = !pileCouches.estVide() && !imageInitialePresente;
+		boolean possedeDejaImages = !pileCouches.estVide() && !imageInitialeBlanchePresente;
 
-		if (choix == LoadChoice.REPLACE || imageInitialePresente) {
+		if (choix == LoadChoice.REPLACE || imageInitialeBlanchePresente) {
 			pileCouches.vider();
 			sessionPlacement.annuler();
 		}
@@ -214,7 +209,7 @@ public class ImageManagerMetier {
 			pileCouches.vider();
 			pileCouches.ajouterCouche(imageFusionnee,
 					new Dimension(imageFusionnee.getWidth(), imageFusionnee.getHeight()), true);
-			imageInitialePresente = false;
+			imageInitialeBlanchePresente = false;
 		}
 		return imageFusionnee;
 	}
@@ -225,7 +220,7 @@ public class ImageManagerMetier {
 			pileCouches.vider();
 			pileCouches.ajouterCouche(imageFusionnee,
 					new Dimension(imageFusionnee.getWidth(), imageFusionnee.getHeight()), true);
-			imageInitialePresente = false;
+			imageInitialeBlanchePresente = false;
 		}
 		return imageFusionnee;
 	}
@@ -262,7 +257,7 @@ public class ImageManagerMetier {
 	public void vider() {
 		pileCouches.vider();
 		sessionPlacement.annuler();
-		imageInitialePresente = true;
+		imageInitialeBlanchePresente = true;
 	}
 
 	/**
@@ -310,7 +305,7 @@ public class ImageManagerMetier {
 	/**
 	 * Indicateur si l'image initiale blanche est encore présente.
 	 */
-	public boolean isImageInitialePresente() {
-		return imageInitialePresente;
+	public boolean isImageInitialeBlanchePresente() {
+		return imageInitialeBlanchePresente;
 	}
 }
