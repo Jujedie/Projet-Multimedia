@@ -14,6 +14,51 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
+ * Composant personnalisé pour afficher une couleur.
+ */
+class PanneauCouleur extends JComponent {
+	private Color couleur;
+	
+	public PanneauCouleur(Color couleurInitiale) {
+		this.couleur = couleurInitiale;
+		setOpaque(true);
+		setPreferredSize(new Dimension(40, 40));
+		setMinimumSize(new Dimension(40, 40));
+		setMaximumSize(new Dimension(40, 40));
+	}
+	
+	public void setCouleur(Color nouvelleCouleur) {
+		System.out.println("PanneauCouleur.setCouleur appelé avec: " + nouvelleCouleur);
+		System.out.println("Ancienne couleur: " + this.couleur);
+		this.couleur = nouvelleCouleur;
+		// Forcer le rafraîchissement complet
+		invalidate();
+		revalidate();
+		repaint();
+		// Forcer aussi le parent
+		if (getParent() != null) {
+			getParent().repaint();
+		}
+		System.out.println("PanneauCouleur rafraîchi, nouvelle couleur: " + this.couleur);
+	}
+	
+	public Color getCouleur() {
+		return couleur;
+	}
+	
+	@Override
+	protected void paintComponent(Graphics g) {
+		// Ne pas appeler super pour avoir un contrôle total
+		Graphics2D g2d = (Graphics2D) g.create();
+		g2d.setColor(couleur);
+		g2d.fillRect(0, 0, getWidth(), getHeight());
+		g2d.setColor(Color.DARK_GRAY);
+		g2d.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+		g2d.dispose();
+	}
+}
+
+/**
  * Constructeur de la barre d'outils de l'application.
  * Fournit les boutons d'accès rapide aux outils de dessin et transformations.
  */
@@ -22,7 +67,7 @@ public class ToolBarBuilder {
 	private PaintPanel panneau;
 	private Color couleurIcone = new Color(60, 60, 60);
 	private int tailleIcone = 20;
-	private JPanel couleurPrincipale;
+	private PanneauCouleur couleurPrincipale;
 	private GestionnaireOutils.EcouteurCouleur ecouteurCouleurPipette;
 
 	/**
@@ -278,34 +323,38 @@ public class ToolBarBuilder {
 	 * @param barre La barre d'outils à modifier.
 	 */
 	private void ajouterSelecteurCouleurs(JToolBar barre) {
-		JPanel miniCouleurPanel = new JPanel(new GridLayout(1, 2, 2, 0));
-		miniCouleurPanel.setMaximumSize(new Dimension(50, 30));
-		miniCouleurPanel.setPreferredSize(new Dimension(50, 30));
-		
-		couleurPrincipale = new JPanel();
-		couleurPrincipale.setBackground(Color.BLACK);
-		couleurPrincipale.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-		couleurPrincipale.setToolTipText("Couleur principale");
+		// Créer le panneau personnalisé pour la couleur
+		couleurPrincipale = new PanneauCouleur(Color.BLACK);
+		couleurPrincipale.setToolTipText("Couleur principale - Cliquez pour changer");
 		
 		// Ajouter un listener pour changer la couleur en cliquant
 		couleurPrincipale.addMouseListener(new java.awt.event.MouseAdapter() {
 			@Override
 			public void mouseClicked(java.awt.event.MouseEvent e) {
-				Color nouvelleCouleur = JColorChooser.showDialog(panneau, "Choisir une couleur", couleurPrincipale.getBackground());
+				Color nouvelleCouleur = JColorChooser.showDialog(panneau, "Choisir une couleur", couleurPrincipale.getCouleur());
 				if (nouvelleCouleur != null) {
-					couleurPrincipale.setBackground(nouvelleCouleur);
+					couleurPrincipale.setCouleur(nouvelleCouleur);
 					panneau.definirCouleurDessin(nouvelleCouleur);
 				}
 			}
 		});
 		
-		miniCouleurPanel.add(couleurPrincipale);
-		barre.add(miniCouleurPanel);
+		barre.add(couleurPrincipale);
 		
 		// Créer l'écouteur de changement de couleur depuis la pipette
-		// Il sera enregistré plus tard quand le gestionnaire d'images sera initialisé
 		ecouteurCouleurPipette = couleur -> {
-			couleurPrincipale.setBackground(couleur);
+			System.out.println("=== PIPETTE: Changement de couleur détecté ===");
+			System.out.println("Nouvelle couleur: " + couleur);
+			System.out.println("RGB: " + couleur.getRed() + ", " + couleur.getGreen() + ", " + couleur.getBlue());
+			
+			// Mettre à jour la couleur
+			SwingUtilities.invokeLater(() -> {
+				couleurPrincipale.setCouleur(couleur);
+				panneau.definirCouleurDessin(couleur);
+				System.out.println("Couleur mise à jour: " + couleurPrincipale.getCouleur());
+			});
+			
+			System.out.println("=========================================");
 		};
 	}
 	
@@ -314,8 +363,12 @@ public class ToolBarBuilder {
 	 * Doit être appelé après l'initialisation du gestionnaire d'images.
 	 */
 	public void connecterEcouteurCouleur() {
+		System.out.println("Connexion de l'écouteur de couleur...");
 		if (ecouteurCouleurPipette != null) {
 			panneau.enregistrerEcouteurCouleur(ecouteurCouleurPipette);
+			System.out.println("Écouteur connecté avec succès!");
+		} else {
+			System.out.println("ERREUR: écouteurCouleurPipette est null!");
 		}
 	}
 	

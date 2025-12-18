@@ -24,7 +24,7 @@ public class Gomme {
 	 */
 	public Gomme() {
 		this.taille = 10;
-		this.couleurEffacement = Color.WHITE;
+		this.couleurEffacement = new Color(255, 255, 255); // Blanc pur RGB
 	}
 
 	/**
@@ -34,7 +34,7 @@ public class Gomme {
 	 */
 	public Gomme(int taille) {
 		this.taille = Math.max(1, taille);
-		this.couleurEffacement = Color.WHITE;
+		this.couleurEffacement = new Color(255, 255, 255); // Blanc pur RGB
 	}
 
 	/**

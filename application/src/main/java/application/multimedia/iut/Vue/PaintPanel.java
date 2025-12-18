@@ -40,14 +40,20 @@ public class PaintPanel extends JPanel {
 		this.controleur = controleur;
 		setLayout(new BorderLayout());
 		
+		System.out.println("=== CONSTRUCTION DE PAINTPANEL ===");
 		new Thread(() -> LucideIconLoader.preloadCommonIcons()).start();
 		JPanel panneauHaut = creerPanneauSuperieur();
+		System.out.println("Panneau supérieur créé, toolBarBuilder = " + toolBarBuilder);
 		
 		creerToile();
+		System.out.println("Toile créée, gestionnaireImages = " + gestionnaireImages);
 		
 		// Connecter l'écouteur de couleur maintenant que gestionnaireImages est initialisé
 		if (toolBarBuilder != null) {
+			System.out.println("Appel de connecterEcouteurCouleur()...");
 			toolBarBuilder.connecterEcouteurCouleur();
+		} else {
+			System.out.println("ERREUR: toolBarBuilder est null!");
 		}
 		
 		add(panneauHaut, BorderLayout.NORTH);
