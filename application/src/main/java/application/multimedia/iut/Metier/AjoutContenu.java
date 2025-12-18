@@ -14,8 +14,35 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
+/**
+ * Classe utilitaire pour la gestion des couches et la fusion de contenus
+ * d'images.
+ * <p>
+ * Cette classe permet de :
+ * <ul>
+ * <li>Effectuer le rendu graphique d'une pile de couches (pour l'affichage
+ * UI).</li>
+ * <li>Construire une image composite finale à partir de plusieurs couches.</li>
+ * <li>Fusionner deux images (horizontalement ou verticalement) avec un effet de
+ * fondu progressif.</li>
+ * </ul>
+ * </p>
+ *
+ * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
+ * @version 1.0
+ */
 public class AjoutContenu {
 
+	/**
+	 * Effectue le rendu graphique de la pile de couches sur un contexte Graphics.
+	 * Gère également l'affichage visuel de la couche en cours de placement
+	 * (prévisualisation).
+	 *
+	 * @param g         L'objet Graphics utilisé pour dessiner.
+	 * @param pile      La pile contenant les couches d'images à afficher.
+	 * @param placement L'état actuel du placement d'une nouvelle couche (peut être
+	 *                  nul).
+	 */
 	public void peindre(Graphics g, PileCouches pile, SessionPlacement placement) {
 		if (pile.estVide())
 			return;
@@ -59,6 +86,16 @@ public class AjoutContenu {
 		}
 	}
 
+	/**
+	 * Génère une {@link BufferedImage} unique regroupant toutes les couches de la
+	 * pile.
+	 * Si une base est définie, l'image est rognée selon ses limites, sinon elle
+	 * englobe toutes les couches.
+	 *
+	 * @param pile La pile de couches à transformer en image composite.
+	 * @return Une image ARGB contenant toutes les couches superposées, ou null si
+	 *         la pile est vide.
+	 */
 	public BufferedImage construireComposite(PileCouches pile) {
 		if (pile.estVide())
 			return null;
@@ -112,6 +149,18 @@ public class AjoutContenu {
 		return composite;
 	}
 
+	/**
+	 * Fusionne deux images horizontalement avec une zone de fondu (alpha blending).
+	 * Les images sont automatiquement redimensionnées si leurs hauteurs diffèrent.
+	 *
+	 * @param imgGauche L'image à placer à gauche.
+	 * @param imgDroite L'image à placer à droite.
+	 * @param fondu     La largeur en pixels de la zone de transition entre les deux
+	 *                  images.
+	 * @return Une nouvelle image fusionnée.
+	 * @throws IllegalArgumentException Si le fondu est négatif ou dépasse la
+	 *                                  largeur des images.
+	 */
 	public static BufferedImage fusionHorizontale(BufferedImage imgGauche, BufferedImage imgDroite, int fondu) {
 
 		if (fondu < 0 || fondu > imgGauche.getWidth() || fondu > imgDroite.getWidth()) {
@@ -186,6 +235,18 @@ public class AjoutContenu {
 		return result;
 	}
 
+	/**
+	 * Fusionne deux images verticalement avec une zone de fondu (alpha blending).
+	 * Les images sont automatiquement redimensionnées si leurs largeurs diffèrent.
+	 *
+	 * @param imgHaut L'image à placer en haut.
+	 * @param imgBas  L'image à placer en bas.
+	 * @param fondu   La hauteur en pixels de la zone de transition entre les deux
+	 *                images.
+	 * @return Une nouvelle image fusionnée verticalement.
+	 * @throws IllegalArgumentException Si le fondu est négatif ou dépasse la
+	 *                                  hauteur des images.
+	 */
 	public static BufferedImage fusionVerticale(BufferedImage imgHaut, BufferedImage imgBas, int fondu) {
 
 		if (fondu < 0 || fondu > imgHaut.getHeight() || fondu > imgBas.getHeight()) {

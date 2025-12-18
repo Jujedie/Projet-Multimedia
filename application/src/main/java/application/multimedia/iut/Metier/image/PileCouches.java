@@ -31,7 +31,7 @@ public class PileCouches {
 	 */
 	public List<CoucheImage> couches() {
 		return Collections.unmodifiableList(couches);
-}
+	}
 
 	/**
 	 * Vérifie si la pile ne contient aucune couche.
@@ -59,8 +59,10 @@ public class PileCouches {
 	 */
 	public void zoomer(double facteur) {
 		niveauZoom *= facteur;
-		if (niveauZoom < 0.1) niveauZoom = 0.1;
-		if (niveauZoom > 5.0) niveauZoom = 5.0;
+		if (niveauZoom < 0.1)
+			niveauZoom = 0.1;
+		if (niveauZoom > 5.0)
+			niveauZoom = 5.0;
 	}
 
 	/**
@@ -74,9 +76,9 @@ public class PileCouches {
 	 * Ajoute une nouvelle couche à partir d'une image.
 	 * L'image peut être centrée automatiquement sur la toile.
 	 *
-	 * @param img L'image source à ajouter.
+	 * @param img         L'image source à ajouter.
 	 * @param tailleToile Les dimensions du canevas pour le centrage.
-	 * @param centrer true pour centrer l'image, false pour position (0,0).
+	 * @param centrer     true pour centrer l'image, false pour position (0,0).
 	 * @return La couche créée et ajoutée.
 	 */
 	public CoucheImage ajouterCouche(BufferedImage img, Dimension tailleToile, boolean centrer) {
@@ -142,7 +144,9 @@ public class PileCouches {
 	 */
 	public Rectangle limitesBase() {
 		CoucheImage base = coucheBase();
-		if (base == null) return null;
-		return new Rectangle(base.x, base.y, base.largeurRedimensionnee(niveauZoom), base.hauteurRedimensionnee(niveauZoom));
+		if (base == null)
+			return null;
+		return new Rectangle(base.x, base.y, base.largeurRedimensionnee(niveauZoom),
+				base.hauteurRedimensionnee(niveauZoom));
 	}
 }

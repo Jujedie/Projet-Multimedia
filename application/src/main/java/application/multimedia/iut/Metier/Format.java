@@ -1,7 +1,6 @@
 /**
  * Classe principale pour lancer l'application de retouche d'images.
- * 
- * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
+ * * @author Lechasles Antoine , Martin Ravenel , Julien Oyer
  * @version 1.0
  */
 package application.multimedia.iut.Metier;
@@ -18,7 +17,7 @@ public class Format {
 	 * Redimensionne une image aux dimensions spécifiées.
 	 * Utilise un algorithme de mise à l'échelle de haute qualité.
 	 *
-	 * @param source L'image source à redimensionner.
+	 * @param source       L'image source à redimensionner.
 	 * @param largeurCible La nouvelle largeur souhaitée.
 	 * @param hauteurCible La nouvelle hauteur souhaitée.
 	 * @return Une nouvelle image redimensionnée.
@@ -69,6 +68,18 @@ public class Format {
 		return imageRedimensionnee;
 	}
 
+	/**
+	 * Effectue une interpolation bilinéaire entre quatre valeurs de composantes de
+	 * couleur.
+	 *
+	 * @param a      Valeur au point (xSol, ySol).
+	 * @param b      Valeur au point (xPlafond, ySol).
+	 * @param c      Valeur au point (xSol, yPlafond).
+	 * @param d      Valeur au point (xPlafond, yPlafond).
+	 * @param poidsX Distance fractionnaire entre xSol et xPlafond.
+	 * @param poidsY Distance fractionnaire entre ySol et yPlafond.
+	 * @return La valeur interpolée arrondie à l'entier le plus proche.
+	 */
 	private static int interpoler(int a, int b, int c, int d, double poidsX, double poidsY) {
 
 		double haut = a * (1 - poidsX) + b * poidsX;
@@ -78,18 +89,42 @@ public class Format {
 		return (int) Math.round(valeurFinale);
 	}
 
+	/**
+	 * Extrait la composante Alpha d'un entier ARGB.
+	 *
+	 * @param rgb Valeur ARGB entière.
+	 * @return Valeur de la couche Alpha (0-255).
+	 */
 	private static int getAlpha(int rgb) {
 		return (rgb >> 24) & 0xFF;
 	}
 
+	/**
+	 * Extrait la composante Rouge d'un entier ARGB.
+	 *
+	 * @param rgb Valeur ARGB entière.
+	 * @return Valeur de la couche Rouge (0-255).
+	 */
 	private static int getRouge(int rgb) {
 		return (rgb >> 16) & 0xFF;
 	}
 
+	/**
+	 * Extrait la composante Verte d'un entier ARGB.
+	 *
+	 * @param rgb Valeur ARGB entière.
+	 * @return Valeur de la couche Verte (0-255).
+	 */
 	private static int getVert(int rgb) {
 		return (rgb >> 8) & 0xFF;
 	}
 
+	/**
+	 * Extrait la composante Bleue d'un entier ARGB.
+	 *
+	 * @param rgb Valeur ARGB entière.
+	 * @return Valeur de la couche Bleue (0-255).
+	 */
 	private static int getBleu(int rgb) {
 		return rgb & 0xFF;
 	}
@@ -99,10 +134,10 @@ public class Format {
 	 * Extrait la zone définie par deux points diagonaux.
 	 *
 	 * @param source L'image source à découper.
-	 * @param x1 Coordonnée X du premier point.
-	 * @param y1 Coordonnée Y du premier point.
-	 * @param x2 Coordonnée X du second point.
-	 * @param y2 Coordonnée Y du second point.
+	 * @param x1     Coordonnée X du premier point.
+	 * @param y1     Coordonnée Y du premier point.
+	 * @param x2     Coordonnée X du second point.
+	 * @param y2     Coordonnée Y du second point.
 	 * @return La sous-image extraite.
 	 * @throws IllegalArgumentException Si les coordonnées sont hors limites.
 	 */
@@ -128,7 +163,7 @@ public class Format {
 	 * Applique une rotation à une image selon un angle donné.
 	 * Gère les rotations à 90°, 180°, 270° et les angles arbitraires.
 	 *
-	 * @param src L'image source à faire pivoter.
+	 * @param src      L'image source à faire pivoter.
 	 * @param angleDeg L'angle de rotation en degrés.
 	 * @return Une nouvelle image pivotée.
 	 */
@@ -165,6 +200,14 @@ public class Format {
 		}
 	}
 
+	/**
+	 * Calcule la rotation pour des angles non multiples de 90 degrés.
+	 * Recalcule les dimensions de l'image de destination pour éviter le rognage.
+	 *
+	 * @param src      L'image source.
+	 * @param angleDeg L'angle en degrés.
+	 * @return Une nouvelle image pivotée avec un fond transparent/noir.
+	 */
 	private static BufferedImage rotationRSamp(BufferedImage src, double angleDeg) {
 		int srcWidth = src.getWidth();
 		int srcHeight = src.getHeight();
@@ -200,7 +243,7 @@ public class Format {
 				if (xSrc >= 0 && xSrc < srcWidth && ySrc >= 0 && ySrc < srcHeight) {
 					dest.setRGB(xPrime, yPrime, src.getRGB(xSrc, ySrc));
 				} else {
-					dest.setRGB(xPrime, yPrime, 0x000000); // fond noir
+					dest.setRGB(xPrime, yPrime, 0x000000);
 				}
 			}
 		}

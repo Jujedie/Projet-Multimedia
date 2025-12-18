@@ -25,9 +25,9 @@ public class SessionPlacement {
 	 * Démarre une nouvelle session de placement d'image.
 	 * L'image est initialement centrée sur la toile, après application du zoom.
 	 *
-	 * @param img L'image source à placer.
+	 * @param img         L'image source à placer.
 	 * @param tailleToile Les dimensions du canevas.
-	 * @param zoom Le facteur d'échelle à appliquer à l'image.
+	 * @param zoom        Le facteur d'échelle à appliquer à l'image.
 	 * @param limitesBase Les limites de la zone de base (première image/canevas).
 	 */
 	public void demarrer(BufferedImage img, Dimension tailleToile, double zoom, Rectangle limitesBase) {
@@ -76,10 +76,11 @@ public class SessionPlacement {
 	 * Le centre de l'image est positionné sur le point donné.
 	 *
 	 * @param point Le point de destination (coordonnées du centre).
-	 * @param zoom Le facteur de zoom actuel pour calculer les dimensions.
+	 * @param zoom  Le facteur de zoom actuel pour calculer les dimensions.
 	 */
 	public void deplacerAu(Point point, double zoom) {
-		if (coucheEnAttente == null) return;
+		if (coucheEnAttente == null)
+			return;
 		int largeur = coucheEnAttente.largeurRedimensionnee(zoom);
 		int hauteur = coucheEnAttente.hauteurRedimensionnee(zoom);
 		coucheEnAttente.x = point.x - largeur / 2;
@@ -94,7 +95,8 @@ public class SessionPlacement {
 	 * @param dy Le décalage vertical en pixels.
 	 */
 	public void translater(int dx, int dy) {
-		if (coucheEnAttente == null) return;
+		if (coucheEnAttente == null)
+			return;
 		coucheEnAttente.x += dx;
 		coucheEnAttente.y += dy;
 	}
@@ -107,8 +109,10 @@ public class SessionPlacement {
 	 * @return true si les zones se chevauchent, false sinon.
 	 */
 	public boolean intersecteBase(double zoom) {
-		if (coucheEnAttente == null) return false;
-		if (limitesBase == null) return true;
+		if (coucheEnAttente == null)
+			return false;
+		if (limitesBase == null)
+			return true;
 		Rectangle inter = limitesCouche(zoom).intersection(limitesBase);
 		return !inter.isEmpty();
 	}
@@ -120,7 +124,8 @@ public class SessionPlacement {
 	 * @return La couche image validée, ou null si aucune session active.
 	 */
 	public CoucheImage valider() {
-		if (!estActive()) return null;
+		if (!estActive())
+			return null;
 		CoucheImage placee = coucheEnAttente;
 		coucheEnAttente = null;
 		active = false;

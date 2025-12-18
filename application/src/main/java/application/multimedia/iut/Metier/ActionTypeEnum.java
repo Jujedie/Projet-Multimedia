@@ -2,7 +2,7 @@ package application.multimedia.iut.Metier;
 
 public enum ActionTypeEnum {
 	// Actions de type Colorisation
-	POT_DE_PEINTURE(5),// false si distance == 0
+	POT_DE_PEINTURE(5), // false si distance == 0
 	TEINTURE(4),
 	CONTRASTE(1),
 	LUMIERE(1),
@@ -12,7 +12,7 @@ public enum ActionTypeEnum {
 	REDIMENSIONNEMENT(-1), // true si changement de taille
 	COUPER(-1),
 	SYMETRIE_HORIZONTALE(-1), // Miroir horizontal
-	SYMETRIE_VERTICALE(-1),   // Miroir vertical
+	SYMETRIE_VERTICALE(-1), // Miroir vertical
 
 	// Actions de type Ajout
 	SUPERPOSITION(2),

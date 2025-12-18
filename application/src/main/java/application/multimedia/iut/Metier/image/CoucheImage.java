@@ -24,8 +24,8 @@ public class CoucheImage {
 	 * Initialise l'image avec sa position sur le canevas.
 	 *
 	 * @param image L'image source de la couche.
-	 * @param x La coordonnée horizontale (coin supérieur gauche).
-	 * @param y La coordonnée verticale (coin supérieur gauche).
+	 * @param x     La coordonnée horizontale (coin supérieur gauche).
+	 * @param y     La coordonnée verticale (coin supérieur gauche).
 	 */
 	public CoucheImage(BufferedImage image, int x, int y) {
 		this.image = image;
