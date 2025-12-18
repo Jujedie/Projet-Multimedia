@@ -10,6 +10,8 @@ package application.multimedia.iut.Metier;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import application.multimedia.iut.Controleur;
+
 /**
  * Gère l'historique des actions pour le système Undo/Redo.
  * Permet d'annuler et de rétablir les modifications d'images.
@@ -19,11 +21,13 @@ public class Journaux {
 	private ArrayList<ActionHistorique> journauxHistorique;
 	private BufferedImage imageInitiale;
 	private int           indexAction;
+	private Controleur    controleur;
 
-	public Journaux(BufferedImage imageInitiale) {
+	public Journaux(BufferedImage imageInitiale, Controleur controleur) {
 		this.journauxHistorique = new ArrayList<ActionHistorique>();
 		this.imageInitiale     = imageInitiale;
 		this.indexAction       = -1;
+		this.controleur        = controleur;
 	}
 
 	public ArrayList<ActionHistorique> getJournauxHistorique() { return journauxHistorique;	}
@@ -65,7 +69,7 @@ public class Journaux {
 		BufferedImage imageTemporaire = copierImage(imageInitiale);
 
 		for (int i = 0; i < indexAction; i++) {
-			journauxHistorique.get(i).faireAction(imageTemporaire);
+			journauxHistorique.get(i).faireAction(imageTemporaire, controleur);
 		}
 
 		if (indexAction >= 0) {
@@ -83,7 +87,7 @@ public class Journaux {
 		}
 
 		for (int i = 0; i <= indexAction; i++) {
-			journauxHistorique.get(i).faireAction(imageTemporaire);
+			journauxHistorique.get(i).faireAction(imageTemporaire, controleur);
 		}
 
 		return imageTemporaire;

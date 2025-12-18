@@ -30,7 +30,7 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
-import application.multimedia.iut.MainControlleur;
+import application.multimedia.iut.Controleur;
 import application.multimedia.iut.Metier.image.CoucheImage;
 import application.multimedia.iut.Metier.image.PileCouches;
 import application.multimedia.iut.Metier.image.RenduToile;
@@ -43,7 +43,7 @@ import application.multimedia.iut.Vue.utils.ImageDialogs.LoadChoice;
  * Coordonne le chargement, l'enregistrement, le zoom, et le placement d'images.
  */
 public class ImageManagerVue {
-	private final MainControlleur.Controleur controleur;
+	private final Controleur controleur;
 	private final JLabel toile;
 	private final JComponent parent;
 
@@ -59,7 +59,7 @@ public class ImageManagerVue {
 	 * @param parent Le composant parent pour les dialogues.
 	 * @param controleur Le contrôleur central de l'application.
 	 */
-	public ImageManagerVue(JLabel toile, JComponent parent, MainControlleur.Controleur controleur) {
+	public ImageManagerVue(JLabel toile, JComponent parent, Controleur controleur) {
 		this.toile = toile;
 		this.parent = parent;
 		this.controleur = controleur;
@@ -104,7 +104,7 @@ public class ImageManagerVue {
 		File fichierChoisi = ImageDialogs.selectImage(parent);
 		if (fichierChoisi == null) return;
 
-		boolean imageInitialePresente = controleur.imageInitialePresente();
+		boolean imageInitialePresente = controleur.isImageInitialeBlanchePresente();
 
 		// Si c'est la première image chargée (image blanche initiale encore présente)
 		// on remplace directement sans demander
